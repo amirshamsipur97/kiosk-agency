@@ -35,7 +35,7 @@ function Logo({ name, file }: Brand) {
   return (
     /* eslint-disable-next-line @next/next/no-img-element */
     <img
-      src={`/logos/${file}`}
+      src={`/logos/${file}?v=3`}
       alt={name}
       loading="lazy"
       onError={() => setFailed(true)}

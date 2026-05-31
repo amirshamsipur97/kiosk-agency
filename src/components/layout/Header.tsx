@@ -47,7 +47,7 @@ export default function Header() {
     <header className="fixed inset-x-0 top-0 z-50 pt-3 md:pt-4">
       <div className="container-x">
         <div
-          className="relative flex h-[64px] items-center justify-center rounded-2xl border border-white/[0.06] px-3 backdrop-blur-md md:h-[68px] md:px-4"
+          className="relative flex h-[64px] items-center rounded-2xl border border-white/[0.06] px-4 backdrop-blur-md md:h-[68px] md:px-6"
           style={{
             backgroundImage: BAR_GRADIENT,
             boxShadow: "inset 0 1px 1px 0 rgba(255,255,255,0.14)",
@@ -57,13 +57,13 @@ export default function Header() {
           <Link
             href="/"
             onClick={() => setOpen(false)}
-            className="absolute left-4 font-display text-xl font-bold tracking-tight md:left-6"
+            className="shrink-0 font-display text-xl font-bold tracking-tight"
           >
             KIOSK<span className="text-accent">.</span>
           </Link>
 
-          {/* Center links — Raycast-style segmented control */}
-          <nav className="hidden items-center gap-6 lg:flex">
+          {/* Left-aligned nav next to the logo — Raycast-style segmented control */}
+          <nav className="ml-10 hidden items-center gap-6 lg:flex xl:ml-14">
             {centerLinks.map((item) => {
               const active =
                 item.href === "/"
@@ -108,8 +108,8 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Right group */}
-          <div className="absolute right-3 hidden items-center gap-5 lg:flex md:right-5">
+          {/* Right group — pushed to the right edge */}
+          <div className="ml-auto hidden items-center gap-5 lg:flex">
             <Link
               href="/contact"
               className="text-sm font-medium tracking-[0.2px] text-[#9c9c9d] transition-colors hover:text-paper"

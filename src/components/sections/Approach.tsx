@@ -138,6 +138,14 @@ export default function Approach() {
       counts[k] = Math.max(0, (counts[k] || 1) - 1);
       if (counts[k] === 0) find(k).forEach((n) => n.classList.remove("is-pressed"));
     };
+    // Force-clear every lit key (used when typing is interrupted by scroll, so
+    // keys never get stuck in the pressed/lime state).
+    const clearPressed = () => {
+      Object.keys(counts).forEach((k) => (counts[k] = 0));
+      el.querySelectorAll(".is-pressed").forEach((n) =>
+        n.classList.remove("is-pressed")
+      );
+    };
 
     const setText = (i: number) => {
       // index i = number of characters typed so far (1-based)
@@ -150,6 +158,7 @@ export default function Approach() {
     const killTyping = () => {
       typeCalls.forEach((c) => c.kill());
       typeCalls = [];
+      clearPressed(); // pending key releases were killed — clear stuck keys
     };
 
     // Timed typing (plays when the section is reached).
@@ -203,6 +212,7 @@ export default function Approach() {
         if (exitP >= 0.999) {
           phase = "idle";
           setText(0);
+          clearPressed();
         }
       }
     };

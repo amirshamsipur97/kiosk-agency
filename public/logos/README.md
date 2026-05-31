@@ -9,18 +9,18 @@ Recommended: **SVG** (single-colour / monochrome works best — the strip applie
 a white filter so logos render uniformly on the dark background). PNG with a
 transparent background also works.
 
-Expected files:
+Expected files (real client logos, full-colour on white — shown in white cards):
 
-- jw-marriott.svg
-- shangri-la.svg
-- movenpick.svg
-- bentley.svg
-- bank-dhofar.svg
-- lamborghini.svg
-- oq.svg
-- hotel-indigo.svg
-- ferrari.svg
-- oxy.svg
+- jw-marriott.png
+- shangri-la.png
+- movenpick.png
+- bentley.png
+- bank-dhofar.png
+- lamborghini.png
+- oq.png
+- hotel-indigo.png
+- ferrari.png
+- oxy.png
 
 Only use logos you have the right to display (e.g. real client/partner
 relationships). To change the brand list, edit the `brands` array in

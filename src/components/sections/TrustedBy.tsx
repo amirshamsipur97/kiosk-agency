@@ -8,38 +8,40 @@ import Reveal from "@/components/ui/Reveal";
 type Brand = { name: string; file: string };
 
 const brands: Brand[] = [
-  { name: "JW Marriott", file: "jw-marriott.svg" },
-  { name: "Shangri-La", file: "shangri-la.svg" },
-  { name: "Mövenpick", file: "movenpick.svg" },
-  { name: "Bentley", file: "bentley.svg" },
-  { name: "Bank Dhofar", file: "bank-dhofar.svg" },
-  { name: "Lamborghini", file: "lamborghini.svg" },
-  { name: "OQ", file: "oq.svg" },
-  { name: "Hotel Indigo", file: "hotel-indigo.svg" },
-  { name: "Ferrari", file: "ferrari.svg" },
-  { name: "OXY", file: "oxy.svg" },
+  { name: "JW Marriott", file: "jw-marriott.png" },
+  { name: "Shangri-La", file: "shangri-la.png" },
+  { name: "Mövenpick", file: "movenpick.png" },
+  { name: "Bentley", file: "bentley.png" },
+  { name: "Bank Dhofar", file: "bank-dhofar.png" },
+  { name: "Lamborghini", file: "lamborghini.png" },
+  { name: "OQ", file: "oq.png" },
+  { name: "Hotel Indigo", file: "hotel-indigo.png" },
+  { name: "Ferrari", file: "ferrari.png" },
+  { name: "OXY", file: "oxy.png" },
 ];
 
 function Logo({ name, file }: Brand) {
   const [failed, setFailed] = useState(false);
 
-  if (failed) {
-    return (
-      <span className="mr-16 whitespace-nowrap font-display text-xl font-semibold tracking-tight text-white/45 transition-colors hover:text-white/80 md:text-2xl">
-        {name}
-      </span>
-    );
-  }
-
+  // Full-colour logos sit on a white rounded card so they read cleanly on the
+  // dark strip.
   return (
-    /* eslint-disable-next-line @next/next/no-img-element */
-    <img
-      src={`/logos/${file}`}
-      alt={name}
-      loading="lazy"
-      onError={() => setFailed(true)}
-      className="mr-16 h-8 w-auto object-contain opacity-60 transition-opacity duration-300 hover:opacity-100 md:h-10 [filter:brightness(0)_invert(1)]"
-    />
+    <div className="mr-6 flex h-16 w-40 shrink-0 items-center justify-center rounded-2xl bg-white px-5 opacity-90 transition-opacity duration-300 hover:opacity-100 md:mr-8 md:h-20 md:w-52 md:px-7">
+      {failed ? (
+        <span className="font-display text-base font-semibold tracking-tight text-ink">
+          {name}
+        </span>
+      ) : (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          src={`/logos/${file}`}
+          alt={name}
+          loading="lazy"
+          onError={() => setFailed(true)}
+          className="max-h-10 w-auto object-contain md:max-h-12"
+        />
+      )}
+    </div>
   );
 }
 

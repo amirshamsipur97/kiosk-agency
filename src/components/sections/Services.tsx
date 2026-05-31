@@ -19,6 +19,9 @@ const services = FEATURED.map(
 const CARD_SHEEN =
   "linear-gradient(134deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0) 55%)";
 
+// Status palette borrowed from the Figma "Project updates" cards.
+const STATUS = ["#68cc58", "#5e6ad2", "#f2994a", "#1abcfe", "#a259ff", "#f2c94c"];
+
 export default function Services() {
   return (
     <section className="py-20 md:py-28">
@@ -57,24 +60,40 @@ export default function Services() {
                 </p>
               </div>
 
-              {/* Preview card listing the capabilities */}
-              <div className="relative mt-1 overflow-hidden rounded-2xl border border-white/[0.07]">
+              {/* Glassy preview card with stacked depth, echoing the Figma
+                  "Project updates" cards. */}
+              <div className="relative mt-1">
+                {/* layered ghost card behind for the stacked look */}
                 <div
-                  className="flex flex-col gap-3.5 p-5"
-                  style={{ backgroundImage: CARD_SHEEN }}
-                >
-                  {service.services.slice(0, 6).map((item) => (
-                    <div
-                      key={item}
-                      className="flex items-center gap-3 text-sm text-[#c8c9cc]"
-                    >
-                      <span className="size-1.5 shrink-0 rounded-full bg-accent" />
-                      {item}
-                    </div>
-                  ))}
+                  aria-hidden
+                  className="absolute -right-2.5 -top-2.5 h-full w-full rotate-[1.5deg] rounded-2xl border border-white/[0.05] bg-white/[0.02]"
+                />
+                <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] backdrop-blur-sm">
+                  <div
+                    className="flex flex-col gap-3 p-5"
+                    style={{ backgroundImage: CARD_SHEEN }}
+                  >
+                    {service.services.slice(0, 6).map((item, j) => {
+                      const color = STATUS[j % STATUS.length];
+                      return (
+                        <div key={item} className="flex items-center gap-3">
+                          <span
+                            className="flex size-6 shrink-0 items-center justify-center rounded-md"
+                            style={{ backgroundColor: `${color}26` }}
+                          >
+                            <span
+                              className="size-2 rounded-[3px]"
+                              style={{ backgroundColor: color }}
+                            />
+                          </span>
+                          <span className="text-sm text-[#e3e4e6]">{item}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* bottom fade so the list dissolves into the surface */}
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-ink to-transparent" />
                 </div>
-                {/* bottom fade so the list dissolves into the surface */}
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-ink to-transparent" />
               </div>
 
               <Link

@@ -57,8 +57,8 @@ export default function TrustedBy() {
         </p>
       </Reveal>
 
-      {/* Full-width white band with the logo marquee */}
-      <div className="mt-12 w-full bg-white py-10 md:mt-16 md:py-12">
+      {/* Centred narrower white band with the logo marquee */}
+      <div className="mx-auto mt-12 w-[88%] max-w-5xl bg-white py-10 md:mt-16 md:py-12">
         <div
           className="marquee marquee-right overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_4%,#000_96%,transparent)]"
           style={{ ["--marquee-duration" as string]: "38s" }}

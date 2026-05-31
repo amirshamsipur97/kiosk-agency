@@ -25,7 +25,7 @@ function Logo({ name, file }: Brand) {
 
   if (failed) {
     return (
-      <span className="mr-16 shrink-0 whitespace-nowrap font-display text-xl font-semibold tracking-tight text-ink md:mr-24 md:text-2xl">
+      <span className="mr-12 shrink-0 whitespace-nowrap font-display text-base font-semibold tracking-tight text-ink md:mr-16 md:text-lg">
         {name}
       </span>
     );
@@ -39,7 +39,7 @@ function Logo({ name, file }: Brand) {
       alt={name}
       loading="lazy"
       onError={() => setFailed(true)}
-      className="mr-16 max-h-[84px] w-auto shrink-0 object-contain md:mr-24 md:max-h-[120px]"
+      className="mr-12 max-h-9 w-auto shrink-0 object-contain md:mr-16 md:max-h-12"
     />
   );
 }
@@ -58,8 +58,8 @@ export default function TrustedBy() {
         </p>
       </Reveal>
 
-      {/* Single full-width white band with the left-to-right logo marquee */}
-      <div className="mt-12 w-full bg-white py-10 md:mt-16 md:py-16">
+      {/* Narrower, thinner centred white band with the logo marquee */}
+      <div className="mx-auto mt-12 w-[92%] max-w-3xl rounded-2xl bg-white py-5 md:mt-16 md:w-1/2 md:py-6">
         <div
           className="marquee marquee-right overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_4%,#000_96%,transparent)]"
           style={{ ["--marquee-duration" as string]: "38s" }}

@@ -23,25 +23,24 @@ const brands: Brand[] = [
 function Logo({ name, file }: Brand) {
   const [failed, setFailed] = useState(false);
 
-  // Full-colour logos sit on a white rounded card so they read cleanly on the
-  // dark strip.
+  if (failed) {
+    return (
+      <span className="mr-16 shrink-0 whitespace-nowrap font-display text-lg font-semibold tracking-tight text-ink md:mr-24 md:text-xl">
+        {name}
+      </span>
+    );
+  }
+
+  // Logos sit directly on the single white band, sized large.
   return (
-    <div className="mr-6 flex h-16 w-40 shrink-0 items-center justify-center rounded-2xl bg-white px-5 opacity-90 transition-opacity duration-300 hover:opacity-100 md:mr-8 md:h-20 md:w-52 md:px-7">
-      {failed ? (
-        <span className="font-display text-base font-semibold tracking-tight text-ink">
-          {name}
-        </span>
-      ) : (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img
-          src={`/logos/${file}`}
-          alt={name}
-          loading="lazy"
-          onError={() => setFailed(true)}
-          className="max-h-10 w-auto object-contain md:max-h-12"
-        />
-      )}
-    </div>
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img
+      src={`/logos/${file}`}
+      alt={name}
+      loading="lazy"
+      onError={() => setFailed(true)}
+      className="mr-16 max-h-14 w-auto shrink-0 object-contain md:mr-24 md:max-h-20"
+    />
   );
 }
 
@@ -59,15 +58,17 @@ export default function TrustedBy() {
         </p>
       </Reveal>
 
-      {/* Left-to-right logo marquee */}
-      <div
-        className="marquee marquee-right mt-12 overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)] md:mt-16"
-        style={{ ["--marquee-duration" as string]: "38s" }}
-      >
-        <div className="marquee-track items-center">
-          {loop.map((b, i) => (
-            <Logo key={`${b.file}-${i}`} name={b.name} file={b.file} />
-          ))}
+      {/* Single full-width white band with the left-to-right logo marquee */}
+      <div className="mt-12 w-full bg-white py-8 md:mt-16 md:py-10">
+        <div
+          className="marquee marquee-right overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_4%,#000_96%,transparent)]"
+          style={{ ["--marquee-duration" as string]: "38s" }}
+        >
+          <div className="marquee-track items-center">
+            {loop.map((b, i) => (
+              <Logo key={`${b.file}-${i}`} name={b.name} file={b.file} />
+            ))}
+          </div>
         </div>
       </div>
     </section>

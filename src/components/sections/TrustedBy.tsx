@@ -30,7 +30,7 @@ function Logo({ name, file, r }: Brand) {
   // Trimmed artwork + fixed trailing margin → constant gap between logos.
   // Height comes from the per-logo ratio so relative sizing is preserved.
   return (
-    <div className="mr-14 flex shrink-0 items-center md:mr-20">
+    <div className="mr-28 flex shrink-0 items-center md:mr-40">
       {failed ? (
         <span className="whitespace-nowrap font-display text-base font-semibold tracking-tight text-white md:text-lg">
           {name}

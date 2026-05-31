@@ -71,18 +71,19 @@ export default function Header() {
                   : pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
               <div key={item.href} className="group relative">
-                {/* Active pill sits behind the label without affecting layout */}
-                {active && (
-                  <span
-                    aria-hidden
-                    className="absolute -inset-x-3.5 -inset-y-2 rounded-full"
-                    style={{ backgroundImage: ACTIVE_PILL, boxShadow: ACTIVE_PILL_SHADOW }}
-                  />
-                )}
+                {/* Segmented-control pill behind the label; shown for the
+                    active route and on hover, without affecting layout. */}
+                <span
+                  aria-hidden
+                  className={`absolute -inset-x-3.5 -inset-y-2 rounded-full transition-opacity duration-200 ${
+                    active ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                  }`}
+                  style={{ backgroundImage: ACTIVE_PILL, boxShadow: ACTIVE_PILL_SHADOW }}
+                />
                 <Link
                   href={item.href}
                   className={`relative z-10 block text-sm font-medium tracking-[0.2px] transition-colors ${
-                    active ? "text-white" : "text-[#6a6b6c] hover:text-paper"
+                    active ? "text-white" : "text-[#6a6b6c] group-hover:text-white"
                   }`}
                 >
                   {item.label}

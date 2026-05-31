@@ -1,5 +1,6 @@
 import Hero from "@/components/sections/Hero";
 import Philosophy from "@/components/sections/Philosophy";
+import TrustedBy from "@/components/sections/TrustedBy";
 import WhatWeDo from "@/components/sections/WhatWeDo";
 import Approach from "@/components/sections/Approach";
 import Industries from "@/components/sections/Industries";
@@ -14,6 +15,7 @@ export default function Home() {
     <>
       <Hero />
       <Philosophy />
+      <TrustedBy />
       <WhatWeDo />
       <Approach />
       <Industries />

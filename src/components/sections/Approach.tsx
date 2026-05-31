@@ -194,26 +194,30 @@ export default function Approach() {
     const updateTyping = () => {
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight || 1;
+      const h = Math.max(rect.height, 1);
       const cy = rect.top + rect.height / 2;
-      const centerOffset = cy - vh / 2; // < 0 once the panel passes above centre
-      const exitP = clamp(-centerOffset / (vh / 2 + rect.height / 2));
 
-      if (exitP <= 0.001) {
-        // Entering / centred
-        if (phase === "idle" && rect.top < vh * 0.72) startTyping();
-        else if (phase === "full") setText(FULL.length);
-      } else {
-        // Passing the section → clear, synced with scroll
-        if (phase === "typing") {
-          killTyping();
-          phase = "full";
-        }
-        if (phase === "full") setText(Math.round(FULL.length * (1 - exitP)));
-        if (exitP >= 0.999) {
+      // Fully out of view (above OR below) → reset so it re-types next visit.
+      if (rect.bottom < 0 || rect.top > vh) {
+        if (phase !== "idle") {
+          killTyping(); // also clears any stuck keys
           phase = "idle";
           setText(0);
-          clearPressed();
         }
+        return;
+      }
+
+      if (phase === "idle") {
+        // Type once the panel is reasonably centred — works whether we arrive
+        // by scrolling DOWN to it or back UP to it.
+        if (cy > vh * 0.18 && cy < vh * 0.85) startTyping();
+        return;
+      }
+
+      if (phase === "full") {
+        // Erase in sync with scroll as the panel passes up out of the top.
+        const topExit = clamp((-rect.top - h * 0.25) / (h * 0.75));
+        setText(Math.round(FULL.length * (1 - topExit)));
       }
     };
 

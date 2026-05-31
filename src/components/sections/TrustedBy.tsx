@@ -38,7 +38,7 @@ function Logo({ name, file }: Brand) {
       src={`/logos/${file}?v=3`}
       alt={name}
       onError={() => setFailed(true)}
-      className="mr-12 max-h-9 w-auto shrink-0 object-contain md:mr-16 md:max-h-12"
+      className="mr-16 max-h-12 w-auto shrink-0 object-contain md:mr-24 md:max-h-14"
     />
   );
 }
@@ -57,8 +57,8 @@ export default function TrustedBy() {
         </p>
       </Reveal>
 
-      {/* Narrower, thinner centred white band with the logo marquee */}
-      <div className="mx-auto mt-12 w-[92%] max-w-3xl rounded-2xl bg-white py-5 md:mt-16 md:w-1/2 md:py-6">
+      {/* Full-width white band with the logo marquee */}
+      <div className="mt-12 w-full bg-white py-10 md:mt-16 md:py-12">
         <div
           className="marquee marquee-right overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_4%,#000_96%,transparent)]"
           style={{ ["--marquee-duration" as string]: "38s" }}

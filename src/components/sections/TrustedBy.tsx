@@ -26,11 +26,12 @@ const brands: Brand[] = [
 function Logo({ name, file, fh }: Brand) {
   const [failed, setFailed] = useState(false);
 
-  // Each logo lives in an equal-width cell and is centred, so spacing stays
-  // even. Its height is the Figma height scaled by --logo-scale, and
+  // Each cell hugs its logo and carries a fixed trailing margin, so the gap
+  // between adjacent logos is constant (even spacing) regardless of how wide
+  // each logo is. Height is the Figma height scaled by --logo-scale, and
   // object-contain keeps the artwork from stretching.
   return (
-    <div className="flex w-[180px] shrink-0 items-center justify-center md:w-[230px]">
+    <div className="mr-16 flex shrink-0 items-center md:mr-24">
       {failed ? (
         <span className="whitespace-nowrap font-display text-base font-semibold tracking-tight text-white md:text-lg">
           {name}

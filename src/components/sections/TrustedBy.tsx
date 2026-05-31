@@ -49,10 +49,10 @@ export default function TrustedBy() {
   return (
     <section className="py-20 md:py-28">
       <Reveal className="container-x flex flex-col items-center gap-4 text-center">
-        <h2 className="max-w-3xl font-display text-2xl font-semibold leading-tight tracking-tight text-balance sm:text-3xl md:text-4xl">
+        <h2 className="max-w-3xl font-display text-xl font-medium uppercase leading-snug tracking-[0.04em] text-paper sm:text-2xl">
           Trusted by Leading Brands Across Industries
         </h2>
-        <p className="max-w-2xl text-base leading-relaxed text-white/60 md:text-lg">
+        <p className="max-w-2xl text-xs uppercase leading-relaxed tracking-[0.08em] text-white/55 md:text-sm">
           From global names to regional leaders we bring the same level of
           precision and excellence to every project.
         </p>

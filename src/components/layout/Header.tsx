@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { nav } from "@/lib/site";
 
@@ -10,6 +11,13 @@ const BAR_GRADIENT =
   "linear-gradient(136deg, rgba(17,18,20,0.75) 5%, rgba(12,13,15,0.9) 76%)";
 const PILL_SHADOW =
   "0 0 0 2px rgba(0,0,0,0.5), 0 0 14px 0 rgba(255,255,255,0.19), inset 0 -1px 0.4px 0 rgba(0,0,0,0.2), inset 0 1px 0.4px 0 #fff";
+
+// Active segmented-control pill (Raycast/Linear material from Figma): a soft
+// gray radial dome lit from the top, with a faint white top highlight.
+const ACTIVE_PILL =
+  "radial-gradient(120% 145% at 50% 0%, #5a5a5a 0%, #3a3a3a 50%, #2a2a2a 75%, #1a1a1a 100%)";
+const ACTIVE_PILL_SHADOW =
+  "inset 0 1px 0.5px 0 rgba(255,255,255,0.22), 0 1px 2px 0 rgba(0,0,0,0.45)";
 
 const centerLinks = nav.slice(1, -1); // Services … Insights
 
@@ -26,6 +34,7 @@ function Star({ size = 16 }: { size?: number }) {
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -53,13 +62,28 @@ export default function Header() {
             KIOSK<span className="text-accent">.</span>
           </Link>
 
-          {/* Center links */}
-          <nav className="hidden items-center gap-1 lg:flex">
-            {centerLinks.map((item) => (
+          {/* Center links — Raycast-style segmented control */}
+          <nav className="hidden items-center gap-6 lg:flex">
+            {centerLinks.map((item) => {
+              const active =
+                item.href === "/"
+                  ? pathname === "/"
+                  : pathname === item.href || pathname.startsWith(`${item.href}/`);
+              return (
               <div key={item.href} className="group relative">
+                {/* Active pill sits behind the label without affecting layout */}
+                {active && (
+                  <span
+                    aria-hidden
+                    className="absolute -inset-x-3.5 -inset-y-2 rounded-full"
+                    style={{ backgroundImage: ACTIVE_PILL, boxShadow: ACTIVE_PILL_SHADOW }}
+                  />
+                )}
                 <Link
                   href={item.href}
-                  className="block rounded-md px-3 py-2 text-sm font-medium tracking-[0.2px] text-[#9c9c9d] transition-colors hover:text-paper"
+                  className={`relative z-10 block text-sm font-medium tracking-[0.2px] transition-colors ${
+                    active ? "text-white" : "text-[#6a6b6c] hover:text-paper"
+                  }`}
                 >
                   {item.label}
                 </Link>
@@ -79,7 +103,8 @@ export default function Header() {
                   </div>
                 )}
               </div>
-            ))}
+              );
+            })}
           </nav>
 
           {/* Right group */}

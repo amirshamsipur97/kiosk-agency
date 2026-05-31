@@ -44,37 +44,59 @@ const PILL_ACTIVE_TEXT = "#ffffff";
 function NavLink({ item, active }: { item: NavEntry; active: boolean }) {
   const pillRef = useRef<HTMLSpanElement>(null);
   const linkRef = useRef<HTMLAnchorElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const handleEnter = () => {
-    if (active) return;
-    gsap.to(pillRef.current, {
-      autoAlpha: 1,
-      scale: 1,
-      duration: 0.5,
-      delay: 0.12,
-      ease: "power3.out",
-    });
-    gsap.to(linkRef.current, {
-      color: PILL_ACTIVE_TEXT,
-      duration: 0.5,
-      delay: 0.12,
-      ease: "power3.out",
-    });
+    // Pill + text only animate for non-active items (active keeps its pill).
+    if (!active) {
+      gsap.to(pillRef.current, {
+        autoAlpha: 1,
+        scale: 1,
+        duration: 0.5,
+        delay: 0.12,
+        ease: "power3.out",
+      });
+      gsap.to(linkRef.current, {
+        color: PILL_ACTIVE_TEXT,
+        duration: 0.5,
+        delay: 0.12,
+        ease: "power3.out",
+      });
+    }
+    // Dropdown opens with the same intent delay + soft curve as the pill.
+    if (menuRef.current) {
+      gsap.to(menuRef.current, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.45,
+        delay: 0.12,
+        ease: "power3.out",
+      });
+    }
   };
 
   const handleLeave = () => {
-    if (active) return;
-    gsap.to(pillRef.current, {
-      autoAlpha: 0,
-      scale: 0.92,
-      duration: 0.32,
-      ease: "power2.out",
-    });
-    gsap.to(linkRef.current, {
-      color: PILL_IDLE,
-      duration: 0.32,
-      ease: "power2.out",
-    });
+    if (!active) {
+      gsap.to(pillRef.current, {
+        autoAlpha: 0,
+        scale: 0.92,
+        duration: 0.32,
+        ease: "power2.out",
+      });
+      gsap.to(linkRef.current, {
+        color: PILL_IDLE,
+        duration: 0.32,
+        ease: "power2.out",
+      });
+    }
+    if (menuRef.current) {
+      gsap.to(menuRef.current, {
+        autoAlpha: 0,
+        y: -8,
+        duration: 0.28,
+        ease: "power2.out",
+      });
+    }
   };
 
   return (
@@ -105,13 +127,25 @@ function NavLink({ item, active }: { item: NavEntry; active: boolean }) {
         {item.label}
       </Link>
       {item.children && (
-        <div className="invisible absolute left-1/2 top-full -translate-x-1/2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
-          <div className="min-w-56 rounded-2xl border border-line bg-surface p-2 shadow-2xl shadow-black/50">
+        // pt-3 keeps a hover bridge between the label and the card.
+        <div className="absolute left-1/2 top-full -translate-x-1/2 pt-3">
+          <div
+            ref={menuRef}
+            className="min-w-[15rem] rounded-2xl border border-white/[0.06] p-2 backdrop-blur-md"
+            style={{
+              backgroundImage: BAR_GRADIENT,
+              boxShadow:
+                "inset 0 1px 1px 0 rgba(255,255,255,0.14), 0 24px 48px -16px rgba(0,0,0,0.65)",
+              opacity: 0,
+              visibility: "hidden",
+              transform: "translateY(-8px)",
+            }}
+          >
             {item.children.map((child) => (
               <Link
                 key={child.href}
                 href={child.href}
-                className="block rounded-xl px-3 py-2 text-sm text-mist transition-colors hover:bg-surface-2 hover:text-paper"
+                className="block rounded-xl px-3 py-2 text-sm font-medium tracking-[0.2px] text-[#9c9c9d] transition-colors duration-200 hover:bg-white/[0.06] hover:text-white"
               >
                 {child.label}
               </Link>

@@ -1,18 +1,47 @@
+"use client";
+
+import { useState } from "react";
 import Reveal from "@/components/ui/Reveal";
 
-// Brand names rendered as text wordmarks (placeholder for real logo assets).
-const brands = [
-  "JW Marriott",
-  "Shangri-La",
-  "Mövenpick",
-  "Bentley",
-  "Bank Dhofar",
-  "Lamborghini",
-  "OQ",
-  "Hotel Indigo",
-  "Ferrari",
-  "OXY",
+// Real client logos. Drop the actual files into /public/logos/<file>.
+// Until a file exists, the brand name renders as a text fallback.
+type Brand = { name: string; file: string };
+
+const brands: Brand[] = [
+  { name: "JW Marriott", file: "jw-marriott.svg" },
+  { name: "Shangri-La", file: "shangri-la.svg" },
+  { name: "Mövenpick", file: "movenpick.svg" },
+  { name: "Bentley", file: "bentley.svg" },
+  { name: "Bank Dhofar", file: "bank-dhofar.svg" },
+  { name: "Lamborghini", file: "lamborghini.svg" },
+  { name: "OQ", file: "oq.svg" },
+  { name: "Hotel Indigo", file: "hotel-indigo.svg" },
+  { name: "Ferrari", file: "ferrari.svg" },
+  { name: "OXY", file: "oxy.svg" },
 ];
+
+function Logo({ name, file }: Brand) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return (
+      <span className="mr-16 whitespace-nowrap font-display text-xl font-semibold tracking-tight text-white/45 transition-colors hover:text-white/80 md:text-2xl">
+        {name}
+      </span>
+    );
+  }
+
+  return (
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img
+      src={`/logos/${file}`}
+      alt={name}
+      loading="lazy"
+      onError={() => setFailed(true)}
+      className="mr-16 h-8 w-auto object-contain opacity-60 transition-opacity duration-300 hover:opacity-100 md:h-10 [filter:brightness(0)_invert(1)]"
+    />
+  );
+}
 
 export default function TrustedBy() {
   const loop = [...brands, ...brands];
@@ -35,12 +64,7 @@ export default function TrustedBy() {
       >
         <div className="marquee-track items-center">
           {loop.map((b, i) => (
-            <span
-              key={`${b}-${i}`}
-              className="mr-16 whitespace-nowrap font-display text-xl font-semibold tracking-tight text-white/45 transition-colors hover:text-white/80 md:text-2xl"
-            >
-              {b}
-            </span>
+            <Logo key={`${b.file}-${i}`} name={b.name} file={b.file} />
           ))}
         </div>
       </div>

@@ -15,12 +15,11 @@ const services = FEATURED.map(
   (slug) => allServices.find((s) => s.slug === slug)!,
 ).filter(Boolean);
 
-// Soft top-left sheen used on the Linear-style preview cards.
+// Linear "Triage" card materials.
 const CARD_SHEEN =
   "linear-gradient(134deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0) 55%)";
-
-// Status palette borrowed from the Figma "Project updates" cards.
-const STATUS = ["#68cc58", "#5e6ad2", "#f2994a", "#1abcfe", "#a259ff", "#f2c94c"];
+const CARD_HIGHLIGHT =
+  "linear-gradient(140deg, rgba(255,255,255,0.12) 0%, rgba(0,0,0,0) 45%)";
 
 export default function Services() {
   return (
@@ -60,39 +59,37 @@ export default function Services() {
                 </p>
               </div>
 
-              {/* Glassy preview card with stacked depth, echoing the Figma
-                  "Project updates" cards. */}
-              <div className="relative mt-1">
-                {/* layered ghost card behind for the stacked look */}
+              {/* Triage-style glassy card (Figma node 2007:9113) */}
+              <div className="mt-1 rounded-[18px] border border-white/[0.06] p-2 shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]">
                 <div
-                  aria-hidden
-                  className="absolute -right-2.5 -top-2.5 h-full w-full rotate-[1.5deg] rounded-2xl border border-white/[0.05] bg-white/[0.02]"
-                />
-                <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] backdrop-blur-sm">
+                  className="relative overflow-hidden rounded-[10px] border border-white/[0.08]"
+                  style={{ backgroundImage: CARD_SHEEN }}
+                >
+                  {/* top-left sheen highlight */}
                   <div
-                    className="flex flex-col gap-3 p-5"
-                    style={{ backgroundImage: CARD_SHEEN }}
-                  >
-                    {service.services.slice(0, 6).map((item, j) => {
-                      const color = STATUS[j % STATUS.length];
-                      return (
-                        <div key={item} className="flex items-center gap-3">
-                          <span
-                            className="flex size-6 shrink-0 items-center justify-center rounded-md"
-                            style={{ backgroundColor: `${color}26` }}
-                          >
-                            <span
-                              className="size-2 rounded-[3px]"
-                              style={{ backgroundColor: color }}
-                            />
-                          </span>
-                          <span className="text-sm text-[#e3e4e6]">{item}</span>
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0"
+                    style={{ backgroundImage: CARD_HIGHLIGHT }}
+                  />
+                  <div className="relative flex flex-col gap-3 px-4 pb-5 pt-4">
+                    <p className="text-[15px] font-semibold tracking-tight text-white">
+                      Capabilities
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      {service.services.slice(0, 5).map((item, j) => (
+                        <div
+                          key={item}
+                          className={`rounded-md px-3 py-2.5 text-sm transition-colors ${
+                            j === 0
+                              ? "border border-white/10 bg-white/[0.05] text-[#e3e4e6]"
+                              : "text-[#969799]"
+                          }`}
+                        >
+                          {item}
                         </div>
-                      );
-                    })}
+                      ))}
+                    </div>
                   </div>
-                  {/* bottom fade so the list dissolves into the surface */}
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-ink to-transparent" />
                 </div>
               </div>
 

@@ -23,23 +23,25 @@ const brands: Brand[] = [
 function Logo({ name, file }: Brand) {
   const [failed, setFailed] = useState(false);
 
-  if (failed) {
-    return (
-      <span className="mr-12 shrink-0 whitespace-nowrap font-display text-base font-semibold tracking-tight text-white md:mr-16 md:text-lg">
-        {name}
-      </span>
-    );
-  }
-
-  // Logos sit directly on the black background, sized large.
+  // Each logo lives in an equal-width cell and is centred, so spacing stays
+  // even and every logo reads at a comparable visual size regardless of its
+  // own aspect ratio. object-contain keeps the artwork from stretching.
   return (
-    /* eslint-disable-next-line @next/next/no-img-element */
-    <img
-      src={`/logos/${file}?v=4`}
-      alt={name}
-      onError={() => setFailed(true)}
-      className="mr-16 max-h-[76px] w-auto shrink-0 object-contain md:mr-24 md:max-h-[86px]"
-    />
+    <div className="flex w-[200px] shrink-0 items-center justify-center md:w-[260px]">
+      {failed ? (
+        <span className="whitespace-nowrap font-display text-base font-semibold tracking-tight text-white md:text-lg">
+          {name}
+        </span>
+      ) : (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          src={`/logos/${file}?v=5`}
+          alt={name}
+          onError={() => setFailed(true)}
+          className="max-h-[56px] w-auto max-w-[150px] object-contain md:max-h-[64px] md:max-w-[185px]"
+        />
+      )}
+    </div>
   );
 }
 

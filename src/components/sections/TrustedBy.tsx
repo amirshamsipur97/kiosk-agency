@@ -38,7 +38,7 @@ function Logo({ name, file }: Brand) {
       src={`/logos/${file}?v=3`}
       alt={name}
       onError={() => setFailed(true)}
-      className="mr-16 max-h-12 w-auto shrink-0 object-contain md:mr-24 md:max-h-14"
+      className="mr-16 max-h-9 w-auto shrink-0 object-contain md:mr-24 md:max-h-[42px]"
     />
   );
 }

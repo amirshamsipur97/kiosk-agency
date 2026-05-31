@@ -9,14 +9,14 @@ type Brand = { name: string; file: string };
 
 const brands: Brand[] = [
   { name: "JW Marriott", file: "jw-marriott.png" },
-  { name: "Shangri-La", file: "shangri-la.png" },
+  { name: "Shangri-La", file: "shangri-la.svg" },
   { name: "Mövenpick", file: "movenpick.png" },
   { name: "Bentley", file: "bentley.png" },
   { name: "Bank Dhofar", file: "bank-dhofar.png" },
   { name: "Lamborghini", file: "lamborghini.png" },
   { name: "OQ", file: "oq.png" },
-  { name: "Hotel Indigo", file: "hotel-indigo.png" },
-  { name: "Ferrari", file: "ferrari.png" },
+  { name: "Hotel Indigo", file: "hotel-indigo.svg" },
+  { name: "Ferrari", file: "ferrari.svg" },
   { name: "OXY", file: "oxy.png" },
 ];
 
@@ -25,17 +25,17 @@ function Logo({ name, file }: Brand) {
 
   if (failed) {
     return (
-      <span className="mr-12 shrink-0 whitespace-nowrap font-display text-base font-semibold tracking-tight text-ink md:mr-16 md:text-lg">
+      <span className="mr-12 shrink-0 whitespace-nowrap font-display text-base font-semibold tracking-tight text-white md:mr-16 md:text-lg">
         {name}
       </span>
     );
   }
 
-  // Logos sit directly on the single white band, sized large.
+  // Logos sit directly on the black background, sized large.
   return (
     /* eslint-disable-next-line @next/next/no-img-element */
     <img
-      src={`/logos/${file}?v=3`}
+      src={`/logos/${file}?v=4`}
       alt={name}
       onError={() => setFailed(true)}
       className="mr-16 max-h-[76px] w-auto shrink-0 object-contain md:mr-24 md:max-h-[86px]"
@@ -57,8 +57,9 @@ export default function TrustedBy() {
         </p>
       </Reveal>
 
-      {/* Full-width, short white band with the logo marquee */}
-      <div className="mt-12 w-full bg-white py-4 md:mt-16 md:py-5">
+      {/* Full-width logo marquee on the black background, framed by a thin
+          white line above and below. */}
+      <div className="mt-12 w-full border-y border-white/80 py-6 md:mt-16 md:py-8">
         <div
           className="marquee marquee-right overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_4%,#000_96%,transparent)]"
           style={{ ["--marquee-duration" as string]: "38s" }}

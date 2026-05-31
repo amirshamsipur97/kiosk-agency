@@ -37,7 +37,6 @@ function Logo({ name, file }: Brand) {
     <img
       src={`/logos/${file}?v=3`}
       alt={name}
-      loading="lazy"
       onError={() => setFailed(true)}
       className="mr-12 max-h-9 w-auto shrink-0 object-contain md:mr-16 md:max-h-12"
     />

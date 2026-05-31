@@ -66,9 +66,9 @@ export default function TrustedBy() {
       {/* Full-width logo marquee on the black background, framed by a thin
           white line above and below. --frame is the reference height each
           logo's ratio is multiplied against. */}
-      <div className="logo-row mt-12 w-full border-y border-white/80 py-6 md:mt-16 md:py-8">
+      <div className="logo-row relative mt-12 w-full border-y border-white/80 py-6 md:mt-16 md:py-8">
         <div
-          className="marquee marquee-right overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_4%,#000_96%,transparent)]"
+          className="marquee marquee-right overflow-hidden"
           style={{ ["--marquee-duration" as string]: "38s" }}
         >
           <div className="marquee-track items-center">
@@ -77,6 +77,9 @@ export default function TrustedBy() {
             ))}
           </div>
         </div>
+        {/* Even dark gradient fade on both edges (covers logos + the lines) */}
+        <div className="pointer-events-none absolute -bottom-px -top-px left-0 z-10 w-20 bg-gradient-to-r from-ink to-transparent md:w-48" />
+        <div className="pointer-events-none absolute -bottom-px -top-px right-0 z-10 w-20 bg-gradient-to-l from-ink to-transparent md:w-48" />
       </div>
     </section>
   );

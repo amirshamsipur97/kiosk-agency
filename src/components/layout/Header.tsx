@@ -41,7 +41,19 @@ function Star({ size = 16 }: { size?: number }) {
 const PILL_IDLE = "#6a6b6c";
 const PILL_ACTIVE_TEXT = "#ffffff";
 
-function NavLink({ item, active }: { item: NavEntry; active: boolean }) {
+function NavLink({
+  item,
+  active,
+  isOpen,
+  onOpen,
+  onClose,
+}: {
+  item: NavEntry;
+  active: boolean;
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+}) {
   const pillRef = useRef<HTMLSpanElement>(null);
   const linkRef = useRef<HTMLAnchorElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -63,16 +75,7 @@ function NavLink({ item, active }: { item: NavEntry; active: boolean }) {
         ease: "power3.out",
       });
     }
-    // Dropdown opens with the same intent delay + soft curve as the pill.
-    if (menuRef.current) {
-      gsap.to(menuRef.current, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.45,
-        delay: 0.12,
-        ease: "power3.out",
-      });
-    }
+    onOpen();
   };
 
   const handleLeave = () => {
@@ -89,15 +92,35 @@ function NavLink({ item, active }: { item: NavEntry; active: boolean }) {
         ease: "power2.out",
       });
     }
-    if (menuRef.current) {
-      gsap.to(menuRef.current, {
-        autoAlpha: 0,
-        y: -8,
-        duration: 0.28,
-        ease: "power2.out",
-      });
-    }
+    onClose();
   };
+
+  // The dropdown is driven by a single nav-level "open" value, so only one can
+  // ever be open. Opening keeps the pill's intent delay + soft curve; closing
+  // is quick and cancels any in-flight open tween (overwrite).
+  useEffect(() => {
+    const el = menuRef.current;
+    if (!el) return;
+    gsap.to(
+      el,
+      isOpen
+        ? {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.45,
+            delay: 0.1,
+            ease: "power3.out",
+            overwrite: true,
+          }
+        : {
+            autoAlpha: 0,
+            y: -8,
+            duration: 0.22,
+            ease: "power2.out",
+            overwrite: true,
+          },
+    );
+  }, [isOpen]);
 
   return (
     <div
@@ -127,8 +150,9 @@ function NavLink({ item, active }: { item: NavEntry; active: boolean }) {
         {item.label}
       </Link>
       {item.children && (
-        // pt-3 keeps a hover bridge between the label and the card.
-        <div className="absolute left-1/2 top-full -translate-x-1/2 pt-3">
+        // pt-3 keeps a hover bridge between the label and the card; the card is
+        // left-aligned to the item so neighbouring menus never overlap.
+        <div className="absolute left-0 top-full z-20 pt-3">
           <div
             ref={menuRef}
             className="min-w-[15rem] rounded-2xl border border-white/[0.06] p-2 backdrop-blur-md"
@@ -159,6 +183,7 @@ function NavLink({ item, active }: { item: NavEntry; active: boolean }) {
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [openHref, setOpenHref] = useState<string | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -188,13 +213,27 @@ export default function Header() {
           </Link>
 
           {/* Left-aligned nav next to the logo — Raycast-style segmented control */}
-          <nav className="ml-10 hidden items-center gap-6 lg:flex xl:ml-14">
+          <nav
+            className="ml-10 hidden items-center gap-9 lg:flex xl:ml-14"
+            onMouseLeave={() => setOpenHref(null)}
+          >
             {centerLinks.map((item) => {
               const active =
                 item.href === "/"
                   ? pathname === "/"
                   : pathname === item.href || pathname.startsWith(`${item.href}/`);
-              return <NavLink key={item.href} item={item} active={active} />;
+              return (
+                <NavLink
+                  key={item.href}
+                  item={item}
+                  active={active}
+                  isOpen={openHref === item.href}
+                  onOpen={() => setOpenHref(item.href)}
+                  onClose={() =>
+                    setOpenHref((cur) => (cur === item.href ? null : cur))
+                  }
+                />
+              );
             })}
           </nav>
 

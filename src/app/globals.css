@@ -90,6 +90,17 @@ body {
   }
 }
 
+/* Trusted-by logo row: --frame is the reference frame height each logo's
+   ratio is multiplied against. */
+.logo-row {
+  --frame: 84px;
+}
+@media (min-width: 768px) {
+  .logo-row {
+    --frame: 104px;
+  }
+}
+
 /* Horizontal marquee (Industries) */
 @keyframes kiosk-marquee-left {
   from {

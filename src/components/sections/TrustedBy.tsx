@@ -66,7 +66,7 @@ export default function TrustedBy() {
       {/* Full-width logo marquee on the black background, framed by a thin
           white line above and below. --frame is the reference height each
           logo's ratio is multiplied against. */}
-      <div className="logo-row relative mt-12 w-full border-y border-white/80 py-6 md:mt-16 md:py-8">
+      <div className="logo-row relative mt-12 w-full border-y border-[#313131] py-6 md:mt-16 md:py-8">
         <div
           className="marquee marquee-right overflow-hidden"
           style={{ ["--marquee-duration" as string]: "38s" }}

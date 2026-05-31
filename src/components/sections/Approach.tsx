@@ -115,7 +115,10 @@ export default function Approach() {
     }
 
     const counts: Record<string, number> = {};
-    const calls: gsap.core.Tween[] = [];
+    let typeCalls: gsap.core.Tween[] = [];
+    type Phase = "idle" | "typing" | "full";
+    let phase: Phase = "idle";
+    const clamp = (n: number) => Math.min(1, Math.max(0, n));
 
     const find = (k: string) =>
       Array.from(el.querySelectorAll<HTMLElement>(`[data-key="${k}"]`));
@@ -144,22 +147,63 @@ export default function Approach() {
         restRef.current.textContent = i > BOLD_LEN ? FULL.slice(BOLD_LEN, i) : "";
     };
 
-    const run = () => {
+    const killTyping = () => {
+      typeCalls.forEach((c) => c.kill());
+      typeCalls = [];
+    };
+
+    // Timed typing (plays when the section is reached).
+    const startTyping = () => {
+      phase = "typing";
+      killTyping();
       let t = 0;
       for (let i = 0; i < FULL.length; i++) {
         const ch = FULL[i];
         const slow = i < BOLD_LEN; // "Kiosk Agency" = our set speed
         const k = keyFor(ch);
-        calls.push(
+        typeCalls.push(
           gsap.delayedCall(t, () => {
             if (k) press(k);
             setText(i + 1);
           })
         );
-        if (k) calls.push(gsap.delayedCall(t + 1, () => release(k)));
+        if (k) typeCalls.push(gsap.delayedCall(t + 1, () => release(k)));
         // bold part at our cadence (0.65s); the rest 0.5s faster (0.15s)
         const base = slow ? 0.65 : 0.15;
         t += base + Math.random() * 0.06 + (ch === " " ? (slow ? 0.14 : 0.05) : 0);
+      }
+      typeCalls.push(
+        gsap.delayedCall(t, () => {
+          phase = "full";
+        })
+      );
+    };
+
+    // Scroll-linked enter/clear: type once when we reach the section, and
+    // erase the text in sync with scroll as we pass beyond it (re-typing on
+    // return).
+    const updateTyping = () => {
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || 1;
+      const cy = rect.top + rect.height / 2;
+      const centerOffset = cy - vh / 2; // < 0 once the panel passes above centre
+      const exitP = clamp(-centerOffset / (vh / 2 + rect.height / 2));
+
+      if (exitP <= 0.001) {
+        // Entering / centred
+        if (phase === "idle" && rect.top < vh * 0.72) startTyping();
+        else if (phase === "full") setText(FULL.length);
+      } else {
+        // Passing the section → clear, synced with scroll
+        if (phase === "typing") {
+          killTyping();
+          phase = "full";
+        }
+        if (phase === "full") setText(Math.round(FULL.length * (1 - exitP)));
+        if (exitP >= 0.999) {
+          phase = "idle";
+          setText(0);
+        }
       }
     };
 
@@ -167,7 +211,6 @@ export default function Approach() {
     // shrinks again when you scroll back up (reverses with scroll direction).
     let raf = 0;
     let running = false;
-    let typedStarted = false;
     let targetP = 0;
     let curP = 0;
 
@@ -187,10 +230,6 @@ export default function Approach() {
         transformOrigin: "50% 60%",
         force3D: true,
       });
-      if (!typedStarted && p >= 0.6) {
-        typedStarted = true;
-        calls.push(gsap.delayedCall(0.2, run)); // type the sentence once
-      }
     };
 
     const tick = () => {
@@ -219,11 +258,13 @@ export default function Approach() {
     const onScroll = () => {
       computeTarget();
       ensureRunning();
+      updateTyping();
     };
 
     computeTarget();
     curP = targetP;
     apply(curP); // initial state, no jump
+    updateTyping();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
 
@@ -231,7 +272,7 @@ export default function Approach() {
       cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
-      calls.forEach((c) => c.kill());
+      killTyping();
       el.querySelectorAll(".is-pressed").forEach((n) =>
         n.classList.remove("is-pressed")
       );

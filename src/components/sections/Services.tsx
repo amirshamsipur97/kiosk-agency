@@ -18,7 +18,7 @@ const services = FEATURED.map(
   (slug) => allServices.find((s) => s.slug === slug)!,
 ).filter(Boolean);
 
-// Short explanation for each capability, revealed when its toggle is on.
+// Short explanation for each capability, revealed when the card toggle is on.
 const DETAILS: Record<string, string> = {
   "UI/UX Design": "Research-led interface design that turns visitors into customers.",
   "Website Development": "Fast, scalable builds engineered for performance and conversion.",
@@ -58,10 +58,12 @@ function Toggle({
       type="button"
       role="switch"
       aria-checked={on}
-      aria-label={`Show details for ${label}`}
+      aria-label={`Show what's included in ${label}`}
       onClick={onToggle}
       className="relative h-5 w-9 shrink-0 rounded-full transition-colors duration-300 ease-out"
-      style={{ backgroundColor: on ? "var(--color-accent, #c6f24e)" : "rgba(255,255,255,0.16)" }}
+      style={{
+        backgroundColor: on ? "var(--color-accent, #d7ff3e)" : "rgba(255,255,255,0.16)",
+      }}
     >
       <span
         className="absolute left-0.5 top-0.5 size-4 rounded-full bg-white shadow-sm transition-transform duration-300 ease-out"
@@ -71,46 +73,37 @@ function Toggle({
   );
 }
 
-function CapabilityRow({ item }: { item: string }) {
-  const [open, setOpen] = useState(false);
-  const detail = DETAILS[item];
-  return (
-    <div className="border-b border-white/[0.06] last:border-b-0">
-      <div className="flex items-center justify-between gap-3 px-4 py-3 transition-colors duration-200 hover:bg-white/[0.04]">
-        <span
-          className={`text-sm transition-colors duration-200 ${
-            open ? "text-white" : "text-[#bdbec1]"
-          }`}
-        >
-          {item}
-        </span>
-        {detail && <Toggle on={open} onToggle={() => setOpen((v) => !v)} label={item} />}
-      </div>
-      {detail && (
-        <div
-          className="grid transition-[grid-template-rows,opacity] duration-300 ease-out"
-          style={{ gridTemplateRows: open ? "1fr" : "0fr", opacity: open ? 1 : 0 }}
-        >
-          <div className="overflow-hidden">
-            <p className="px-4 pb-3 text-[13px] leading-relaxed text-[#8a8b8e]">
-              {detail}
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ServiceCard({
+function FeatureBlock({
   service,
+  delay,
 }: {
   service: (typeof services)[number];
+  delay: number;
 }) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <div className="mt-1 border border-white/[0.06] p-2 shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] transition-colors duration-300 group-hover:border-white/[0.14]">
+    <Reveal
+      delay={delay}
+      as="article"
+      className="group relative flex flex-col gap-5 border-b border-white/[0.06] py-10 md:px-10 md:[&:nth-child(even)]:pr-0 md:[&:nth-child(odd)]:border-r md:[&:nth-child(odd)]:pl-0"
+    >
+      {/* Heading row with a single toggle */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between gap-4">
+          <h3 className="font-display text-xl font-semibold tracking-tight text-paper">
+            {service.name}
+          </h3>
+          <Toggle on={open} onToggle={() => setOpen((v) => !v)} label={service.name} />
+        </div>
+        <p className="max-w-md text-[15px] leading-relaxed text-mist">
+          {service.overview}
+        </p>
+      </div>
+
+      {/* Single-bordered glassy card (Figma "Triage"), square corners */}
       <div
-        className="relative overflow-hidden border border-white/[0.08]"
+        className="relative mt-1 overflow-hidden border border-white/[0.08] shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] transition-colors duration-300 group-hover:border-white/[0.16]"
         style={{ backgroundImage: CARD_SHEEN }}
       >
         <div
@@ -123,13 +116,54 @@ function ServiceCard({
             Capabilities
           </p>
           <div className="flex flex-col">
-            {service.services.slice(0, 4).map((item) => (
-              <CapabilityRow key={item} item={item} />
-            ))}
+            {service.services.slice(0, 4).map((item) => {
+              const detail = DETAILS[item];
+              return (
+                <div
+                  key={item}
+                  className="border-b border-white/[0.06] px-4 transition-colors duration-200 last:border-b-0 hover:bg-white/[0.04]"
+                >
+                  <div className="py-3">
+                    <span
+                      className={`text-sm transition-colors duration-200 ${
+                        open ? "text-white" : "text-[#bdbec1]"
+                      }`}
+                    >
+                      {item}
+                    </span>
+                  </div>
+                  {detail && (
+                    <div
+                      className="grid transition-[grid-template-rows,opacity] duration-300 ease-out"
+                      style={{
+                        gridTemplateRows: open ? "1fr" : "0fr",
+                        opacity: open ? 1 : 0,
+                      }}
+                    >
+                      <div className="overflow-hidden">
+                        <p className="pb-3 text-[13px] leading-relaxed text-[#8a8b8e]">
+                          {detail}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
-    </div>
+
+      <Link
+        href={`/services/${service.slug}`}
+        className="inline-flex items-center gap-2 text-sm font-medium text-accent"
+      >
+        Learn more
+        <span className="transition-transform duration-300 group-hover:translate-x-1">
+          →
+        </span>
+      </Link>
+    </Reveal>
   );
 }
 
@@ -155,33 +189,7 @@ export default function Services() {
         {/* Linear-style bordered feature grid */}
         <div className="mt-12 grid border-t border-white/[0.06] md:mt-16 md:grid-cols-2">
           {services.map((service, i) => (
-            <Reveal
-              key={service.slug}
-              delay={i * 80}
-              as="article"
-              className="group relative flex flex-col gap-5 border-b border-white/[0.06] py-10 md:px-10 md:[&:nth-child(even)]:pr-0 md:[&:nth-child(odd)]:border-r md:[&:nth-child(odd)]:pl-0"
-            >
-              <div className="flex flex-col gap-2">
-                <h3 className="font-display text-xl font-semibold tracking-tight text-paper">
-                  {service.name}
-                </h3>
-                <p className="max-w-md text-[15px] leading-relaxed text-mist">
-                  {service.overview}
-                </p>
-              </div>
-
-              <ServiceCard service={service} />
-
-              <Link
-                href={`/services/${service.slug}`}
-                className="inline-flex items-center gap-2 text-sm font-medium text-accent"
-              >
-                Learn more
-                <span className="transition-transform duration-300 group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
-            </Reveal>
+            <FeatureBlock key={service.slug} service={service} delay={i * 80} />
           ))}
         </div>
       </div>

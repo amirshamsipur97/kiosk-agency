@@ -101,9 +101,9 @@ function FeatureBlock({
         </p>
       </div>
 
-      {/* Single-bordered glassy card (Figma "Triage"), square corners */}
+      {/* Borderless glassy panel (Figma frame 4009:2179) — gradient only */}
       <div
-        className="relative mt-1 overflow-hidden border border-white/[0.08] shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] transition-colors duration-300 group-hover:border-white/[0.16]"
+        className="relative mt-1 overflow-hidden"
         style={{ backgroundImage: CARD_SHEEN }}
       >
         <div
@@ -121,7 +121,7 @@ function FeatureBlock({
               return (
                 <div
                   key={item}
-                  className="border-b border-white/[0.06] px-4 transition-colors duration-200 last:border-b-0 hover:bg-white/[0.04]"
+                  className="px-4 transition-colors duration-200 hover:bg-white/[0.04]"
                 >
                   <div className="py-3">
                     <span

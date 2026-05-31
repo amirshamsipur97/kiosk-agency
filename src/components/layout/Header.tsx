@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 import { nav } from "@/lib/site";
+
+type NavEntry = (typeof nav)[number];
 
 // Floating Linear/Raycast-style nav bar: a centered glassy rounded bar with a
 // subtle border + top highlight, gray center links, and a light pill CTA.
@@ -29,6 +32,94 @@ function Star({ size = 16 }: { size?: number }) {
         fill="currentColor"
       />
     </svg>
+  );
+}
+
+// A single segmented-control nav item. The pill + text are eased in/out with
+// GSAP so hover feels natural: a short intent delay before it lights up, a
+// soft power curve, and a quicker, delay-free fade on the way out.
+const PILL_IDLE = "#6a6b6c";
+const PILL_ACTIVE_TEXT = "#ffffff";
+
+function NavLink({ item, active }: { item: NavEntry; active: boolean }) {
+  const pillRef = useRef<HTMLSpanElement>(null);
+  const linkRef = useRef<HTMLAnchorElement>(null);
+
+  const handleEnter = () => {
+    if (active) return;
+    gsap.to(pillRef.current, {
+      autoAlpha: 1,
+      scale: 1,
+      duration: 0.5,
+      delay: 0.12,
+      ease: "power3.out",
+    });
+    gsap.to(linkRef.current, {
+      color: PILL_ACTIVE_TEXT,
+      duration: 0.5,
+      delay: 0.12,
+      ease: "power3.out",
+    });
+  };
+
+  const handleLeave = () => {
+    if (active) return;
+    gsap.to(pillRef.current, {
+      autoAlpha: 0,
+      scale: 0.92,
+      duration: 0.32,
+      ease: "power2.out",
+    });
+    gsap.to(linkRef.current, {
+      color: PILL_IDLE,
+      duration: 0.32,
+      ease: "power2.out",
+    });
+  };
+
+  return (
+    <div
+      className="group relative"
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      {/* Segmented-control pill behind the label (does not affect layout) */}
+      <span
+        ref={pillRef}
+        aria-hidden
+        className="absolute -inset-x-3.5 -inset-y-2 rounded-full"
+        style={{
+          backgroundImage: ACTIVE_PILL,
+          boxShadow: ACTIVE_PILL_SHADOW,
+          opacity: active ? 1 : 0,
+          visibility: active ? "visible" : "hidden",
+          transform: active ? "scale(1)" : "scale(0.92)",
+        }}
+      />
+      <Link
+        ref={linkRef}
+        href={item.href}
+        className="relative z-10 block text-sm font-medium tracking-[0.2px]"
+        style={{ color: active ? PILL_ACTIVE_TEXT : PILL_IDLE }}
+      >
+        {item.label}
+      </Link>
+      {item.children && (
+        <div className="invisible absolute left-1/2 top-full -translate-x-1/2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
+          <div className="min-w-56 rounded-2xl border border-line bg-surface p-2 shadow-2xl shadow-black/50">
+            {item.children.map((child) => (
+              <Link
+                key={child.href}
+                href={child.href}
+                className="block rounded-xl px-3 py-2 text-sm text-mist transition-colors hover:bg-surface-2 hover:text-paper"
+              >
+                {child.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -69,42 +160,7 @@ export default function Header() {
                 item.href === "/"
                   ? pathname === "/"
                   : pathname === item.href || pathname.startsWith(`${item.href}/`);
-              return (
-              <div key={item.href} className="group relative">
-                {/* Segmented-control pill behind the label; shown for the
-                    active route and on hover, without affecting layout. */}
-                <span
-                  aria-hidden
-                  className={`absolute -inset-x-3.5 -inset-y-2 rounded-full transition-opacity duration-200 ${
-                    active ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                  }`}
-                  style={{ backgroundImage: ACTIVE_PILL, boxShadow: ACTIVE_PILL_SHADOW }}
-                />
-                <Link
-                  href={item.href}
-                  className={`relative z-10 block text-sm font-medium tracking-[0.2px] transition-colors ${
-                    active ? "text-white" : "text-[#6a6b6c] group-hover:text-white"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-                {item.children && (
-                  <div className="invisible absolute left-1/2 top-full -translate-x-1/2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
-                    <div className="min-w-56 rounded-2xl border border-line bg-surface p-2 shadow-2xl shadow-black/50">
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.href}
-                          href={child.href}
-                          className="block rounded-xl px-3 py-2 text-sm text-mist transition-colors hover:bg-surface-2 hover:text-paper"
-                        >
-                          {child.label}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              );
+              return <NavLink key={item.href} item={item} active={active} />;
             })}
           </nav>
 

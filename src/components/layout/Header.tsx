@@ -60,6 +60,8 @@ function NavLink({
 
   const handleEnter = () => {
     // Pill + text only animate for non-active items (active keeps its pill).
+    // overwrite:true kills any pending leave tween (even mid-delay) so the
+    // pill can never get stuck "on".
     if (!active) {
       gsap.to(pillRef.current, {
         autoAlpha: 1,
@@ -67,12 +69,14 @@ function NavLink({
         duration: 0.5,
         delay: 0.12,
         ease: "power3.out",
+        overwrite: true,
       });
       gsap.to(linkRef.current, {
         color: PILL_ACTIVE_TEXT,
         duration: 0.5,
         delay: 0.12,
         ease: "power3.out",
+        overwrite: true,
       });
     }
     onOpen();
@@ -85,11 +89,13 @@ function NavLink({
         scale: 0.92,
         duration: 0.32,
         ease: "power2.out",
+        overwrite: true,
       });
       gsap.to(linkRef.current, {
         color: PILL_IDLE,
         duration: 0.32,
         ease: "power2.out",
+        overwrite: true,
       });
     }
     onClose();

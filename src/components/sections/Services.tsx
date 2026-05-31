@@ -86,7 +86,7 @@ function FeatureBlock({
     <Reveal
       delay={delay}
       as="article"
-      className="group relative flex flex-col gap-5 border-b border-white/[0.06] py-10 md:px-10 md:[&:nth-child(even)]:pr-0 md:[&:nth-child(odd)]:border-r md:[&:nth-child(odd)]:pl-0"
+      className="group relative flex flex-col gap-5 py-10 md:px-10 md:[&:nth-child(even)]:pr-0 md:[&:nth-child(odd)]:pl-0"
     >
       {/* Heading row with a single toggle */}
       <div className="flex flex-col gap-2">
@@ -186,8 +186,8 @@ export default function Services() {
           </Reveal>
         </div>
 
-        {/* Linear-style bordered feature grid */}
-        <div className="mt-12 grid border-t border-white/[0.06] md:mt-16 md:grid-cols-2">
+        {/* Feature grid */}
+        <div className="mt-12 grid gap-x-6 md:mt-16 md:grid-cols-2">
           {services.map((service, i) => (
             <FeatureBlock key={service.slug} service={service} delay={i * 80} />
           ))}

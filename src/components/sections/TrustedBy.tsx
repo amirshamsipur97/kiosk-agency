@@ -5,33 +5,31 @@ import Reveal from "@/components/ui/Reveal";
 
 // Real client logos. Drop the actual files into /public/logos/<file>.
 // Until a file exists, the brand name renders as a text fallback.
-// `fh` is the logo's height in the Figma design (node 867-37135). Each logo
-// is rendered at that height multiplied by --logo-scale, so the relative
-// sizing matches the design exactly instead of forcing a uniform height.
-type Brand = { name: string; file: string; fh: number };
+// Every logo is exported inside an identical frame (~590×280) with the right
+// internal padding, so rendering them all at one uniform height reproduces
+// the intended relative sizing.
+type Brand = { name: string; file: string };
 
 const brands: Brand[] = [
-  { name: "JW Marriott", file: "jw-marriott.png", fh: 87 },
-  { name: "Shangri-La", file: "shangri-la.svg", fh: 99 },
-  { name: "Mövenpick", file: "movenpick.png", fh: 129 },
-  { name: "Bentley", file: "bentley.png", fh: 48 },
-  { name: "Bank Dhofar", file: "bank-dhofar.png", fh: 212 },
-  { name: "Lamborghini", file: "lamborghini.png", fh: 117 },
-  { name: "OQ", file: "oq.png", fh: 67 },
-  { name: "Hotel Indigo", file: "hotel-indigo.svg", fh: 86 },
-  { name: "Ferrari", file: "ferrari.svg", fh: 91 },
-  { name: "OXY", file: "oxy.png", fh: 133 },
+  { name: "JW Marriott", file: "jw-marriott.png" },
+  { name: "Shangri-La", file: "shangri-la.png" },
+  { name: "Mövenpick", file: "movenpick.png" },
+  { name: "Bentley", file: "bentley.png" },
+  { name: "Bank Dhofar", file: "bank-dhofar.png" },
+  { name: "Lamborghini", file: "lamborghini.png" },
+  { name: "OQ", file: "oq.png" },
+  { name: "Hotel Indigo", file: "hotel-indigo.png" },
+  { name: "Ferrari", file: "ferrari.png" },
+  { name: "OXY", file: "oxy.png" },
 ];
 
-function Logo({ name, file, fh }: Brand) {
+function Logo({ name, file }: Brand) {
   const [failed, setFailed] = useState(false);
 
-  // Each cell hugs its logo and carries a fixed trailing margin, so the gap
-  // between adjacent logos is constant (even spacing) regardless of how wide
-  // each logo is. Height is the Figma height scaled by --logo-scale, and
-  // object-contain keeps the artwork from stretching.
+  // Uniform frame height + object-contain → consistent sizing; the identical
+  // export frames mean the gap between logos stays even on its own.
   return (
-    <div className="mr-16 flex shrink-0 items-center md:mr-24">
+    <div className="mr-6 flex shrink-0 items-center md:mr-10">
       {failed ? (
         <span className="whitespace-nowrap font-display text-base font-semibold tracking-tight text-white md:text-lg">
           {name}
@@ -39,11 +37,10 @@ function Logo({ name, file, fh }: Brand) {
       ) : (
         /* eslint-disable-next-line @next/next/no-img-element */
         <img
-          src={`/logos/${file}?v=6`}
+          src={`/logos/${file}?v=7`}
           alt={name}
           onError={() => setFailed(true)}
-          style={{ height: `calc(${fh}px * var(--logo-scale))` }}
-          className="w-auto max-w-full object-contain"
+          className="h-[84px] w-auto object-contain md:h-[104px]"
         />
       )}
     </div>
@@ -67,7 +64,7 @@ export default function TrustedBy() {
       {/* Full-width logo marquee on the black background, framed by a thin
           white line above and below. --logo-scale converts each logo's Figma
           height to its on-screen height. */}
-      <div className="logo-row mt-12 w-full border-y border-white/80 py-6 md:mt-16 md:py-8">
+      <div className="mt-12 w-full border-y border-white/80 py-6 md:mt-16 md:py-8">
         <div
           className="marquee marquee-right overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_4%,#000_96%,transparent)]"
           style={{ ["--marquee-duration" as string]: "38s" }}

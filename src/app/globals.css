@@ -90,16 +90,6 @@ body {
   }
 }
 
-/* Trusted-by logo row: scales each logo's Figma height to screen size */
-.logo-row {
-  --logo-scale: 0.42;
-}
-@media (min-width: 768px) {
-  .logo-row {
-    --logo-scale: 0.5;
-  }
-}
-
 /* Horizontal marquee (Industries) */
 @keyframes kiosk-marquee-left {
   from {

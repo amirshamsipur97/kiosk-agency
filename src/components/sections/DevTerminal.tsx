@@ -4,16 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import type { DevService } from "@/lib/dev-services";
 
 const ICONS = {
-  layers: "M12 3 2 8l10 5 10-5z M2 13l10 5 10-5 M2 18l10 5 10-5",
-  play: "M7 4l13 8-13 8z",
+  code: "M16 18l6-6-6-6 M8 6l-6 6 6 6",
+  grid: "M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z",
   chart: "M4 20V10 M10 20V4 M16 20v-7 M22 20H2",
   search: "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14z M20 20l-4-4",
   bolt: "M13 2 4 14h7l-1 8 9-12h-7z",
 } as const;
 
 const ICON_FOR: Record<string, keyof typeof ICONS> = {
-  "website-digital-systems": "layers",
-  "media-content": "play",
+  "website-digital-systems": "code",
+  "design-systems": "grid",
   "growth-marketing": "chart",
   seo: "search",
   "automation-crm": "bolt",
@@ -89,7 +89,7 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
     setRevealed(0);
     let shown = 0;
     let last = performance.now();
-    const SPEED = 0.16; // chars per ms ≈ 160 cps — fast but natural
+    const SPEED = 0.05; // chars per ms ≈ 50 cps — relaxed, natural typing
     const tick = (now: number) => {
       const dt = now - last;
       last = now;
@@ -109,9 +109,9 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
 
   return (
     <div className="mt-12 flex flex-col gap-12 md:mt-16">
-      {/* Service tab row */}
+      {/* Service tab row — centred */}
       <div className="relative">
-        <div className="flex gap-8 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex justify-center gap-8 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {services.map((s, i) => {
             const on = i === active;
             return (
@@ -148,7 +148,6 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
             );
           })}
         </div>
-        <div className="pointer-events-none absolute right-0 top-0 h-14 w-20 bg-gradient-to-l from-ink to-transparent" />
       </div>
 
       {/* Terminal panel */}
@@ -221,7 +220,7 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
             className="flex items-center gap-6 px-5 py-3.5 text-[11.8px] text-[rgba(239,245,255,0.69)]"
             style={{ borderTop: "1px solid rgba(212,228,254,0.10)" }}
           >
-            <a href={`/services/${service.slug}`} className="inline-flex items-center gap-2 transition-colors hover:text-paper">
+            <a href="/services" className="inline-flex items-center gap-2 transition-colors hover:text-paper">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className="size-4">
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>

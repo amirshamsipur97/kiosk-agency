@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import type { DevService } from "@/lib/dev-services";
+
+// Material borrowed from the Featured Services cards.
+const CARD_SHEEN =
+  "linear-gradient(134deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0) 55%)";
+// Lightweight procedural film grain (inline SVG noise — no asset/library bloat).
+const GRAIN =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)'/%3E%3C/svg%3E\")";
 
 const ICONS = {
   code: "M16 18l6-6-6-6 M8 6l-6 6 6 6",
@@ -75,6 +82,37 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
   const [active, setActive] = useState(0);
   const [revealed, setRevealed] = useState(0);
   const rafRef = useRef<number | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const target = useRef({ x: 50, y: 50 });
+  const current = useRef({ x: 50, y: 50 });
+
+  // Dynamic local light that smoothly eases toward the cursor (rAF lerp).
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+    let raf = 0;
+    const loop = () => {
+      const cur = current.current;
+      const tgt = target.current;
+      cur.x += (tgt.x - cur.x) * 0.12;
+      cur.y += (tgt.y - cur.y) * 0.12;
+      el.style.setProperty("--mx", cur.x.toFixed(2));
+      el.style.setProperty("--my", cur.y.toFixed(2));
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const handleMove = (e: MouseEvent<HTMLDivElement>) => {
+    const el = panelRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    target.current = {
+      x: ((e.clientX - r.left) / r.width) * 100,
+      y: ((e.clientY - r.top) / r.height) * 100,
+    };
+  };
 
   const service = services[active];
   const lines = buildLines(service);
@@ -150,10 +188,15 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
         </div>
       </div>
 
-      {/* Terminal panel */}
+      {/* Terminal panel — Featured Services material, square corners */}
       <div
-        className="relative overflow-hidden rounded-3xl"
-        style={{ border: "1px solid rgba(212,228,254,0.19)" }}
+        ref={panelRef}
+        onMouseMove={handleMove}
+        className="relative overflow-hidden"
+        style={{
+          border: "1px solid rgba(212,228,254,0.19)",
+          backgroundImage: CARD_SHEEN,
+        }}
       >
         {/* header */}
         <div
@@ -234,6 +277,22 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
             </a>
           </div>
         </div>
+
+        {/* Cursor-following local light */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-10"
+          style={{
+            background:
+              "radial-gradient(220px circle at calc(var(--mx, 50) * 1%) calc(var(--my, 50) * 1%), rgba(215,255,62,0.07), rgba(255,255,255,0.03) 35%, transparent 60%)",
+          }}
+        />
+        {/* Lightweight film grain */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-10 opacity-[0.06] mix-blend-overlay"
+          style={{ backgroundImage: GRAIN }}
+        />
       </div>
     </div>
   );

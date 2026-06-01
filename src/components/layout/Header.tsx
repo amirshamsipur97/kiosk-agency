@@ -158,7 +158,13 @@ function NavLink({
       {item.children && (
         // pt-3 keeps a hover bridge between the label and the card; the card is
         // left-aligned to the item so neighbouring menus never overlap.
-        <div className="absolute left-0 top-full z-20 pt-3">
+        // While closed the wrapper is click-through so the empty area below the
+        // button can't trigger the menu — only hovering the button opens it.
+        <div
+          className={`absolute left-0 top-full z-20 pt-3 ${
+            isOpen ? "pointer-events-auto" : "pointer-events-none"
+          }`}
+        >
           <div
             ref={menuRef}
             className="min-w-[15rem] rounded-2xl border border-white/[0.06] p-2 backdrop-blur-md"

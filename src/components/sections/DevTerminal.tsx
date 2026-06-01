@@ -26,6 +26,15 @@ const ICON_FOR: Record<string, keyof typeof ICONS> = {
   "automation-crm": "bolt",
 };
 
+// Multiplayer-style cursor colour + label per service.
+const CURSOR: Record<string, { label: string; color: string }> = {
+  "website-digital-systems": { label: "Web", color: "#2f6fed" },
+  "design-systems": { label: "Design", color: "#1f9d57" },
+  "growth-marketing": { label: "Growth", color: "#e07b1a" },
+  seo: { label: "SEO", color: "#e0479e" },
+  "automation-crm": { label: "Automation", color: "#c0392b" },
+};
+
 function Icon({ name, className }: { name: keyof typeof ICONS; className?: string }) {
   return (
     <svg
@@ -82,22 +91,23 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
   const [active, setActive] = useState(0);
   const [revealed, setRevealed] = useState(0);
   const rafRef = useRef<number | null>(null);
+  const [hovering, setHovering] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
-  const target = useRef({ x: 50, y: 50 });
-  const current = useRef({ x: 50, y: 50 });
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const target = useRef({ x: 0, y: 0 });
+  const cur = useRef({ x: 0, y: 0 });
 
-  // Dynamic local light that smoothly eases toward the cursor (rAF lerp).
+  // Custom Figma-style cursor that eases toward the pointer over the panel.
   useEffect(() => {
-    const el = panelRef.current;
-    if (!el) return;
     let raf = 0;
     const loop = () => {
-      const cur = current.current;
-      const tgt = target.current;
-      cur.x += (tgt.x - cur.x) * 0.12;
-      cur.y += (tgt.y - cur.y) * 0.12;
-      el.style.setProperty("--mx", cur.x.toFixed(2));
-      el.style.setProperty("--my", cur.y.toFixed(2));
+      const c = cur.current;
+      const t = target.current;
+      c.x += (t.x - c.x) * 0.25;
+      c.y += (t.y - c.y) * 0.25;
+      if (cursorRef.current) {
+        cursorRef.current.style.transform = `translate3d(${c.x - 2}px, ${c.y - 2}px, 0)`;
+      }
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
@@ -108,13 +118,21 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
     const el = panelRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    target.current = {
-      x: ((e.clientX - r.left) / r.width) * 100,
-      y: ((e.clientY - r.top) / r.height) * 100,
-    };
+    target.current = { x: e.clientX - r.left, y: e.clientY - r.top };
+  };
+
+  const handleEnter = (e: MouseEvent<HTMLDivElement>) => {
+    const el = panelRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const p = { x: e.clientX - r.left, y: e.clientY - r.top };
+    target.current = p;
+    cur.current = { ...p };
+    setHovering(true);
   };
 
   const service = services[active];
+  const cursor = CURSOR[service.slug] ?? { label: service.name, color: "#d7ff3e" };
   const lines = buildLines(service);
   const total = lines.reduce(
     (sum, line) => sum + line.reduce((s, tok) => s + tok.t.length, 0),
@@ -192,7 +210,9 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
       <div
         ref={panelRef}
         onMouseMove={handleMove}
-        className="relative overflow-hidden"
+        onMouseEnter={handleEnter}
+        onMouseLeave={() => setHovering(false)}
+        className="relative overflow-hidden [cursor:none]"
         style={{
           border: "1px solid rgba(212,228,254,0.19)",
           backgroundImage: CARD_SHEEN,
@@ -278,21 +298,35 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
           </div>
         </div>
 
-        {/* Cursor-following local light */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 z-10"
-          style={{
-            background:
-              "radial-gradient(220px circle at calc(var(--mx, 50) * 1%) calc(var(--my, 50) * 1%), rgba(215,255,62,0.07), rgba(255,255,255,0.03) 35%, transparent 60%)",
-          }}
-        />
         {/* Lightweight film grain */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 z-10 opacity-[0.06] mix-blend-overlay"
           style={{ backgroundImage: GRAIN }}
         />
+        {/* Custom multiplayer-style cursor — colour + name follow the active service */}
+        <div
+          ref={cursorRef}
+          aria-hidden
+          className="pointer-events-none absolute left-0 top-0 z-20 will-change-transform transition-opacity duration-150"
+          style={{ opacity: hovering ? 1 : 0 }}
+        >
+          <svg width="24" height="26" viewBox="0 0 24 26" fill="none">
+            <path
+              d="M4 3 L4 21 L9 16.5 L12 23 L15 21.8 L12 15.3 L19 15.3 Z"
+              fill="#ffffff"
+              stroke="rgba(0,0,0,0.35)"
+              strokeWidth="1"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span
+            className="absolute left-[16px] top-[18px] whitespace-nowrap rounded-[10px] px-2.5 py-1 text-[13px] font-semibold leading-none text-white shadow-md"
+            style={{ backgroundColor: cursor.color }}
+          >
+            {cursor.label}
+          </span>
+        </div>
       </div>
     </div>
   );

@@ -3,10 +3,6 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import type { DevService } from "@/lib/dev-services";
 
-// Material borrowed from the Featured Services cards.
-const CARD_SHEEN =
-  "linear-gradient(134deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0) 55%)";
-// Lightweight procedural film grain (inline SVG noise — no asset/library bloat).
 const GRAIN =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)'/%3E%3C/svg%3E\")";
 
@@ -26,31 +22,76 @@ const ICON_FOR: Record<string, keyof typeof ICONS> = {
   "automation-crm": "bolt",
 };
 
-// Figma cursor-style colour + label per service (fill + darker border).
+// Header toggle icons.
+const H = {
+  monitor: "M3 4.5h18v12H3z M8.5 20.5h7 M12 16.5v4",
+  phone: "M7 2.5h10v19H7z M10.5 18.5h3",
+  moon: "M20.5 13.6A7.5 7.5 0 1 1 10.4 3.5 6 6 0 0 0 20.5 13.6Z",
+  sun: "M12 7.6a4.4 4.4 0 1 0 0 8.8 4.4 4.4 0 0 0 0-8.8Z M12 1.8v2.2 M12 20v2.2 M4 12H1.8 M22.2 12H20 M5.4 5.4 3.9 3.9 M20.1 20.1l-1.5-1.5 M18.6 5.4l1.5-1.5 M3.9 20.1l1.5-1.5",
+};
+
 const CURSOR: Record<string, { label: string; color: string; border: string }> = {
   "website-digital-systems": { label: "Web", color: "#2f80ed", border: "#1f5fc0" },
   "design-systems": { label: "Design", color: "#27ae60", border: "#1c8c4c" },
   "growth-marketing": { label: "Growth", color: "#f79009", border: "#dc6803" },
   seo: { label: "SEO", color: "#e0479e", border: "#b83480" },
-  "automation-crm": { label: "Automation", color: "#eb5757", border: "#c0392b" },
+  "automation-crm": { label: "Automation", color: "#c0392b", border: "#922b21" },
 };
 
 type Tok = { t: string; c: string };
-const COLOR: Record<string, string> = {
-  prompt: "#68cc58",
-  kw: "#737a7f",
-  num: "#464a4d",
-  cap: "#ebeced",
-  desc: "#ffc446",
-  out: "#a1fcea",
-  punc: "#737a7f",
+
+// Theme-dependent UI + syntax colours.
+const THEME = {
+  dark: {
+    base: "transparent",
+    sheen:
+      "linear-gradient(134deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0) 55%)",
+    border: "rgba(212,228,254,0.19)",
+    codeBg: "#05050a",
+    lineNo: "#2f3336",
+    headText: "rgba(252,253,255,0.94)",
+    sub: "rgba(239,245,255,0.69)",
+    faint: "rgba(239,245,255,0.45)",
+    sel: "#3cabff",
+    tagText: "rgba(239,245,255,0.8)",
+    iconOff: "rgba(239,245,255,0.55)",
+    syntax: {
+      prompt: "#68cc58",
+      kw: "#737a7f",
+      num: "#464a4d",
+      cap: "#ebeced",
+      desc: "#ffc446",
+      out: "#a1fcea",
+      punc: "#737a7f",
+    } as Record<string, string>,
+  },
+  light: {
+    base: "#eceef1",
+    sheen:
+      "linear-gradient(134deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.015) 50%, rgba(0,0,0,0) 55%)",
+    border: "rgba(10,20,40,0.12)",
+    codeBg: "#f7f8fa",
+    lineNo: "#b3b8c0",
+    headText: "#1f2328",
+    sub: "#5b6472",
+    faint: "#8a909a",
+    sel: "#0a84ff",
+    tagText: "#3a414c",
+    iconOff: "#8a909a",
+    syntax: {
+      prompt: "#1a7f37",
+      kw: "#6a737d",
+      num: "#b3b8c0",
+      cap: "#1f2328",
+      desc: "#b35900",
+      out: "#0a7ea4",
+      punc: "#8a909a",
+    } as Record<string, string>,
+  },
 };
 
 const fileName = (s: string) =>
-  s
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "") + ".tsx";
+  s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + ".tsx";
 
 function buildLines(service: DevService): Tok[][] {
   const lines: Tok[][] = [
@@ -78,18 +119,43 @@ function buildLines(service: DevService): Tok[][] {
 
 function Icon({ name, className }: { name: keyof typeof ICONS; className?: string }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.6}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
       <path d={ICONS[name]} />
     </svg>
+  );
+}
+
+function HBtn({
+  d,
+  active,
+  onClick,
+  ui,
+}: {
+  d: string;
+  active: boolean;
+  onClick: () => void;
+  ui: (typeof THEME)["dark"];
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex size-8 items-center justify-center transition-colors"
+      style={{ backgroundColor: active ? "rgba(121,121,250,0.18)" : "transparent" }}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={active ? ui.sel : ui.iconOff}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="size-[18px]"
+        aria-hidden
+      >
+        <path d={d} />
+      </svg>
+    </button>
   );
 }
 
@@ -99,12 +165,15 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
   const [replay, setReplay] = useState(0);
   const [revealed, setRevealed] = useState(0);
   const [hovering, setHovering] = useState(false);
+  const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const rafRef = useRef<number | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const target = useRef({ x: 0, y: 0 });
   const cur = useRef({ x: 0, y: 0 });
 
+  const ui = THEME[theme];
   const service = services[active];
   const cursor =
     CURSOR[service.slug] ?? { label: service.name, color: "#f79009", border: "#dc6803" };
@@ -115,7 +184,6 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
   );
   const outcomes = service.capabilities.map((c) => c.outcome);
 
-  // Natural typewriter whenever the service (or replay) changes.
   useEffect(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     setRevealed(0);
@@ -136,7 +204,6 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, replay]);
 
-  // Custom Figma-style cursor easing toward the pointer.
   useEffect(() => {
     let raf = 0;
     const loop = () => {
@@ -218,7 +285,7 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
         </div>
       </div>
 
-      {/* Editor panel (Figma Irfan-invest editor) — square material frame */}
+      {/* Editor panel */}
       <div
         ref={panelRef}
         onMouseMove={handleMove}
@@ -226,65 +293,33 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
         onMouseLeave={() => setHovering(false)}
         className="relative overflow-hidden rounded-3xl [cursor:none]"
         style={{
-          border: "1px solid rgba(212,228,254,0.19)",
-          backgroundImage: CARD_SHEEN,
+          border: `1px solid ${ui.border}`,
+          backgroundColor: ui.base,
+          backgroundImage: ui.sheen,
         }}
       >
-        {/* Header — traffic lights + view toggles */}
-        <div
-          className="flex h-12 items-center justify-between px-4"
-          style={{ borderBottom: "1px solid rgba(212,228,254,0.19)" }}
-        >
+        {/* Header — traffic lights + functional toggles */}
+        <div className="flex h-12 items-center justify-between px-4" style={{ borderBottom: `1px solid ${ui.border}` }}>
           <div className="flex items-center gap-2">
             <span className="size-2.5 rounded-full bg-[rgba(255,107,109,0.94)]" />
             <span className="size-2.5 rounded-full bg-[#ffcb47]" />
             <span className="size-2.5 rounded-full bg-[rgba(66,255,164,0.7)]" />
           </div>
           <div className="flex items-center gap-2">
-            {[
-              ["M3 5h18v11H3z M8 20h8", "M9 4h6v16H9z"],
-              ["M4 4h16v12H4z M2 20h20", "M12 6a6 6 0 0 0 0 12 6 6 0 0 1 0-12z"],
-            ].map((pair, gi) => (
-              <div
-                key={gi}
-                className="flex items-center overflow-hidden rounded-lg border"
-                style={{ borderColor: "rgba(212,228,254,0.19)" }}
-              >
-                {pair.map((d, ii) => (
-                  <span
-                    key={ii}
-                    className="flex size-8 items-center justify-center"
-                    style={{
-                      backgroundColor:
-                        ii === 0 ? "rgba(121,121,250,0.03)" : "transparent",
-                    }}
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="rgba(239,245,255,0.55)"
-                      strokeWidth={1.5}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="size-4"
-                      aria-hidden
-                    >
-                      <path d={d} />
-                    </svg>
-                  </span>
-                ))}
-              </div>
-            ))}
+            <div className="flex items-center overflow-hidden rounded-lg border" style={{ borderColor: ui.border }}>
+              <HBtn d={H.monitor} active={device === "desktop"} onClick={() => setDevice("desktop")} ui={ui} />
+              <HBtn d={H.phone} active={device === "mobile"} onClick={() => setDevice("mobile")} ui={ui} />
+            </div>
+            <div className="flex items-center overflow-hidden rounded-lg border" style={{ borderColor: ui.border }}>
+              <HBtn d={H.moon} active={theme === "dark"} onClick={() => setTheme("dark")} ui={ui} />
+              <HBtn d={H.sun} active={theme === "light"} onClick={() => setTheme("light")} ui={ui} />
+            </div>
           </div>
         </div>
 
         {/* Body — sidebar | code | preview */}
         <div className="flex h-[460px]">
-          {/* Sidebar: capabilities as files */}
-          <aside
-            className="hidden w-[200px] shrink-0 overflow-y-auto p-2 md:block"
-            style={{ borderRight: "1px solid rgba(212,228,254,0.19)" }}
-          >
+          <aside className="hidden w-[200px] shrink-0 overflow-y-auto p-2 md:block" style={{ borderRight: `1px solid ${ui.border}` }}>
             <div className="flex flex-col gap-1">
               {service.capabilities.map((c, i) => {
                 const on = i === selFile;
@@ -297,15 +332,10 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
                       setReplay((r) => r + 1);
                     }}
                     className="flex items-center gap-2 rounded px-2 py-1.5 text-left text-[13.5px] transition-colors"
-                    style={{ color: on ? "#3cabff" : "rgba(239,245,255,0.69)" }}
+                    style={{ color: on ? ui.sel : ui.sub }}
                   >
                     <svg viewBox="0 0 24 24" fill="none" className="size-4 shrink-0" aria-hidden>
-                      <path
-                        d="M6 2h8l4 4v16H6z M14 2v4h4"
-                        stroke={on ? "#3cabff" : "rgba(239,245,255,0.45)"}
-                        strokeWidth="1.4"
-                        strokeLinejoin="round"
-                      />
+                      <path d="M6 2h8l4 4v16H6z M14 2v4h4" stroke={on ? ui.sel : ui.faint} strokeWidth="1.4" strokeLinejoin="round" />
                     </svg>
                     <span className="truncate">{fileName(c.capability)}</span>
                   </button>
@@ -315,13 +345,13 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
           </aside>
 
           {/* Code column */}
-          <div className="relative min-w-0 flex-1 overflow-auto bg-[#05050a]">
+          <div className="relative min-w-0 flex-1 overflow-auto" style={{ backgroundColor: ui.codeBg }}>
             <div className="p-4 font-mono text-[13px] leading-[24px]">
               {lines.map((line, li) => {
                 const has = line.length > 0;
                 return (
                   <div key={li} className="flex gap-5">
-                    <span className="w-6 shrink-0 select-none text-right text-[#2f3336]">
+                    <span className="w-6 shrink-0 select-none text-right" style={{ color: ui.lineNo }}>
                       {li + 1}
                     </span>
                     <span className="whitespace-pre-wrap break-words">
@@ -329,19 +359,13 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
                         ? line.map((tok, ti) => {
                             const start = offset;
                             offset += tok.t.length;
-                            const shown = Math.max(
-                              0,
-                              Math.min(tok.t.length, revealed - start),
-                            );
-                            const atCursor =
-                              typing && revealed >= start && revealed < start + tok.t.length;
+                            const shown = Math.max(0, Math.min(tok.t.length, revealed - start));
+                            const atCursor = typing && revealed >= start && revealed < start + tok.t.length;
                             return (
-                              <span key={ti} style={{ color: COLOR[tok.c] }}>
+                              <span key={ti} style={{ color: ui.syntax[tok.c] }}>
                                 {tok.t.slice(0, shown)}
                                 {atCursor && (
-                                  <span className="inline-block w-[7px] -translate-y-[1px] animate-pulse bg-accent">
-                                    &nbsp;
-                                  </span>
+                                  <span className="inline-block w-[7px] -translate-y-[1px] animate-pulse bg-accent">&nbsp;</span>
                                 )}
                               </span>
                             );
@@ -354,48 +378,57 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
             </div>
           </div>
 
-          {/* Preview card column */}
+          {/* Preview card column — desktop / mobile */}
           <div
             className="hidden w-[360px] shrink-0 overflow-y-auto p-6 lg:block"
             style={{
-              borderLeft: "1px solid rgba(212,228,254,0.19)",
+              borderLeft: `1px solid ${ui.border}`,
               backgroundImage:
                 "radial-gradient(120% 80% at 50% 0%, rgba(0,163,255,0.10), rgba(0,163,255,0) 60%)",
             }}
           >
-            <div className="flex items-center gap-2 text-accent">
-              <Icon name={ICON_FOR[service.slug] ?? "code"} className="size-5" />
-              <span className="text-[12px] uppercase tracking-[0.12em] text-[rgba(239,245,255,0.55)]">
-                Preview
-              </span>
-            </div>
-            <h4 className="mt-5 font-display text-2xl font-medium leading-tight text-[rgba(252,253,255,0.94)]">
-              {service.name}
-            </h4>
-            <p className="mt-3 text-sm leading-relaxed text-[rgba(239,245,255,0.69)]">
-              {service.overview}
-            </p>
-            <p className="mt-6 text-[12px] uppercase tracking-[0.12em] text-[rgba(239,245,255,0.45)]">
-              Outcomes
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {outcomes.map((o) => (
-                <span
-                  key={o}
-                  className="rounded-full border px-3 py-1 text-xs text-[rgba(239,245,255,0.8)]"
-                  style={{ borderColor: "rgba(212,228,254,0.19)" }}
-                >
-                  {o}
-                </span>
-              ))}
-            </div>
-            <a
-              href="/services"
-              className="mt-7 inline-flex items-center gap-2 rounded-md bg-[#00a3ff] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1ab0ff]"
-              style={{ cursor: "none" }}
+            <div
+              className={
+                device === "mobile"
+                  ? "mx-auto w-[280px] rounded-[28px] border p-5"
+                  : "w-full"
+              }
+              style={device === "mobile" ? { borderColor: ui.border } : undefined}
             >
-              Get Started
-            </a>
+              <div className="flex items-center gap-2 text-accent">
+                <Icon name={ICON_FOR[service.slug] ?? "code"} className="size-5" />
+                <span className="text-[12px] uppercase tracking-[0.12em]" style={{ color: ui.faint }}>
+                  Preview
+                </span>
+              </div>
+              <h4 className="mt-5 font-display text-2xl font-medium leading-tight" style={{ color: ui.headText }}>
+                {service.name}
+              </h4>
+              <p className="mt-3 text-sm leading-relaxed" style={{ color: ui.sub }}>
+                {service.overview}
+              </p>
+              <p className="mt-6 text-[12px] uppercase tracking-[0.12em]" style={{ color: ui.faint }}>
+                Outcomes
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {outcomes.map((o) => (
+                  <span
+                    key={o}
+                    className="rounded-full border px-3 py-1 text-xs"
+                    style={{ borderColor: ui.border, color: ui.tagText }}
+                  >
+                    {o}
+                  </span>
+                ))}
+              </div>
+              <a
+                href="/services"
+                className="mt-7 inline-flex items-center gap-2 rounded-md bg-[#00a3ff] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1ab0ff]"
+                style={{ cursor: "none" }}
+              >
+                Get Started
+              </a>
+            </div>
           </div>
         </div>
 

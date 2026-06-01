@@ -26,13 +26,13 @@ const ICON_FOR: Record<string, keyof typeof ICONS> = {
   "automation-crm": "bolt",
 };
 
-// Multiplayer-style cursor colour + label per service.
-const CURSOR: Record<string, { label: string; color: string }> = {
-  "website-digital-systems": { label: "Web", color: "#2f6fed" },
-  "design-systems": { label: "Design", color: "#1f9d57" },
-  "growth-marketing": { label: "Growth", color: "#e07b1a" },
-  seo: { label: "SEO", color: "#e0479e" },
-  "automation-crm": { label: "Automation", color: "#c0392b" },
+// Figma cursor-style colour + label per service (fill + darker border).
+const CURSOR: Record<string, { label: string; color: string; border: string }> = {
+  "website-digital-systems": { label: "Web", color: "#2f80ed", border: "#1f5fc0" },
+  "design-systems": { label: "Design", color: "#27ae60", border: "#1c8c4c" },
+  "growth-marketing": { label: "Growth", color: "#f79009", border: "#dc6803" },
+  seo: { label: "SEO", color: "#e0479e", border: "#b83480" },
+  "automation-crm": { label: "Automation", color: "#eb5757", border: "#c0392b" },
 };
 
 function Icon({ name, className }: { name: keyof typeof ICONS; className?: string }) {
@@ -132,7 +132,8 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
   };
 
   const service = services[active];
-  const cursor = CURSOR[service.slug] ?? { label: service.name, color: "#d7ff3e" };
+  const cursor =
+    CURSOR[service.slug] ?? { label: service.name, color: "#f79009", border: "#dc6803" };
   const lines = buildLines(service);
   const total = lines.reduce(
     (sum, line) => sum + line.reduce((s, tok) => s + tok.t.length, 0),
@@ -311,18 +312,22 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
           className="pointer-events-none absolute left-0 top-0 z-20 will-change-transform transition-opacity duration-150"
           style={{ opacity: hovering ? 1 : 0 }}
         >
-          <svg width="24" height="26" viewBox="0 0 24 26" fill="none">
+          <svg width="20" height="22" viewBox="0 0 20 22" fill="none">
             <path
-              d="M4 3 L4 21 L9 16.5 L12 23 L15 21.8 L12 15.3 L19 15.3 Z"
+              d="M3 2.5 L3 17.6 L7 13.8 L9.6 19 L12 17.9 L9.4 12.7 L15 12.7 Z"
               fill="#ffffff"
-              stroke="rgba(0,0,0,0.35)"
+              stroke="rgba(0,0,0,0.4)"
               strokeWidth="1"
               strokeLinejoin="round"
             />
           </svg>
           <span
-            className="absolute left-[16px] top-[18px] whitespace-nowrap rounded-[10px] px-2.5 py-1 text-[13px] font-semibold leading-none text-white shadow-md"
-            style={{ backgroundColor: cursor.color }}
+            className="absolute left-[15px] top-[16px] whitespace-nowrap rounded-bl-[24px] rounded-br-[24px] rounded-tl-[2px] rounded-tr-[24px] border-2 pb-2 pl-4 pr-5 pt-2 text-[15px] font-medium leading-6 text-white"
+            style={{
+              backgroundColor: cursor.color,
+              borderColor: cursor.border,
+              boxShadow: `4px 4px 12px ${cursor.color}29`,
+            }}
           >
             {cursor.label}
           </span>

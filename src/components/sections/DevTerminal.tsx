@@ -169,9 +169,11 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const rafRef = useRef<number | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const target = useRef({ x: 0, y: 0 });
   const cur = useRef({ x: 0, y: 0 });
+  const scaleRef = useRef(1);
 
   const ui = THEME[theme];
   const service = services[active];
@@ -220,17 +222,71 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
     return () => cancelAnimationFrame(raf);
   }, []);
 
+  // Scroll-linked scale: the panel grows as it scrolls into view and shrinks
+  // again on the way out — smoothly eased in both directions.
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    el.style.transformOrigin = "50% 50%";
+    let raf = 0;
+    let running = false;
+    let targetP = 0;
+    let curP = 0;
+    const computeTarget = () => {
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || 1;
+      targetP = Math.min(1, Math.max(0, (vh - rect.top) / (vh * 0.6)));
+    };
+    const apply = (p: number) => {
+      const e = 1 - Math.pow(1 - p, 3);
+      const s = 0.86 + 0.14 * e;
+      scaleRef.current = s;
+      el.style.transform = `translateY(${(1 - e) * 40}px) scale(${s})`;
+      el.style.opacity = String(0.4 + 0.6 * e);
+    };
+    const tick = () => {
+      curP += (targetP - curP) * 0.06;
+      if (Math.abs(targetP - curP) < 0.0015) {
+        curP = targetP;
+        apply(curP);
+        running = false;
+        return;
+      }
+      apply(curP);
+      raf = requestAnimationFrame(tick);
+    };
+    const onScroll = () => {
+      computeTarget();
+      if (!running) {
+        running = true;
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    computeTarget();
+    curP = targetP;
+    apply(curP);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   const handleMove = (e: MouseEvent<HTMLDivElement>) => {
     const el = panelRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    target.current = { x: e.clientX - r.left, y: e.clientY - r.top };
+    const s = scaleRef.current || 1;
+    target.current = { x: (e.clientX - r.left) / s, y: (e.clientY - r.top) / s };
   };
   const handleEnter = (e: MouseEvent<HTMLDivElement>) => {
     const el = panelRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    const p = { x: e.clientX - r.left, y: e.clientY - r.top };
+    const s = scaleRef.current || 1;
+    const p = { x: (e.clientX - r.left) / s, y: (e.clientY - r.top) / s };
     target.current = p;
     cur.current = { ...p };
     setHovering(true);
@@ -253,6 +309,7 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
                 onClick={() => {
                   setActive(i);
                   setSelFile(0);
+                  setRevealed(0);
                 }}
                 className="flex shrink-0 flex-col items-center gap-3"
               >
@@ -285,7 +342,8 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
         </div>
       </div>
 
-      {/* Editor panel */}
+      {/* Editor panel (scroll-scaled wrapper) */}
+      <div ref={wrapRef} className="will-change-transform">
       <div
         ref={panelRef}
         onMouseMove={handleMove}
@@ -465,6 +523,7 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
             {cursor.label}
           </span>
         </div>
+      </div>
       </div>
     </div>
   );

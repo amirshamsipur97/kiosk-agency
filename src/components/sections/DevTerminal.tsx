@@ -317,8 +317,8 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
           </div>
         </div>
 
-        {/* Body — sidebar | code | preview */}
-        <div className="flex h-[460px]">
+        {/* Body — sidebar | code | preview (fades in on service switch) */}
+        <div key={active} className="dev-fade flex h-[460px]">
           <aside className="hidden w-[200px] shrink-0 overflow-y-auto p-2 md:block" style={{ borderRight: `1px solid ${ui.border}` }}>
             <div className="flex flex-col gap-1">
               {service.capabilities.map((c, i) => {

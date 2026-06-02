@@ -291,7 +291,7 @@ export default function DevTerminal({ services }: { services: DevService[] }) {
         onMouseMove={handleMove}
         onMouseEnter={handleEnter}
         onMouseLeave={() => setHovering(false)}
-        className="relative overflow-hidden rounded-3xl [cursor:none]"
+        className="theme-anim relative overflow-hidden rounded-3xl [cursor:none]"
         style={{
           border: `1px solid ${ui.border}`,
           backgroundColor: ui.base,

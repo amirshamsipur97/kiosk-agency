@@ -101,6 +101,17 @@ body {
   }
 }
 
+/* Smooth dark/light theme transition for the dev editor */
+.theme-anim,
+.theme-anim * {
+  transition:
+    background-color 0.45s ease,
+    color 0.45s ease,
+    border-color 0.45s ease,
+    fill 0.45s ease,
+    stroke 0.45s ease;
+}
+
 /* Horizontal marquee (Industries) */
 @keyframes kiosk-marquee-left {
   from {

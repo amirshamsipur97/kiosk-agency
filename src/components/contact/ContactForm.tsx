@@ -111,7 +111,7 @@ export default function ContactForm() {
 
         <button
           type="submit"
-          className="mt-2 inline-flex items-center justify-center rounded-full bg-accent px-6 py-3.5 text-sm font-medium text-ink transition-all duration-300 hover:bg-paper hover:shadow-[0_0_40px_-8px_rgba(215,255,62,0.6)]"
+          className="mt-2 inline-flex items-center justify-center rounded-full bg-[#df6a1b] px-6 py-3.5 text-sm font-medium text-ink transition-all duration-300 hover:bg-[#e87d33] hover:shadow-[0_0_40px_-8px_rgba(223,106,27,0.6)]"
         >
           Book A Strategy Call
         </button>

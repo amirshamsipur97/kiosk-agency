@@ -1,4 +1,5 @@
 import Hero from "@/components/sections/Hero";
+import Dock from "@/components/sections/Dock";
 import Philosophy from "@/components/sections/Philosophy";
 import TrustedBy from "@/components/sections/TrustedBy";
 import WhatWeDo from "@/components/sections/WhatWeDo";
@@ -14,6 +15,9 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <section className="py-10 md:py-14">
+        <Dock />
+      </section>
       <Philosophy />
       <TrustedBy />
       <WhatWeDo />

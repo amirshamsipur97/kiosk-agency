@@ -296,6 +296,18 @@ export default function Approach() {
   return (
     <section className="py-24 md:py-32">
       <div className="container-x">
+        {/* Heading + intro on top (matches Figma 407:19780) */}
+        <Reveal className="mx-auto mb-12 max-w-2xl text-center md:mb-16">
+          <h2 className="bg-gradient-to-r from-[#f4f4f5] to-[#8e8e8f] bg-clip-text pb-1 font-display text-3xl font-semibold leading-[1.2] tracking-tight text-transparent text-balance sm:text-4xl md:text-5xl">
+            Everything works together
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/60 md:text-lg">
+            Every successful business requires more than a website or a marketing
+            campaign. We combine the disciplines below into complete digital
+            ecosystems that scale.
+          </p>
+        </Reveal>
+
         <div
           ref={root}
           className="relative mx-auto max-w-5xl overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#0c0d10]/80 p-5 shadow-[inset_0_1px_1px_0_rgba(255,255,255,0.05)] sm:p-8"
@@ -303,7 +315,7 @@ export default function Approach() {
             {/* ambient top glow */}
             <div
               aria-hidden
-              className="pointer-events-none absolute -top-24 left-1/2 h-64 w-2/3 -translate-x-1/2 rounded-full bg-accent/10 blur-[120px]"
+              className="pointer-events-none absolute -top-24 left-1/2 h-64 w-2/3 -translate-x-1/2 rounded-full bg-white/10 blur-[120px]"
             />
 
             {/* Typed text bar */}
@@ -364,22 +376,6 @@ export default function Approach() {
               ))}
             </div>
         </div>
-
-        {/* Text — Our Approach */}
-        <Reveal delay={120} className="mx-auto mt-12 max-w-2xl text-center md:mt-16">
-          <span className="mb-4 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-accent">
-            <span className="h-px w-8 bg-accent" />
-            Our Approach
-          </span>
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl md:text-5xl">
-            Everything works together
-          </h2>
-          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/60 md:text-lg">
-            Every successful business requires more than a website or a marketing
-            campaign. We combine the disciplines below into complete digital
-            ecosystems that scale.
-          </p>
-        </Reveal>
       </div>
     </section>
   );

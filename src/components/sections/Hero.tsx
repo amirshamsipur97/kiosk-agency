@@ -3,35 +3,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import Button from "@/components/ui/Button";
-import HeroGlobe from "@/components/hero/HeroGlobe";
-
-// Decorative 4-point sparkles (position %, size px, twinkle delay).
-const sparkles = [
-  { top: "18%", left: "12%", size: 14, delay: 0 },
-  { top: "26%", left: "84%", size: 10, delay: 0.6 },
-  { top: "62%", left: "8%", size: 11, delay: 1.1 },
-  { top: "70%", left: "90%", size: 16, delay: 0.3 },
-  { top: "40%", left: "50%", size: 8, delay: 1.6 },
-  { top: "82%", left: "30%", size: 9, delay: 0.9 },
-  { top: "14%", left: "60%", size: 9, delay: 1.3 },
-];
-
-function Sparkle({ size }: { size: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden
-    >
-      <path
-        d="M12 0c.6 6.3 5.7 11.4 12 12-6.3.6-11.4 5.7-12 12-.6-6.3-5.7-11.4-12-12C6.3 11.4 11.4 6.3 12 0z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
+import HeroSignals from "@/components/hero/HeroSignals";
 
 export default function Hero() {
   const root = useRef<HTMLDivElement | null>(null);
@@ -44,39 +16,10 @@ export default function Hero() {
     let onVisible: (() => void) | undefined;
 
     const ctx = gsap.context(() => {
-      // Final, visible state — used as a guaranteed fallback so the hero is
-      // never stuck invisible (e.g. if the page loads in a background tab,
-      // where requestAnimationFrame — and therefore GSAP — is paused).
+      // Guaranteed visible fallback (e.g. loaded in a background tab where rAF
+      // — and therefore GSAP — is paused), so the hero is never stuck hidden.
       const showFinal = () => {
         gsap.set(".hero-anim", { opacity: 1, y: 0 });
-        gsap.set(".hero-spark", { opacity: 0.5 });
-      };
-
-      const twinkle = () => {
-        gsap.utils.toArray<HTMLElement>(".hero-spark").forEach((el) => {
-          const delay = parseFloat(el.dataset.delay ?? "0");
-          gsap.fromTo(
-            el,
-            { opacity: 0, scale: 0.4 },
-            {
-              opacity: 0.85,
-              scale: 1,
-              duration: 1.4,
-              delay: 0.4 + delay,
-              ease: "power2.out",
-              onComplete: () => {
-                gsap.to(el, {
-                  opacity: 0.25,
-                  scale: 0.8,
-                  duration: 1.6 + delay,
-                  repeat: -1,
-                  yoyo: true,
-                  ease: "sine.inOut",
-                });
-              },
-            }
-          );
-        });
       };
 
       const playIntro = () => {
@@ -88,7 +31,6 @@ export default function Hero() {
           stagger: 0.09,
           delay: 0.15,
         });
-        twinkle();
       };
 
       if (reduce) {
@@ -99,8 +41,6 @@ export default function Hero() {
       if (document.visibilityState === "visible") {
         playIntro();
       } else {
-        // Loaded hidden: show content immediately, then play the intro the
-        // first time the tab becomes visible.
         showFinal();
         onVisible = () => {
           if (document.visibilityState === "visible") {
@@ -124,50 +64,54 @@ export default function Hero() {
       ref={root}
       className="relative flex min-h-[92vh] items-center justify-center overflow-hidden"
     >
-      {/* Translucent spotlight layered over the site-wide WebGL noise,
-          giving the hero extra punch without hiding the grain. */}
-      <div
+      {/* Concentric pattern (Figma 411:17322) — square, centred, anchored to the
+          bottom of the hero. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/hero/pattern.svg?v=3"
+        alt=""
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_50%_at_50%_45%,rgba(255,255,255,0.06),transparent_62%)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/3 h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-accent/10 blur-[130px]"
+        className="pointer-events-none absolute bottom-0 left-1/2 aspect-square w-[854px] max-w-none -translate-x-1/2 -scale-y-100 select-none"
       />
 
-      {/* Network globe centred behind the content */}
-      <HeroGlobe />
-
-      {/* Sparkles */}
-      <div aria-hidden className="absolute inset-0">
-        {sparkles.map((s, i) => (
-          <span
-            key={i}
-            className="hero-spark absolute text-paper/80"
-            data-delay={s.delay}
-            style={{ top: s.top, left: s.left, opacity: 0 }}
-          >
-            <Sparkle size={s.size} />
-          </span>
-        ))}
-      </div>
+      {/* Orange signal streaks travelling along the ring borders */}
+      <HeroSignals />
 
       {/* Content */}
       <div className="container-x relative z-10 flex flex-col items-center py-32 text-center md:py-40">
-        <span className="hero-anim inline-flex items-center gap-2 rounded-full border border-line bg-surface/50 px-4 py-1.5 text-xs font-medium tracking-wide text-mist backdrop-blur-sm">
-          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-          Growth-focused digital agency
+        {/* Glassy "material" pill ported exactly from the Framer/Figma template
+            (frosted backdrop + white edge + inner top-light glow). */}
+        <span className="hero-anim relative inline-flex items-center gap-2 rounded-lg border border-white px-4 py-1.5 text-[13px] font-medium leading-5 text-white shadow-[0px_1px_22px_0px_rgba(255,255,255,0.1),0px_4px_4px_0px_rgba(0,0,0,0.05),0px_10px_10px_0px_rgba(0,0,0,0.1)]">
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-lg bg-white/[0.02] backdrop-blur-[10px]"
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-lg shadow-[inset_0px_1px_3px_0px_rgba(199,220,255,0.35),inset_0px_0px_20px_0px_rgba(198,204,255,0.2)]"
+          />
+          <span className="relative">Growth-focused digital agency</span>
+          <svg
+            className="relative size-4 shrink-0"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.6}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <path d="M6 3.5 10.5 8 6 12.5" />
+          </svg>
         </span>
 
-        <h1 className="hero-anim mt-7 max-w-4xl font-display text-4xl font-semibold leading-[1.05] text-balance sm:text-6xl md:text-7xl">
-          Build digital systems that generate{" "}
-          <span className="text-accent">real business growth</span>
+        <h1 className="hero-anim mt-7 max-w-4xl bg-gradient-to-r from-white to-[#999] bg-clip-text pb-2 font-display text-[1.8rem] font-semibold leading-[1.15] tracking-tight text-transparent text-balance sm:text-[3rem] md:text-[3.6rem]">
+          The Smarter Way to Grow Your Business
         </h1>
 
-        <p className="hero-anim mt-7 max-w-2xl text-lg leading-relaxed text-mist">
-          We combine strategy, content production, website development, CRM
-          systems, automation, SEO, and performance marketing to create scalable
-          growth ecosystems for modern businesses.
+        <p className="hero-anim mt-7 max-w-2xl text-lg leading-relaxed text-[#a1a1aa]">
+          Kiosk Agency is a full-service digital agency focused on building
+          scalable, high-performance systems for modern businesses.
         </p>
 
         <div className="hero-anim mt-9 flex flex-col gap-3 sm:flex-row">
@@ -177,12 +121,6 @@ export default function Hero() {
           </Button>
         </div>
       </div>
-
-      {/* Bottom fade into the next section */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-ink"
-      />
     </section>
   );
 }

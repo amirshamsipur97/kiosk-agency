@@ -65,10 +65,10 @@ export default function WhatWeDo() {
       <div className="container-x">
         {/* Top heading */}
         <Reveal className="flex flex-col items-center text-center">
-          <h2 className="font-display text-2xl font-semibold tracking-tight text-paper sm:text-3xl">
+          <h2 className="bg-gradient-to-r from-[#f4f4f5] to-[#8e8e8f] bg-clip-text pb-1 font-display text-3xl font-semibold leading-[1.2] tracking-tight text-transparent text-balance sm:text-4xl md:text-5xl">
             Six capabilities, one system.
           </h2>
-          <p className="mt-2 text-lg text-fog sm:text-xl">
+          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/60 md:text-lg">
             One connected system, everything you need to grow.
           </p>
         </Reveal>
@@ -76,10 +76,10 @@ export default function WhatWeDo() {
         {/* Window frame */}
         <Reveal delay={120} className="mt-12 md:mt-16">
           <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[20px] border border-white/10 bg-[linear-gradient(150deg,rgba(20,21,24,0.9),rgba(10,11,13,0.95))] shadow-[inset_0_1px_1px_0_rgba(255,255,255,0.08)]">
-            {/* Internal lime glow */}
+            {/* Internal white glow */}
             <div
               aria-hidden
-              className="pointer-events-none absolute right-[8%] top-1/2 h-[26rem] w-[26rem] -translate-y-1/2 rounded-full bg-accent/15 blur-[120px]"
+              className="pointer-events-none absolute right-[8%] top-1/2 h-[26rem] w-[26rem] -translate-y-1/2 rounded-full bg-white/15 blur-[120px]"
             />
 
             {/* Toolbar */}
@@ -172,17 +172,6 @@ export default function WhatWeDo() {
               </Button>
             </div>
           </div>
-        </Reveal>
-
-        {/* Bottom caption */}
-        <Reveal delay={160} className="mx-auto mt-12 max-w-xl text-center">
-          <h3 className="text-base font-medium text-paper">
-            Everything in one place.
-          </h3>
-          <p className="mt-1 text-base text-white/40">
-            Strategy, build, marketing, and automation — connected so nothing
-            falls through the cracks.
-          </p>
         </Reveal>
       </div>
     </section>

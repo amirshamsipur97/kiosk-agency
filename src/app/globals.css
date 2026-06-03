@@ -14,7 +14,7 @@
   --color-accent: #d7ff3e;
   --color-accent-dim: #b4d62f;
 
-  --font-display: var(--font-display-src), "Space Grotesk", sans-serif;
+  --font-display: var(--font-sans-src), "Inter", sans-serif;
   --font-sans: var(--font-sans-src), "Inter", sans-serif;
 }
 
@@ -171,10 +171,10 @@ body {
     border-color 0.4s ease, box-shadow 0.4s ease;
 }
 .kbd-key.is-pressed {
-  background-color: #d7ff3e;
-  border-color: #d7ff3e;
+  background-color: #ffffff;
+  border-color: #ffffff;
   color: #0a0a0b;
-  box-shadow: 0 0 22px -6px rgba(215, 255, 62, 0.65);
+  box-shadow: 0 0 22px -6px rgba(255, 255, 255, 0.65);
 }
 @keyframes kiosk-caret {
   0%,
@@ -191,7 +191,7 @@ body {
   width: 2px;
   height: 1.1em;
   margin-left: 2px;
-  background: #d7ff3e;
+  background: #ffffff;
   vertical-align: -2px;
   animation: kiosk-caret 1.05s steps(1) infinite;
 }

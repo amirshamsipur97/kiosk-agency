@@ -88,8 +88,7 @@ export default function Footer() {
 
         <div className="mt-14 flex flex-col gap-4 border-t border-line pt-8 text-sm text-fog sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {new Date().getFullYear()} {site.fullName}. CR No: {site.crNumber}.
-            All rights reserved.
+            © {new Date().getFullYear()} {site.fullName}. All rights reserved.
           </p>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
             <a href={`mailto:${site.email}`} className="hover:text-paper">

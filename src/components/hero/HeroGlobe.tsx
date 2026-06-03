@@ -2,6 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
+import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
+import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
 /**
  * Network globe for the hero: points distributed in clusters on a sphere
@@ -106,11 +109,13 @@ export default function HeroGlobe() {
     group.add(new THREE.Points(pointGeo, pointMat));
 
     // --- Lines (nearest-neighbour web) ---
+    // Rendered as fat, anti-aliased lines (LineSegments2 / LineMaterial) for a
+    // crisp web instead of the jaggy 1px native gl.LINES. A green "signal"
+    // pulse travels each segment, injected into LineMaterial's shader.
     const MAX_DIST = 0.34;
     const MAX_PER_POINT = 3;
-    const linePos: number[] = [];
-    const lineProgress: number[] = [];
-    const linePhase: number[] = [];
+    const linePos: number[] = []; // 6 floats per segment (start xyz, end xyz)
+    const segPhase: number[] = []; // one phase per segment (instance)
 
     for (let i = 0; i < pts.length; i++) {
       let connections = 0;
@@ -120,68 +125,65 @@ export default function HeroGlobe() {
         const dz = pts[i][2] - pts[j][2];
         const d = Math.hypot(dx, dy, dz);
         if (d < MAX_DIST) {
-          const phase = Math.random() * 10;
           linePos.push(...pts[i], ...pts[j]);
-          lineProgress.push(0, 1);
-          linePhase.push(phase, phase);
+          segPhase.push(Math.random() * 10);
           connections++;
         }
       }
     }
 
-    const lineGeo = new THREE.BufferGeometry();
-    lineGeo.setAttribute(
-      "position",
-      new THREE.BufferAttribute(new Float32Array(linePos), 3)
-    );
-    lineGeo.setAttribute(
-      "aProgress",
-      new THREE.BufferAttribute(new Float32Array(lineProgress), 1)
-    );
+    const lineGeo = new LineSegmentsGeometry();
+    lineGeo.setPositions(new Float32Array(linePos));
     lineGeo.setAttribute(
       "aPhase",
-      new THREE.BufferAttribute(new Float32Array(linePhase), 1)
+      new THREE.InstancedBufferAttribute(new Float32Array(segPhase), 1)
     );
 
-    const lineMat = new THREE.ShaderMaterial({
+    const lineMat = new LineMaterial({
+      color: 0x6a7176,
+      linewidth: 1.5, // device-independent pixels (resolution-aware)
       transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      uniforms: {
-        uTime: { value: 0 },
-        uSpeed: { value: 0.12 },
-        uBase: { value: new THREE.Color(0x6a7176) },
-        uSignal: { value: new THREE.Color(0xd7ff3e) },
-      },
-      vertexShader: /* glsl */ `
-        attribute float aProgress;
-        attribute float aPhase;
-        varying float vProgress;
-        varying float vPhase;
-        void main() {
-          vProgress = aProgress;
-          vPhase = aPhase;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: /* glsl */ `
-        precision mediump float;
-        uniform float uTime;
-        uniform float uSpeed;
-        uniform vec3 uBase;
-        uniform vec3 uSignal;
-        varying float vProgress;
-        varying float vPhase;
-        void main() {
-          float p = fract(uTime * uSpeed + vPhase);
-          float pulse = smoothstep(0.06, 0.0, abs(vProgress - p));
-          vec3 col = uBase * 0.45 + uSignal * pulse;
-          float a = 0.12 + pulse * 0.42;
-          gl_FragColor = vec4(col, a);
-        }
-      `,
+      depthTest: true,
+      dashed: false,
     });
-    group.add(new THREE.LineSegments(lineGeo, lineMat));
+    lineMat.depthWrite = false;
+    lineMat.blending = THREE.AdditiveBlending;
+
+    // Inject the travelling signal pulse into LineMaterial's built-in shader.
+    // `vUv.y` runs +1 (segment start) → -1 (segment end), so remap to 0..1.
+    let lineShader: { uniforms: Record<string, { value: number }> } | null =
+      null;
+    lineMat.onBeforeCompile = (shader) => {
+      shader.uniforms.uTime = { value: 0 };
+      shader.uniforms.uSpeed = { value: 0.13 };
+      shader.uniforms.uSignal = { value: new THREE.Color(0xd14320) };
+
+      shader.vertexShader =
+        "attribute float aPhase;\nvarying float vPhase;\n" +
+        shader.vertexShader.replaceAll("vUv = uv;", "vUv = uv;\n\tvPhase = aPhase;");
+
+      shader.fragmentShader =
+        "uniform float uTime;\nuniform float uSpeed;\nuniform vec3 uSignal;\nvarying float vPhase;\n" +
+        shader.fragmentShader.replace(
+          "gl_FragColor = vec4( diffuseColor.rgb, alpha );",
+          /* glsl */ `
+          float segT = clamp((1.0 - vUv.y) * 0.5, 0.0, 1.0);
+          float p = fract(uTime * uSpeed + vPhase);
+          float pulse = smoothstep(0.13, 0.0, abs(segT - p));
+          vec3 sigCol = diffuseColor.rgb * 0.5 + uSignal * pulse * 2.4;
+          float sigA = alpha * (0.28 + pulse * 1.9);
+          gl_FragColor = vec4( sigCol, sigA );
+          `
+        );
+
+      lineShader = shader as unknown as {
+        uniforms: Record<string, { value: number }>;
+      };
+    };
+
+    const lines = new LineSegments2(lineGeo, lineMat);
+    lines.computeLineDistances();
+    group.add(lines);
 
     // --- Sizing ---
     const resize = () => {
@@ -190,6 +192,9 @@ export default function HeroGlobe() {
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      // LineMaterial needs the viewport resolution (CSS px) so `linewidth`
+      // stays a device-independent pixel size.
+      lineMat.resolution.set(w, h);
     };
     resize();
     const ro = new ResizeObserver(resize);
@@ -211,11 +216,13 @@ export default function HeroGlobe() {
     let running = true;
     const clock = new THREE.Clock();
     let baseRot = 0;
+    let uTimeVal = 0;
 
     const frame = () => {
       const dt = clock.getDelta();
       baseRot += dt * 0.06; // slow, natural spin
-      lineMat.uniforms.uTime.value += dt;
+      uTimeVal += dt;
+      if (lineShader) lineShader.uniforms.uTime.value = uTimeVal;
 
       // Ease the parallax toward the pointer (small shift on hover).
       curX += (targetX - curX) * 0.045;

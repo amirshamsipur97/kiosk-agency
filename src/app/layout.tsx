@@ -1,19 +1,15 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import SiteBackground from "@/components/background/SiteBackground";
 
-const display = Space_Grotesk({
-  variable: "--font-display-src",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
+// Inter is now used for both display and body text.
 const sans = Inter({
   variable: "--font-sans-src",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -57,7 +53,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${display.variable} ${sans.variable} h-full antialiased`}
+      className={`${sans.variable} h-full antialiased`}
     >
       <body className="relative min-h-full flex flex-col bg-ink text-paper">
         <SiteBackground />

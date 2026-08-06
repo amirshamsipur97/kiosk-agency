@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import SectionHeading from "@/components/ui/SectionHeading";
 import Reveal from "@/components/ui/Reveal";
 import { services as allServices } from "@/lib/services";
 
@@ -96,12 +95,12 @@ function Row({
         >
           <div className="overflow-hidden">
             <div
-              className="relative mb-5 max-w-[460px] overflow-hidden"
+              className="relative mb-5 max-w-[460px] overflow-hidden rounded-[15px]"
               style={{ backgroundImage: PANEL_SHEEN }}
             >
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 opacity-80"
+                className="pointer-events-none absolute inset-0 rounded-[15px] opacity-80"
                 style={{ backgroundImage: PANEL_HIGHLIGHT }}
               />
               <div className="relative">
@@ -125,12 +124,34 @@ function Row({
 
         <Link
           href={`/services/${service.slug}`}
-          className="group/link inline-flex items-center gap-2 text-sm font-medium text-[#df6a1b]"
+          aria-label={`Learn more about ${service.name}`}
+          className="group/btn relative inline-flex items-center justify-center gap-3 rounded-[10px] px-[30px] py-3 transition-transform duration-300 ease-out hover:-translate-y-0.5"
         >
-          Learn more
-          <span className="transition-transform duration-300 group-hover/link:translate-x-1">
-            →
+          {/* dark blurred glow fill */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-[10px] border border-[#e0e3ff] bg-gradient-to-b from-[rgba(47,40,74,0)] to-75% to-[#111113] blur-[30px]"
+          />
+          {/* white edge glow */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-[10px] border border-white mix-blend-plus-lighter transition-opacity duration-300 group-hover/btn:opacity-100 opacity-80"
+          />
+          <span className="relative z-10 text-[14px] font-medium leading-5 text-white">
+            Learn more
           </span>
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="relative z-10 size-4 text-white transition-transform duration-300 group-hover/btn:translate-x-1"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
         </Link>
       </div>
     </div>
@@ -210,20 +231,17 @@ export default function Services() {
   return (
     <section className="py-20 md:py-28">
       <div className="container-x">
-        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <SectionHeading
-            eyebrow="Featured Services"
-            title="Connected services built for growth"
-          />
-          <Reveal delay={120}>
-            <Link
-              href="/services"
-              className="inline-flex items-center gap-2 text-sm text-mist transition-colors hover:text-accent"
-            >
-              Explore all services →
-            </Link>
-          </Reveal>
-        </div>
+        <Reveal className="mx-auto flex max-w-3xl flex-col items-center text-center">
+          <h2 className="bg-gradient-to-r from-[#f4f4f5] to-[#8e8e8f] bg-clip-text pb-1 font-display text-3xl font-semibold leading-[1.2] tracking-tight text-transparent text-balance sm:text-4xl md:text-5xl">
+            Connected services built for growth
+          </h2>
+          <Link
+            href="/services"
+            className="mt-6 inline-flex items-center gap-2 text-sm text-mist transition-colors hover:text-accent"
+          >
+            Explore all services →
+          </Link>
+        </Reveal>
 
         {/* Timeline */}
         <div ref={root} className="relative mt-10 overflow-hidden md:mt-14">

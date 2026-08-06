@@ -1,7 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import MapModal from "@/components/dock/MapModal";
+
+// Hover label shown above a dock item at a fixed distance (Figma 444:17608).
+function DockTip({ label }: { label: string }) {
+  return (
+    <span className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-3 -translate-x-1/2 whitespace-nowrap rounded-[7px] border border-[rgba(75,85,99,0.6)] bg-[#202020] px-2.5 py-1 text-[12px] font-medium text-white opacity-0 shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-200 ease-out group-hover:-translate-y-0.5 group-hover:opacity-100">
+      {label}
+      <span
+        aria-hidden
+        className="absolute left-1/2 top-full size-0 -translate-x-1/2 border-x-[5px] border-t-[5px] border-x-transparent border-t-[#202020]"
+      />
+    </span>
+  );
+}
 
 // WMO weather-code → short condition label (Open-Meteo).
 function weatherText(code: number): string {
@@ -31,6 +45,7 @@ const TRACKS = [
 export default function Dock() {
   const icons = useRef<(HTMLDivElement | null)[]>([]);
   const [mapOpen, setMapOpen] = useState(false);
+  const router = useRouter();
 
   // Live Muscat weather via Open-Meteo (free, no key), refreshed every 10 min.
   const [weather, setWeather] = useState<{ temp: number | null; condition: string }>({
@@ -114,19 +129,28 @@ export default function Dock() {
     i,
     img,
     name,
+    label,
     indicator,
+    onClick,
   }: {
     i: number;
     img: string;
     name: string;
+    label?: string;
     indicator?: boolean;
+    onClick?: () => void;
   }) => (
     <div className="group relative flex flex-col items-center">
+      <DockTip label={label ?? name} />
       <div
         ref={(n) => {
           icons.current[i] = n;
         }}
-        className="relative size-16 origin-bottom transition-transform duration-150 ease-out will-change-transform"
+        onClick={onClick}
+        role={onClick ? "button" : undefined}
+        className={`relative size-16 origin-bottom transition-transform duration-150 ease-out will-change-transform ${
+          onClick ? "cursor-pointer" : ""
+        }`}
       >
         <div className={`size-16 overflow-hidden rounded-[14px] shadow-[0px_2px_6px_0px_rgba(0,0,0,0.2)]`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -143,14 +167,17 @@ export default function Dock() {
     i,
     img,
     name,
+    label,
     onClick,
   }: {
     i: number;
     img: string;
     name: string;
+    label?: string;
     onClick?: () => void;
   }) => (
     <div className="group relative flex flex-col items-center">
+      <DockTip label={label ?? name} />
       <div
         ref={(n) => {
           icons.current[i] = n;
@@ -170,11 +197,11 @@ export default function Dock() {
 
   return (
     <>
-    <div className="flex items-end justify-start overflow-x-auto px-4 pb-2 pt-12 [scrollbar-width:none] md:justify-center [&::-webkit-scrollbar]:hidden">
+    <div className="pointer-events-none flex items-end justify-start overflow-x-auto px-4 pb-2 pt-12 [scrollbar-width:none] md:justify-center [&::-webkit-scrollbar]:hidden">
       <div
         onMouseMove={onMove}
         onMouseLeave={reset}
-        className="relative shrink-0 rounded-[28px] border border-white/20"
+        className="pointer-events-auto relative shrink-0 rounded-[28px] border border-white/20"
       >
         {/* Frosted background */}
         <div
@@ -187,11 +214,22 @@ export default function Dock() {
         />
 
         <div className="relative flex items-end gap-[17px] px-4 pb-1 pt-4">
-          {/* Terminal */}
-          <AppIcon i={0} img="terminal.png" name="Terminal" />
+          {/* Terminal → AI agent panel */}
+          <AppIcon
+            i={0}
+            img="terminal.png"
+            name="Terminal"
+            label="Ai Terminal"
+            onClick={() => {
+              const el = document.getElementById("ai-architect");
+              if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              else router.push("/#ai-architect");
+            }}
+          />
 
           {/* Weather widget */}
-          <div className="relative flex flex-col items-center">
+          <div className="group relative flex flex-col items-center">
+            <DockTip label="Weather" />
             <div
               className="relative h-16 w-[200px] overflow-hidden rounded-[14px] shadow-[0px_2px_6px_0px_rgba(0,0,0,0.2)]"
               style={{ backgroundImage: "linear-gradient(-72deg, #2663b5 0%, #2f92d5 99%)" }}
@@ -200,7 +238,7 @@ export default function Dock() {
                 <span className="truncate">{weather.condition}</span>
                 <span className="text-[14.4px]">Muscat</span>
               </div>
-              <span className="absolute right-[46px] top-1 font-extralight leading-none text-white text-[38px]">
+              <span className="absolute right-[22px] top-1 font-extralight leading-none text-white text-[38px]">
                 {weather.temp ?? "··"}&deg;
               </span>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -210,8 +248,9 @@ export default function Dock() {
             <span className="mt-1.5 size-1.5 rounded-full bg-transparent" />
           </div>
 
-          {/* Spotify widget */}
-          <div className="relative flex flex-col items-center">
+          {/* Music (Spotify) widget */}
+          <div className="group relative flex flex-col items-center">
+            <DockTip label="Music" />
             <div className="relative h-16 w-[200px] overflow-hidden rounded-[14px] border border-[#191919]/60 shadow-[0px_2px_6px_0px_rgba(0,0,0,0.2)]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/dock/spotify-art.png" alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
@@ -279,17 +318,25 @@ export default function Dock() {
             <span className="mt-1.5 size-1.5 rounded-full bg-transparent" />
           </div>
 
-          {/* Figma */}
-          <AppIcon i={1} img="figma.png" name="Figma" indicator />
+          {/* Packages → /packages */}
+          <AppIcon
+            i={1}
+            img="figma.png"
+            name="Figma"
+            label="Packages"
+            indicator
+            onClick={() => router.push("/packages")}
+          />
 
           {/* Maps */}
-          <PlainIcon i={2} img="maps.png" name="Maps" onClick={() => setMapOpen(true)} />
+          <PlainIcon i={2} img="maps.png" name="Maps" label="Address" onClick={() => setMapOpen(true)} />
 
           {/* Mail */}
           <PlainIcon
             i={3}
             img="mail.png"
             name="Mail"
+            label="E-Mail"
             onClick={() => {
               window.location.href = "mailto:info@kioskoman.com";
             }}

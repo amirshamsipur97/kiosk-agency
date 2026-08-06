@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 const TOKEN =
@@ -47,6 +47,22 @@ export default function MapModal({
   onClose: () => void;
 }) {
   const mapEl = useRef<HTMLDivElement | null>(null);
+  // Keep mounted through the exit transition; toggle `entered` for the fade/scale.
+  const [render, setRender] = useState(open);
+  const [entered, setEntered] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setRender(true);
+      const r = requestAnimationFrame(() =>
+        requestAnimationFrame(() => setEntered(true)),
+      );
+      return () => cancelAnimationFrame(r);
+    }
+    setEntered(false);
+    const t = setTimeout(() => setRender(false), 280);
+    return () => clearTimeout(t);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -81,7 +97,7 @@ export default function MapModal({
     };
   }, [open, onClose]);
 
-  if (!open || typeof document === "undefined") return null;
+  if (!render || typeof document === "undefined") return null;
 
   return createPortal(
     <div
@@ -92,9 +108,15 @@ export default function MapModal({
       <button
         aria-label="Close"
         onClick={onClose}
-        className="absolute inset-0 cursor-default bg-black/70 backdrop-blur-sm"
+        className={`absolute inset-0 cursor-default bg-black/70 backdrop-blur-sm transition-opacity duration-300 ease-out ${
+          entered ? "opacity-100" : "opacity-0"
+        }`}
       />
-      <div className="relative w-[min(92vw,520px)] overflow-hidden rounded-2xl border border-white/12 bg-[#0c0d10] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)]">
+      <div
+        className={`relative w-[min(92vw,520px)] overflow-hidden rounded-2xl border border-white/12 bg-[#0c0d10] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] transition-all duration-300 ease-out ${
+          entered ? "scale-100 opacity-100 translate-y-0" : "scale-95 opacity-0 translate-y-2"
+        }`}
+      >
         <div ref={mapEl} className="aspect-square w-full bg-[#15171c]" />
         <div className="flex items-center justify-between gap-4 px-5 py-4">
           <div className="min-w-0">

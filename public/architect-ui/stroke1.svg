@@ -1,0 +1,20 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 74 148" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Stroke" filter="url(#filter0_i_0_846)">
+<path d="M74 144C55.4348 144 37.6301 136.625 24.5025 123.497C11.375 110.37 4 92.5652 4 74C4 55.4349 11.375 37.6301 24.5025 24.5025C37.63 11.375 55.4348 4.00001 74 4" stroke="url(#paint0_linear_0_846)" stroke-width="8" stroke-dasharray="0.5 5"/>
+</g>
+<defs>
+<filter id="filter0_i_0_846" x="0" y="0" width="74" height="148" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.556863 0 0 0 0 0.607843 0 0 0 0 0.682353 0 0 0 0.5 0"/>
+<feBlend mode="normal" in2="shape" result="effect1_innerShadow_0_846"/>
+</filter>
+<linearGradient id="paint0_linear_0_846" x1="44.8391" y1="7.0511" x2="13.311" y2="123.502" gradientUnits="userSpaceOnUse">
+<stop stop-color="#D782FF"/>
+<stop offset="0.965972" stop-color="#00A3FF"/>
+</linearGradient>
+</defs>
+</svg>

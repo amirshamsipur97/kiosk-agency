@@ -40,13 +40,15 @@ body {
   color: #0a0a0b;
 }
 
-::-webkit-scrollbar {
+/* Scoped to the legacy shell — the 2026 homepage keeps the platform's
+   overlay scrollbar so it doesn't steal 10px of layout width. */
+body:has(.legacy-shell)::-webkit-scrollbar {
   width: 10px;
 }
-::-webkit-scrollbar-track {
+body:has(.legacy-shell)::-webkit-scrollbar-track {
   background: #0a0a0b;
 }
-::-webkit-scrollbar-thumb {
+body:has(.legacy-shell)::-webkit-scrollbar-thumb {
   background: #26262b;
   border-radius: 999px;
   border: 3px solid #0a0a0b;

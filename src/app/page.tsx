@@ -1,33 +1,26 @@
-import Hero from "@/components/sections/Hero";
-import Dock from "@/components/sections/Dock";
-import Philosophy from "@/components/sections/Philosophy";
-import TrustedBy from "@/components/sections/TrustedBy";
-import WhatWeDo from "@/components/sections/WhatWeDo";
-import Approach from "@/components/sections/Approach";
-import Industries from "@/components/sections/Industries";
-import Services from "@/components/sections/Services";
-import CaseStudies from "@/components/sections/CaseStudies";
-import WhyKiosk from "@/components/sections/WhyKiosk";
-import Process from "@/components/sections/Process";
-import FinalCTA from "@/components/sections/FinalCTA";
+import "./kiosk.css";
+import Chrome from "@/components/k/Chrome";
+import Hero from "@/components/k/Hero";
+import Manifesto from "@/components/k/Manifesto";
+import Films from "@/components/k/Films";
+import Ivory from "@/components/k/Ivory";
+import Ground from "@/components/k/Ground";
+import Clients from "@/components/k/Clients";
+import Contact from "@/components/k/Contact";
+import Motion from "@/components/k/Motion";
 
 export default function Home() {
   return (
-    <>
+    <div className="ksite">
+      <Chrome />
       <Hero />
-      <section className="py-10 md:py-14">
-        <Dock />
-      </section>
-      <Philosophy />
-      <TrustedBy />
-      <WhatWeDo />
-      <Approach />
-      <Industries />
-      <Services />
-      <CaseStudies />
-      <WhyKiosk />
-      <Process />
-      <FinalCTA />
-    </>
+      <Manifesto />
+      <Films />
+      <Ivory />
+      <Ground />
+      <Clients />
+      <Contact />
+      <Motion />
+    </div>
   );
 }

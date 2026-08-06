@@ -1,47 +1,117 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Anton, Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import SiteBackground from "@/components/background/SiteBackground";
 
-// Inter is now used for both display and body text.
+/* Display face for the new site — Anton, all-caps condensed. */
+const anton = Anton({
+  variable: "--font-anton",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+/* Body/UI face for the new site. */
+const grotesk = Space_Grotesk({
+  variable: "--font-grotesk",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+});
+
+/* Kept for the legacy inner pages, which still style off --font-sans-src. */
 const sans = Inter({
   variable: "--font-sans-src",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
 
+const SITE_URL = "https://www.kioskoman.com";
+
+const TITLE = "Kiosk Agency — We Design. We Create. You Grow.";
+const DESCRIPTION =
+  "Kiosk Agency — full-service creative media, marketing and production, Muscat, Oman. 17 years across the GCC. From idea to installation.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kiosk-agency.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "KIOSK — Build Digital Systems That Generate Real Business Growth",
+    default: TITLE,
     template: "%s — KIOSK Agency",
   },
-  description:
-    "KIOSK is a growth-focused digital agency building connected systems — strategy, content, websites, CRM, automation, SEO, and performance marketing — that attract, engage, convert, and scale.",
+  description: DESCRIPTION,
+  applicationName: "KIOSK Agency",
+  authors: [{ name: "KIOSK Agency", url: SITE_URL }],
+  creator: "KIOSK Agency",
+  publisher: "KIOSK Agency",
+  category: "marketing",
   keywords: [
-    "digital agency",
-    "growth marketing",
-    "web development",
-    "CRM automation",
-    "SEO",
-    "lead generation",
+    "creative agency Muscat",
+    "marketing agency Oman",
+    "exhibition stands Oman",
+    "event production Muscat",
+    "film production Oman",
+    "signage and branding",
+    "performance marketing GCC",
+    "activations and retail",
   ],
+  alternates: { canonical: "/" },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
-    title: "KIOSK — Build Digital Systems That Generate Real Business Growth",
-    description:
-      "Connected digital ecosystems that attract, engage, convert, and scale.",
+    title: TITLE,
+    description: DESCRIPTION,
     type: "website",
     siteName: "KIOSK Agency",
-    url: "/",
+    locale: "en_US",
+    url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "KIOSK — Build Digital Systems That Generate Real Business Growth",
-    description:
-      "Connected digital ecosystems that attract, engage, convert, and scale.",
+    title: TITLE,
+    description: DESCRIPTION,
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
+  colorScheme: "dark",
+};
+
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "KIOSK Agency",
+      url: SITE_URL,
+      logo: `${SITE_URL}/apple-icon`,
+      email: "info@kioskoman.com",
+      telephone: "+968 9816 5570",
+      description: DESCRIPTION,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Al Ghubrah St.",
+        addressLocality: "Muscat",
+        addressCountry: "OM",
+      },
+      sameAs: ["https://www.instagram.com/kiosk.om/"],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: "KIOSK Agency",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      inLanguage: "en",
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -53,21 +123,14 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${sans.variable} h-full antialiased`}
+      className={`${anton.variable} ${grotesk.variable} ${sans.variable} h-full antialiased`}
     >
-      <body className="relative min-h-full flex flex-col bg-ink text-paper">
-        <SiteBackground />
-        {/* Soft fade from the hero down into pure black for the rest of the page */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 top-[88vh] z-[1]"
-          style={{
-            background: "linear-gradient(to bottom, rgba(0,0,0,0) 0, #000 900px)",
-          }}
+      <body className="relative min-h-full bg-ink text-paper">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
         />
-        <Header />
-        <main className="relative z-10 flex-1">{children}</main>
-        <Footer />
+        {children}
       </body>
     </html>
   );

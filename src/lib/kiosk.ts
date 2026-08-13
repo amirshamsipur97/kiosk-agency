@@ -4,8 +4,11 @@
  */
 
 export const CONTACT = {
-  phone: "+968 9816 5570",
-  phoneIntl: "96898165570",
+  phone: "+968 909 909 23",
+  phoneIntl: "96890990923",
+  /* Second line, shown beside the first wherever the number is listed. */
+  phone2: "+968 9092 0764",
+  phone2Intl: "96890920764",
   email: "info@kioskoman.com",
   instagram: "https://www.instagram.com/kiosk.om/",
   instagramHandle: "@kiosk.om",
@@ -18,11 +21,13 @@ export const wa = (text?: string) =>
   (text ? `&text=${encodeURIComponent(text)}` : "");
 
 export const MENU = [
-  { label: "Films", href: "#films", n: "01" },
-  { label: "Services", href: "#services", n: "02" },
-  { label: "On the ground", href: "#ground", n: "03" },
-  { label: "Clients", href: "#clients", n: "04" },
+  { label: "Services", href: "/services", n: "01" },
+  { label: "Clients", href: "#clients", n: "02" },
+  { label: "Films", href: "/films", n: "03" },
+  { label: "On the ground", href: "#ground", n: "04" },
   { label: "Contact", href: "#contact", n: "05" },
+  // The only long-form content on the site today; still the pre-2026 design.
+  { label: "Blog", href: "/insights", n: "06" },
 ];
 
 export const TICKER = [
@@ -37,20 +42,20 @@ export const TICKER = [
   "Branding",
 ];
 
-/* Images the hero trail cycles through, in the reference order. */
+/* Images the hero trail cycles through. */
 export const TRAIL = [
-  "/k/film-04-old-new-oman.jpg",
-  "/k/film-05-podcasts.jpg",
-  "/k/feed-b-02.jpg",
-  "/k/feed-a-03.jpg",
-  "/k/feed-a-05.jpg",
-  "/k/feed-b-04.jpg",
-  "/k/feed-a-01.jpg",
-  "/k/feed-a-02.jpg",
-  "/k/feed-b-01.jpg",
-  "/k/feed-a-04.jpg",
-  "/k/feed-a-06.jpg",
-  "/k/feed-b-05.jpg",
+  "/k/feed/ferrari.jpg",
+  "/k/feed/jw-marriott.jpg",
+  "/k/feed/lamborghini-1.jpg",
+  "/k/feed/mk-properties-5.jpg",
+  "/k/feed/porsche-1.jpg",
+  "/k/feed/movenpick-1.jpg",
+  "/k/feed/bentley.jpg",
+  "/k/feed/dar-global.jpg",
+  "/k/feed/alfa-romeo.jpg",
+  "/k/feed/rhyton-gold.jpg",
+  "/k/feed/zunairah.jpg",
+  "/k/feed/mall-of-oman.jpg",
 ];
 
 export const FILMS = [
@@ -60,7 +65,7 @@ export const FILMS = [
     meta: "Destination film · 156K views",
     href: "https://youtu.be/Cx-1w3IX5z8",
     cursor: "Watch",
-    img: "/k/film-01-discover-muscat.jpg",
+    img: "/k/feed/mk-properties-1.jpg",
   },
   {
     idx: "/02",
@@ -68,7 +73,7 @@ export const FILMS = [
     meta: "Luxury property film",
     href: "https://youtu.be/AntUHPNAXM4",
     cursor: "Watch",
-    img: "/k/film-02-zunairah.jpg",
+    img: "/k/feed/zunairah.jpg",
   },
   {
     idx: "/03",
@@ -76,7 +81,7 @@ export const FILMS = [
     meta: "Sustainability film",
     href: "https://youtu.be/mqQrEnULK14",
     cursor: "Watch",
-    img: "/k/film-03-the-arc.jpg",
+    img: "/k/feed/oxy-national-day.jpg",
   },
   {
     idx: "/04",
@@ -84,7 +89,7 @@ export const FILMS = [
     meta: "Brand storytelling",
     href: "https://youtu.be/bm-v8OEZeV4",
     cursor: "Watch",
-    img: "/k/film-04-old-new-oman.jpg",
+    img: "/k/feed/mall-of-oman.jpg",
   },
   {
     idx: "/05",
@@ -92,71 +97,97 @@ export const FILMS = [
     meta: "96K+ views · series",
     href: CONTACT.instagram,
     cursor: "Listen",
-    img: "/k/film-05-podcasts.jpg",
+    img: "/k/feed/irfan-investment.jpg",
   },
 ];
 
 /* Two counter-scrolling photo rows. Each is rendered twice for a seamless loop. */
 export const FEED_A = [
-  "/k/feed-a-01.jpg",
-  "/k/feed-a-02.jpg",
-  "/k/feed-a-03.jpg",
-  "/k/feed-a-04.jpg",
-  "/k/feed-a-05.jpg",
-  "/k/feed-a-06.jpg",
+  "/k/feed/mk-properties-1.jpg",
+  "/k/feed/porsche-1.jpg",
+  "/k/feed/juva-1.jpg",
+  "/k/feed/atana-hotels.jpg",
+  "/k/feed/ferrari.jpg",
+  "/k/feed/dar-global.jpg",
+  "/k/feed/movenpick-1.jpg",
+  "/k/feed/lamborghini-1.jpg",
+  "/k/feed/mk-properties-2.jpg",
+  "/k/feed/chic-derma.jpg",
+  "/k/feed/supercars-majlis.jpg",
+  "/k/feed/hotel-indigo.jpg",
+  "/k/feed/oxy-national-day.jpg",
+  "/k/feed/mk-properties-3.jpg",
+  "/k/feed/rhyton-gold.jpg",
+  "/k/feed/gac-oman.jpg",
 ];
 
 export const FEED_B = [
-  "/k/feed-b-01.jpg",
-  "/k/feed-b-02.jpg",
-  "/k/feed-b-03.jpg",
-  "/k/feed-b-04.jpg",
-  "/k/feed-b-05.jpg",
-  "/k/film-04-old-new-oman.jpg",
+  "/k/feed/jw-marriott.jpg",
+  "/k/feed/alfa-romeo.jpg",
+  "/k/feed/mk-properties-4.jpg",
+  "/k/feed/movenpick-2.jpg",
+  "/k/feed/bentley.jpg",
+  "/k/feed/juva-2.jpg",
+  "/k/feed/mall-of-oman.jpg",
+  "/k/feed/porsche-2.jpg",
+  "/k/feed/bait-al-bahr.jpg",
+  "/k/feed/lamborghini-2.jpg",
+  "/k/feed/mk-properties-5.jpg",
+  "/k/feed/liva.jpg",
+  "/k/feed/pampers.jpg",
+  "/k/feed/movenpick-3.jpg",
+  "/k/feed/zunairah.jpg",
+  "/k/feed/irfan-investment.jpg",
 ];
 
 export const SERVICES = [
   {
     idx: "/01",
     title: "Creative strategy",
-    body: "Research, audience analysis and campaign planning — before any budget is spent.",
-    arm: "Online",
+    body: "We turn business goals into clear creative direction, campaign concepts, and stronger brand communication.",
+    img: "/k/feed/irfan-investment.jpg",
   },
   {
     idx: "/02",
     title: "Films & content",
-    body: "Commercial films, social videos, podcasts and photography — end-to-end production.",
-    arm: "Online",
+    body: "We create films, photography, and digital content designed to capture attention and tell your brand story.",
+    img: "/k/feed/juva-1.jpg",
   },
   {
     idx: "/03",
     title: "Performance ads",
-    body: "Meta, Google and YouTube campaigns built for qualified inquiries, not clicks.",
-    arm: "Online",
+    body: "We build performance-driven campaigns focused on brand awareness, qualified lead generation, and measurable growth.",
+    img: "/k/feed/mk-properties-2.jpg",
   },
   {
     idx: "/04",
-    title: "Social & CRM",
-    body: "Publishing, community, WhatsApp funnels and lead qualification for sales teams.",
-    arm: "Online",
+    title: "Stands & exhibitions",
+    body: "We design and build exhibition stands that bring your brand to life in physical spaces.",
+    img: "/k/build-02-exhibition-arena.jpg",
   },
   {
     idx: "/05",
-    title: "Stands & exhibitions",
-    body: "Expo booths, mall stands and podiums — designed, fabricated and installed in-house.",
-    arm: "Ground",
+    title: "Activations & retail",
+    body: "We create brand activations and retail experiences that turn spaces into memorable customer interactions.",
+    img: "/k/build-08-instore-retail.jpg",
   },
   {
     idx: "/06",
-    title: "Activations & retail",
-    body: "Roadshows, POSM, in-store displays and brand experiences that move product.",
-    arm: "Ground",
+    title: "Signage & branding",
+    body: "We create visual identities and signage systems that make your brand consistent and recognizable across every touchpoint.",
+    img: "/k/build-11-office-branding.jpg",
   },
   {
     idx: "/07",
-    title: "Signage & branding",
-    body: "Indoor and outdoor signage, LED, stage sets, wraps, uniforms and giveaways.",
-    arm: "Ground",
+    title: "Web & CRM",
+    body: "Websites and CRM solutions designed to capture leads, organize customer data, and support business growth.",
+    img: "/k/feed/mk-properties-4.jpg",
+  },
+  {
+    idx: "/08",
+    title: "Social media management",
+    body: "We manage your social media from planning and publishing to audience engagement, keeping your brand active, consistent, and connected.",
+    img: "/k/feed/movenpick-1.jpg",
   },
 ];
 
@@ -209,7 +240,11 @@ export const GROUND = [
   { img: "/k/build-12-giveaways.jpg", caption: "Promotional giveaways" },
 ];
 
-export const CLIENTS = [
+/**
+ * The brand wall. `featured` names carry an accent-tinted outline so the
+ * newer marquee logos read differently from the back catalogue.
+ */
+export const CLIENTS: { name: string; sector: string; featured?: boolean }[] = [
   { name: "Samsung", sector: "Electronics" },
   { name: "Unilever", sector: "FMCG" },
   { name: "Nike", sector: "Sportswear" },
@@ -233,12 +268,19 @@ export const CLIENTS = [
   { name: "RAKBANK", sector: "Banking" },
   { name: "Fox Movies", sector: "Media" },
   { name: "MK Properties", sector: "Real estate" },
-  { name: "Irfan Investment", sector: "Real estate" },
+  { name: "Irfan Investment", sector: "Investment" },
+  { name: "JW Marriott", sector: "Hospitality", featured: true },
+  { name: "Shangri-La", sector: "Hospitality", featured: true },
+  { name: "Bentley", sector: "Automotive", featured: true },
+  { name: "Lamborghini", sector: "Automotive", featured: true },
+  { name: "Ferrari", sector: "Automotive", featured: true },
+  { name: "Bank Dhofar", sector: "Banking", featured: true },
+  { name: "OQ", sector: "Energy", featured: true },
 ];
 
-export const PROJECT_CHIPS = [
-  { label: "Campaign", value: "a campaign" },
-  { label: "Event / stand", value: "an event or exhibition stand" },
-  { label: "Films & content", value: "films and content production" },
-  { label: "Full retainer", value: "a full monthly retainer" },
-];
+/** Rows the brand wall splits into; names are dealt out round-robin. */
+export const WALL_ROWS = 4;
+
+/** Headline figure for the tally. The wall itself names a subset of these. */
+export const BRAND_COUNT = 40;
+

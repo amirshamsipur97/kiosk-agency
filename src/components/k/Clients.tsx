@@ -1,72 +1,72 @@
-import { CLIENTS, wa } from "@/lib/kiosk";
+import { Fragment } from "react";
+import { BRAND_COUNT, CLIENTS, WALL_ROWS } from "@/lib/kiosk";
 
-/** Editorial brand index — hover scrambles the name and ghosts it behind. */
+/**
+ * Kinetic brand wall — four marquee rows of outlined names running in
+ * alternating directions. Each row is its segment rendered three times so the
+ * loop can wrap at a third of the width; Motion drives the tweens, the
+ * roaming spotlight and the sector chip.
+ */
 export default function Clients() {
-  const columns = [CLIENTS.slice(0, 12), CLIENTS.slice(12)];
+  const rows = Array.from({ length: WALL_ROWS }, (_, r) =>
+    CLIENTS.filter((_, i) => i % WALL_ROWS === r),
+  );
 
   return (
     <section id="clients">
-      <div className="cl-ghost" aria-hidden>
-        <span id="clGhost">Samsung</span>
-      </div>
-
-      <div className="cl-inner">
-        <div className="sec-label">06 — Delivered for</div>
-
-        <div className="cl-top">
-          <h2>
-            Brands we&apos;ve
-            <br />
-            <i>delivered for</i>
+      <div className="cw-inner">
+        <div className="sec-label">05 — Delivered for</div>
+        <div className="cw-top">
+          <h2 className="cw-h">
+            Brands we&apos;ve <i>delivered for</i>
           </h2>
-          <div className="cl-tally">
+          <div className="cw-tally">
             <div>
-              <b>
-                <span data-count="24">0</span>
-              </b>
+              <b data-count={BRAND_COUNT}>0</b>
               <small>Brands</small>
             </div>
             <div>
-              <b>
-                <span data-count="5">0</span>
-              </b>
+              <b data-count="5">0</b>
               <small>Countries</small>
             </div>
             <div>
-              <b>
-                <span data-count="17">0</span>
-              </b>
+              <b data-count="17">0</b>
               <small>Years</small>
             </div>
           </div>
         </div>
-
-        <div className="cl-grid">
-          {columns.map((col, c) => (
-            <div className="cl-col" key={c}>
-              {col.map((client, i) => (
-                <div className="cl-row" key={client.name}>
-                  <span className="idx">
-                    /{String(c * 12 + i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="nm">{client.name}</span>
-                  <span className="sec">{client.sector}</span>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-
-        <div className="cl-note">
-          <span>
-            Produced and delivered by our team across Oman, the UAE and the
-            wider GCC.
-          </span>
-          <a href={wa()} target="_blank" rel="noopener">
-            Ask for sector references ↗
-          </a>
-        </div>
       </div>
+
+      <div className="cw-wall" id="cwWall">
+        {rows.map((row, r) => (
+          <div className="cw-row" key={r}>
+            {[0, 1, 2].map((copy) => (
+              <div className="seg" key={copy} aria-hidden={copy > 0}>
+                {/* Fragment, never a wrapper element: .seg is the flex
+                    context that gives .cw-dot its 9×9 box. */}
+                {row.map((c) => (
+                  <Fragment key={c.name}>
+                    <span
+                      className={`cw-name${c.featured ? " feat" : ""}`}
+                      data-sec={c.sector}
+                    >
+                      {c.name}
+                    </span>
+                    <i className="cw-dot" />
+                  </Fragment>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <div className="cw-inner cw-footrow">
+        <span>…and growing. Ask us for sector-specific references.</span>
+        <span className="cw-hint">Hover a name</span>
+      </div>
+
+      <div className="cw-chip" id="cwChip" aria-hidden />
     </section>
   );
 }

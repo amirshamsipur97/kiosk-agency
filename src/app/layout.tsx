@@ -79,8 +79,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0a",
-  colorScheme: "dark",
+  themeColor: "#ffffff",
+  colorScheme: "light",
 };
 
 const JSON_LD = {
@@ -93,7 +93,7 @@ const JSON_LD = {
       url: SITE_URL,
       logo: `${SITE_URL}/apple-icon`,
       email: "info@kioskoman.com",
-      telephone: "+968 9816 5570",
+      telephone: "+968 909 909 23",
       description: DESCRIPTION,
       address: {
         "@type": "PostalAddress",

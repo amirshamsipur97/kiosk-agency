@@ -7,8 +7,6 @@ import { TRAIL } from "@/lib/kiosk";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const SCRAMBLE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
 /**
  * Every scroll/pointer behaviour on the page, wired against the static markup
  * the section components render — mirroring the reference build, which drives
@@ -76,38 +74,35 @@ export default function Motion() {
 
       /* --------------------------------------- manifesto word reveal --- */
       const mani = document.getElementById("mani");
-      if (mani && !mani.dataset.split) {
-        const parts: { t: string; acc: boolean }[] = [];
-        mani.childNodes.forEach((n) => {
-          const acc = n.nodeType === 1;
-          (n.textContent || "")
-            .split(/\s+/)
-            .filter(Boolean)
-            .forEach((w) => parts.push({ t: w, acc }));
-        });
-        mani.innerHTML = parts
-          .map(
-            (p) =>
-              `<span class="w"><span${
-                p.acc ? ' style="color:var(--accent)"' : ""
-              }>${p.t}</span></span> `,
-          )
-          .join("");
-        mani.dataset.split = "1";
+      if (mani) {
+        // Manifesto renders the word spans; clear anything a previous run left
+        // on them so yPercent is measured from zero rather than stacking.
         const words = mani.querySelectorAll(".w > span");
-        gsap.set(words, { yPercent: 110 });
-        ScrollTrigger.create({
-          trigger: mani,
-          start: "top 80%",
-          once: true,
-          onEnter: () =>
-            gsap.to(words, {
-              yPercent: 0,
-              duration: 0.9,
-              stagger: 0.045,
-              ease: "power4.out",
-            }),
-        });
+        gsap.set(words, { clearProps: "transform" });
+        const reveal = () =>
+          gsap.to(words, {
+            yPercent: 0,
+            duration: 0.9,
+            stagger: 0.045,
+            ease: "power4.out",
+            overwrite: true,
+          });
+
+        if (reduce) {
+          gsap.set(words, { yPercent: 0 });
+        } else {
+          gsap.set(words, { yPercent: 110 });
+          ScrollTrigger.create({
+            trigger: mani,
+            start: "top 80%",
+            once: true,
+            onEnter: reveal,
+          });
+          // The words are clipped until the trigger fires, so never rely on it
+          // alone: if the heading is already past the start line when we set
+          // up, play immediately.
+          if (mani.getBoundingClientRect().top < innerHeight * 0.8) reveal();
+        }
       }
 
       /* ------------------------------------------- generic reveals ---- */
@@ -128,7 +123,7 @@ export default function Motion() {
           scrollTrigger: { trigger: el.closest("h2") || el, start: "top 85%" },
         });
       });
-      gsap.utils.toArray<HTMLElement>(".f-row,.s-row").forEach((el) => {
+      gsap.utils.toArray<HTMLElement>(".s-card").forEach((el) => {
         gsap.from(el, {
           opacity: 0,
           y: 26,
@@ -150,61 +145,27 @@ export default function Motion() {
         });
       });
 
-      /* --------------------------------------- film preview follow ---- */
-      const prev = document.getElementById("preview");
-      const prevImg = prev?.querySelector("img");
-      if (prev && prevImg && !isTouch) {
-        let px = 0,
-          py = 0,
-          pxT = 0,
-          pyT = 0;
-        const onMove = (e: MouseEvent) => {
-          pxT = e.clientX + 24;
-          pyT = e.clientY - 160;
-        };
-        const render = () => {
-          px += (pxT - px) * 0.12;
-          py += (pyT - py) * 0.12;
-          prev.style.left = px + "px";
-          prev.style.top = py + "px";
-        };
-        addEventListener("mousemove", onMove);
-        gsap.ticker.add(render);
-        off.push(() => {
-          removeEventListener("mousemove", onMove);
-          gsap.ticker.remove(render);
-        });
-
-        document.querySelectorAll<HTMLElement>(".f-row").forEach((row) => {
-          const enter = () => {
-            prevImg.src = row.dataset.prev || "";
-            gsap.fromTo(
-              prevImg,
-              { scale: 1.15 },
-              { scale: 1, duration: 0.6, ease: "power3.out" },
-            );
-            prev.classList.add("on");
-          };
-          const leave = () => prev.classList.remove("on");
-          row.addEventListener("mouseenter", enter);
-          row.addEventListener("mouseleave", leave);
-          off.push(() => {
-            row.removeEventListener("mouseenter", enter);
-            row.removeEventListener("mouseleave", leave);
-          });
-        });
-      }
-
       /* --------------------------------------------------- marquees --- */
       document.querySelectorAll<HTMLElement>("[data-marquee]").forEach((el) => {
         const dir = Number(el.dataset.dir) || -1;
         let x = 0;
+        // The track holds its content twice, so the loop distance is where the
+        // second copy starts. scrollWidth/2 is NOT that distance once the row
+        // has a gap — it drops half a gap every lap, which is the visible tear.
+        // Re-read it each frame so it stays right while images are still
+        // loading and the row is still growing.
+        const loopWidth = () => {
+          const mid = el.children[el.children.length / 2] as
+            | HTMLElement
+            | undefined;
+          return mid ? mid.offsetLeft : el.scrollWidth / 2;
+        };
         const render = () => {
+          const h = loopWidth();
+          if (h <= 1) return;
           x += dir * 0.65;
-          const h = el.scrollWidth / 2;
-          if (!h) return;
-          if (x <= -h) x += h;
-          if (x >= 0) x -= h;
+          while (x <= -h) x += h;
+          while (x >= 0) x -= h;
           el.style.transform = `translateX(${x}px)`;
         };
         gsap.ticker.add(render);
@@ -366,76 +327,108 @@ export default function Motion() {
         });
       }
 
-      /* ------------------------------------------ clients index ------- */
-      const rows = [...document.querySelectorAll<HTMLElement>(".cl-row")];
-      if (rows.length) {
-        const ghost = document.getElementById("clGhost");
-
-        document.querySelectorAll<HTMLElement>(".cl-col").forEach((col) => {
-          gsap.from(col.querySelectorAll(".cl-row"), {
-            clipPath: "inset(0 100% 0 0)",
-            opacity: 0,
-            duration: 0.75,
-            stagger: 0.045,
-            ease: "power3.out",
-            scrollTrigger: { trigger: col, start: "top 88%" },
+      /* -------------------------------------- clients kinetic wall ---- */
+      const wall = document.getElementById("cwWall");
+      const chip = document.getElementById("cwChip");
+      if (wall) {
+        const rowEls = [...wall.querySelectorAll<HTMLElement>(".cw-row")];
+        // Each row holds its segment three times, so a third of the width is
+        // exactly one loop.
+        const tweens = rowEls.map((row, r) => {
+          const forward = r % 2 === 1;
+          gsap.set(row, { xPercent: forward ? -33.334 : 0 });
+          return gsap.to(row, {
+            xPercent: forward ? 0 : -33.334,
+            duration: 34 + r * 7,
+            repeat: -1,
+            ease: "none",
           });
         });
-        gsap.from(".cl-tally div", {
-          opacity: 0,
-          y: 22,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: "power3.out",
-          scrollTrigger: { trigger: ".cl-top", start: "top 90%" },
+
+        /* scrolling fast sweeps the wall along with you */
+        let cool: ReturnType<typeof setTimeout> | undefined;
+        ScrollTrigger.create({
+          trigger: "#clients",
+          start: "top bottom",
+          end: "bottom top",
+          onUpdate: (self) => {
+            const boost = gsap.utils.clamp(
+              1,
+              4,
+              1 + Math.abs(self.getVelocity()) / 900,
+            );
+            tweens.forEach((t) =>
+              gsap.to(t, { timeScale: boost, duration: 0.2, overwrite: true }),
+            );
+            clearTimeout(cool);
+            cool = setTimeout(
+              () =>
+                tweens.forEach((t) =>
+                  gsap.to(t, {
+                    timeScale: 1,
+                    duration: 1.2,
+                    ease: "power2.out",
+                  }),
+                ),
+              140,
+            );
+          },
+        });
+        off.push(() => clearTimeout(cool));
+
+        /* a spotlight wanders the wall so it never sits still */
+        let lit: Element | null = null;
+        const spot = setInterval(() => {
+          const names = wall.querySelectorAll(".cw-name");
+          if (!names.length) return;
+          lit?.classList.remove("lit");
+          lit = names[Math.floor(Math.random() * names.length)];
+          lit.classList.add("lit");
+        }, 2000);
+        off.push(() => {
+          clearInterval(spot);
+          lit?.classList.remove("lit");
         });
 
-        let hideT: ReturnType<typeof setTimeout> | null = null;
-        rows.forEach((r) => {
-          const nm = r.querySelector<HTMLElement>(".nm")!;
-          const orig = nm.textContent || "";
-          let iv: ReturnType<typeof setInterval> | null = null;
-
-          const enter = () => {
-            if (hideT) clearTimeout(hideT);
-            if (ghost) {
-              ghost.textContent = orig;
-              ghost.classList.add("on");
+        /* sector chip trails the cursor */
+        if (chip) {
+          const track = (e: PointerEvent) => {
+            const t = (e.target as HTMLElement)?.closest?.(".cw-name") as
+              | HTMLElement
+              | null;
+            if (t) {
+              chip.textContent = t.dataset.sec || "";
+              chip.style.left = e.clientX + "px";
+              chip.style.top = e.clientY + "px";
+              chip.classList.add("on");
+            } else {
+              chip.classList.remove("on");
             }
-            let f = 0;
-            if (iv) clearInterval(iv);
-            iv = setInterval(() => {
-              nm.textContent = orig
-                .split("")
-                .map((c, i) => {
-                  if (c === " " || c === "'") return c;
-                  return i < f / 1.6
-                    ? orig[i]
-                    : SCRAMBLE_CHARS[Math.floor(Math.random() * 26)];
-                })
-                .join("");
-              f++;
-              if (f / 1.6 >= orig.length) {
-                if (iv) clearInterval(iv);
-                nm.textContent = orig;
-              }
-            }, 26);
           };
-          const leave = () => {
-            if (iv) clearInterval(iv);
-            nm.textContent = orig;
-            hideT = setTimeout(() => ghost?.classList.remove("on"), 120);
-          };
-          r.addEventListener("mouseenter", enter);
-          r.addEventListener("mouseleave", leave);
+          const leave = () => chip.classList.remove("on");
+          wall.addEventListener("pointermove", track, { passive: true });
+          wall.addEventListener("pointerover", track, { passive: true });
+          wall.addEventListener("pointerleave", leave, { passive: true });
           off.push(() => {
-            if (iv) clearInterval(iv);
-            r.removeEventListener("mouseenter", enter);
-            r.removeEventListener("mouseleave", leave);
+            wall.removeEventListener("pointermove", track);
+            wall.removeEventListener("pointerover", track);
+            wall.removeEventListener("pointerleave", leave);
+            chip.classList.remove("on");
+          });
+        }
+
+        /* hovering a row nearly stops it so a name can be read */
+        rowEls.forEach((row, i) => {
+          const slow = () => gsap.to(tweens[i], { timeScale: 0.15, duration: 0.5 });
+          const resume = () => gsap.to(tweens[i], { timeScale: 1, duration: 0.8 });
+          row.addEventListener("pointerenter", slow);
+          row.addEventListener("pointerleave", resume);
+          off.push(() => {
+            row.removeEventListener("pointerenter", slow);
+            row.removeEventListener("pointerleave", resume);
           });
         });
       }
-
       /* -------------------------------------------------- contact ----- */
       gsap.from("#contact .ln > span", {
         yPercent: 118,

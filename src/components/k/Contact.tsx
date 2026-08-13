@@ -1,19 +1,15 @@
-"use client";
-
-import { useState } from "react";
-import { CONTACT, PROJECT_CHIPS, wa } from "@/lib/kiosk";
+import { CONTACT, wa } from "@/lib/kiosk";
 
 const LINKS = [
   { small: "WhatsApp", big: CONTACT.phone, href: wa() },
+  { small: "Phone", big: CONTACT.phone2, href: `tel:+${CONTACT.phone2Intl}` },
   { small: "Email", big: CONTACT.email, href: `mailto:${CONTACT.email}` },
   { small: "Instagram", big: CONTACT.instagramHandle, href: CONTACT.instagram },
   { small: "Studio", big: CONTACT.studio, href: CONTACT.maps },
 ];
 
-/** Closing CTA — the chips retarget the WhatsApp message before it is sent. */
+/** Closing CTA. */
 export default function Contact() {
-  const [chip, setChip] = useState(PROJECT_CHIPS[0].value);
-
   return (
     <section id="contact">
       <div className="c-inner">
@@ -33,35 +29,15 @@ export default function Contact() {
             Tell us what you need — scope is tailored to your goals, markets and
             priorities.
           </p>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 16,
-              alignItems: "flex-end",
-            }}
+          <a
+            className="cta magnetic"
+            id="waCta"
+            href={wa("Hi Kiosk — I'd like to start a project.")}
+            target="_blank"
+            rel="noopener"
           >
-            <div className="p-chips">
-              {PROJECT_CHIPS.map((c) => (
-                <button
-                  key={c.value}
-                  className={`pchip${chip === c.value ? " on" : ""}`}
-                  onClick={() => setChip(c.value)}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-            <a
-              className="cta magnetic"
-              id="waCta"
-              href={wa(`Hi Kiosk — I'd like to talk about ${chip}.`)}
-              target="_blank"
-              rel="noopener"
-            >
-              Start a project
-            </a>
-          </div>
+            Start a project
+          </a>
         </div>
       </div>
 

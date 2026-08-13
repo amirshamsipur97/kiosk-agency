@@ -7,13 +7,16 @@
    ========================================================================== */
 
 .ksite {
-  --bg: #0a0a0a;
+  /* Light theme: the page surface is white, text is ink, and the accent
+     orange is untouched. --ivory stays the warm band that sets the services
+     and numbers block apart from the plain white page. */
+  --bg: #ffffff;
   --ivory: #ece8e1;
-  --text: #ece8e1;
+  --text: #111110;
   --ink: #111110;
-  --muted: #8a877f;
+  --muted: #6b6860;
   --accent: #ff4b1f;
-  --line: rgba(236, 232, 225, 0.14);
+  --line: rgba(17, 17, 16, 0.16);
   --line-dark: rgba(17, 17, 16, 0.16);
 
   background: var(--bg);
@@ -27,8 +30,8 @@
 
 /* The page owns the whole viewport background, not just its own box. */
 body:has(.ksite) {
-  background: #0a0a0a;
-  color: #ece8e1;
+  background: #ffffff;
+  color: #111110;
   overflow-x: hidden;
 }
 
@@ -70,7 +73,8 @@ body:has(.ksite) {
   height: 200%;
   pointer-events: none;
   z-index: 9989;
-  opacity: 0.03;
+  /* Dark noise reads far stronger over white than it did over black. */
+  opacity: 0.015;
   background-image: url("data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 180px 180px;
   background-repeat: repeat;
@@ -145,7 +149,7 @@ body:has(.ksite) {
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background: #000;
+  background: #ffffff;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -180,30 +184,28 @@ body:has(.ksite) {
   align-items: center;
   justify-content: space-between;
   padding: 18px clamp(18px, 3vw, 44px);
-  mix-blend-mode: difference;
+  /* No difference blend on the light theme — it would flip the accent dot to
+     cyan over white. Ink reads correctly over the page and the orange menu. */
 }
 .ksite .logo {
   font-family: var(--font-anton), sans-serif;
   font-size: 1.4rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--ink);
 }
 .ksite .logo i {
   font-style: normal;
   color: var(--accent);
 }
+/* The accent dot would vanish against the orange overlay menu. */
+.ksite:has(#menu.open) .logo i {
+  color: var(--ink);
+}
 .ksite .n-right {
   display: flex;
   align-items: center;
   gap: clamp(14px, 2.4vw, 30px);
-}
-.ksite .n-clock {
-  font-size: 0.72rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: #fff;
-  opacity: 0.7;
 }
 .ksite .menu-btn {
   display: flex;
@@ -213,7 +215,7 @@ body:has(.ksite) {
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--ink);
 }
 .ksite .menu-btn .bars {
   width: 26px;
@@ -227,7 +229,7 @@ body:has(.ksite) {
   left: 0;
   right: 0;
   height: 2px;
-  background: #fff;
+  background: var(--ink);
   transition: transform 0.35s, top 0.35s;
 }
 .ksite .menu-btn .bars::before {
@@ -235,11 +237,6 @@ body:has(.ksite) {
 }
 .ksite .menu-btn .bars::after {
   top: 10px;
-}
-@media (max-width: 640px) {
-  .ksite .n-clock {
-    display: none;
-  }
 }
 
 /* --------------------------------------------------------- overlay menu -- */
@@ -253,7 +250,10 @@ body:has(.ksite) {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 0 clamp(18px, 3vw, 44px) 5vh;
+  /* Top padding keeps the list clear of the logo, and scrolling is the last
+     resort on very short windows. */
+  padding: 92px clamp(18px, 3vw, 44px) 5vh;
+  overflow-y: auto;
 }
 .ksite #menu.open {
   clip-path: inset(0 0 0% 0);
@@ -261,7 +261,9 @@ body:has(.ksite) {
 .ksite #menu a.m-link {
   display: block;
   font-family: var(--font-anton), sans-serif;
-  font-size: clamp(3rem, 9.5vw, 8rem);
+  /* Capped against viewport height as well as width so six items can never
+     climb into the logo. Short screens get their own scale further down. */
+  font-size: clamp(2.4rem, min(9.12vw, 10.8vh), 7.68rem);
   line-height: 1.02;
   text-transform: uppercase;
   color: #000;
@@ -279,6 +281,16 @@ body:has(.ksite) {
   vertical-align: super;
   margin-left: 10px;
   font-weight: 700;
+}
+/* Landscape phones: too little height for the main scale, so shrink the type
+   and claw back the top clearance. */
+@media (max-height: 520px) {
+  .ksite #menu {
+    padding-top: 72px;
+  }
+  .ksite #menu a.m-link {
+    font-size: clamp(1.7rem, 8.5vh, 2.6rem);
+  }
 }
 .ksite #menu .m-foot {
   display: flex;
@@ -334,13 +346,15 @@ body:has(.ksite) {
   font-size: clamp(0.66rem, 1vw, 0.8rem);
   letter-spacing: 0.4em;
   text-transform: uppercase;
-  color: var(--muted);
+  /* A step darker than --muted: this is the smallest type sitting over the
+     glow, and it has to stay past 4.5:1 at the wash's peak. */
+  color: #56534b;
   margin-bottom: 3vh;
   font-weight: 500;
 }
 .ksite #hero h1 {
   font-size: clamp(22vw, 24vw, 34vh);
-  color: var(--text);
+  color: var(--accent);
 }
 .ksite #hero h1 .hl {
   display: block;
@@ -434,23 +448,45 @@ body:has(.ksite) {
 }
 .ksite .t-track span {
   font-family: var(--font-anton), sans-serif;
-  font-size: 1.05rem;
+  font-size: 1.37rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   white-space: nowrap;
   color: var(--muted);
-  padding-right: 56px;
+  /* No padding here: the half of the track that repeats would otherwise get a
+     double gap at the seam. The separator alone sets the rhythm. */
+  padding-right: 0;
 }
 .ksite .t-track span i {
   font-style: normal;
   color: var(--accent);
-  padding-right: 56px;
+  padding-right: 72px;
+}
+
+/* ---------------------------------------------------- WebGL accent glow -- */
+.ksite .k-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ksite .k-glow canvas {
+  display: block;
 }
 
 /* ------------------------------------------------------------ manifesto -- */
 .ksite #manifesto {
   padding: clamp(100px, 13vw, 180px) clamp(18px, 3vw, 44px);
   text-align: center;
+  /* Positioning context for the glow layer, which sits behind the copy. */
+  position: relative;
+  overflow: hidden;
+}
+.ksite #manifesto > p,
+.ksite #manifesto > h2 {
+  position: relative;
+  z-index: 1;
 }
 .ksite #manifesto .display {
   font-size: clamp(2.2rem, 6vw, 5.6rem);
@@ -464,9 +500,10 @@ body:has(.ksite) {
   padding-bottom: 0.06em;
   margin-bottom: -0.06em;
 }
+/* No hidden-by-default transform here: the reveal is applied by script, so if
+   it never runs the headline simply shows instead of staying clipped. */
 .ksite #manifesto .display .w > span {
   display: inline-block;
-  transform: translateY(110%);
 }
 .ksite #manifesto .display em {
   font-style: normal;
@@ -478,12 +515,23 @@ body:has(.ksite) {
   margin: 36px auto 0;
   font-size: 1.02rem;
 }
-
-/* ================================================ films list w/ preview === */
-.ksite #films {
-  position: relative;
-  padding: clamp(80px, 9vw, 130px) 0 clamp(60px, 7vw, 90px);
+/* The systems line leads the section, so its spacing sits underneath. The
+   selector carries the id so it outranks the rule above without !important. */
+.ksite #manifesto p.mani-sys {
+  font-family: var(--font-anton), sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.1rem, 2.4vw, 1.7rem);
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  max-width: none;
+  margin: 0 auto 26px;
 }
+.ksite #manifesto p.mani-sys em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+/* ============================================= shared section label === */
 .ksite .sec-label {
   display: flex;
   align-items: center;
@@ -501,74 +549,6 @@ body:has(.ksite) {
   flex: 1;
   height: 1px;
   background: var(--line);
-}
-.ksite .f-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 20px;
-  padding: clamp(20px, 3vw, 34px) clamp(18px, 3vw, 44px);
-  border-top: 1px solid var(--line);
-  position: relative;
-  transition: background 0.35s;
-  flex-wrap: wrap;
-}
-.ksite .f-row:last-of-type {
-  border-bottom: 1px solid var(--line);
-}
-.ksite .f-row .f-idx {
-  font-size: 0.78rem;
-  color: var(--muted);
-  letter-spacing: 0.2em;
-  width: 44px;
-  flex: none;
-}
-.ksite .f-row h3 {
-  font-family: var(--font-anton), sans-serif;
-  font-size: clamp(2rem, 5.6vw, 4.6rem);
-  text-transform: uppercase;
-  line-height: 0.9;
-  transition: color 0.3s, transform 0.4s;
-  flex: 1;
-}
-.ksite .f-row .f-meta {
-  color: var(--muted);
-  font-size: 0.82rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  text-align: right;
-}
-.ksite .f-row:hover {
-  background: rgba(255, 75, 31, 0.06);
-}
-.ksite .f-row:hover h3 {
-  color: var(--accent);
-  transform: translateX(14px);
-}
-.ksite #preview {
-  position: fixed;
-  z-index: 900;
-  width: min(300px, 30vw);
-  aspect-ratio: 3/3.8;
-  pointer-events: none;
-  overflow: hidden;
-  opacity: 0;
-  transform: scale(0.85) rotate(3deg);
-  transition: opacity 0.3s, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.ksite #preview.on {
-  opacity: 1;
-  transform: scale(1) rotate(0);
-}
-.ksite #preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-@media (hover: none) {
-  .ksite #preview {
-    display: none;
-  }
 }
 
 /* ------------------------------------------------- diagonal creative band - */
@@ -589,6 +569,9 @@ body:has(.ksite) {
 .ksite .b-row img {
   height: clamp(200px, 26vh, 300px);
   width: auto;
+  /* Reserve the width before the file arrives, so the loop distance is right
+     from the first frame and the row never re-flows mid-scroll. */
+  aspect-ratio: 460 / 818;
   filter: grayscale(1) contrast(1.06) brightness(0.9);
   transition: filter 0.5s;
   border-radius: 6px;
@@ -641,82 +624,131 @@ body:has(.ksite) {
   font-size: 0.95rem;
   padding-bottom: 10px;
 }
-.ksite .s-row {
-  display: grid;
-  grid-template-columns: 60px 1fr 1.1fr auto;
-  gap: clamp(14px, 3vw, 40px);
-  align-items: center;
-  padding: clamp(20px, 2.6vw, 30px) clamp(18px, 3vw, 44px);
-  border-top: 1px solid var(--line-dark);
-  position: relative;
-  overflow: hidden;
-  transition: color 0.35s;
+/* Services on the landing page are boxes, not rows: everything is on show, so
+   the section reads as a substantial block rather than a thin list. The
+   collapsible treatment lives on /services. */
+.ksite .sv-head-r {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
 }
-.ksite .s-row:last-of-type {
-  border-bottom: 1px solid var(--line-dark);
-}
-.ksite .s-row::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--ink);
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform 0.45s cubic-bezier(0.6, 0.05, 0.2, 1);
-  z-index: 0;
-}
-.ksite .s-row:hover::before {
-  transform: scaleY(1);
-}
-.ksite .s-row > * {
-  position: relative;
-  z-index: 1;
-}
-.ksite .s-row:hover {
-  color: var(--ivory);
-}
-.ksite .s-row .s-idx {
-  font-size: 0.74rem;
-  letter-spacing: 0.2em;
-  color: inherit;
-  opacity: 0.5;
-}
-.ksite .s-row h3 {
-  font-family: var(--font-anton), sans-serif;
-  font-size: clamp(1.4rem, 3.2vw, 2.4rem);
-  text-transform: uppercase;
-  line-height: 0.95;
-}
-.ksite .s-row:hover h3 {
-  color: var(--accent);
-}
-.ksite .s-row p {
-  font-size: 0.9rem;
-  opacity: 0.72;
-}
-.ksite .s-row .s-arm {
+.ksite .sv-all {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  border: 1.5px solid currentColor;
-  border-radius: 100px;
-  padding: 8px 16px;
-  white-space: nowrap;
+  color: var(--accent);
+  border-bottom: 1px solid rgba(255, 75, 31, 0.4);
+  padding-bottom: 3px;
+  transition: border-color 0.3s;
 }
-@media (max-width: 800px) {
-  .ksite .s-row {
-    grid-template-columns: 44px 1fr;
-    grid-template-rows: auto auto;
+.ksite .sv-all:hover {
+  border-bottom-color: var(--accent);
+}
+
+.ksite .s-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(14px, 1.6vw, 22px);
+  padding: 0 clamp(18px, 3vw, 44px);
+}
+.ksite .s-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* The tall min-height is the point — the section should feel like a block. */
+  min-height: clamp(240px, 24vw, 330px);
+  padding: clamp(24px, 2.4vw, 38px);
+  background: var(--bg);
+  border: 1px solid var(--line-dark);
+  overflow: hidden;
+  transition: border-color 0.4s, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+/* accent bar that grows up the left edge on hover */
+.ksite .s-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.45s cubic-bezier(0.6, 0.05, 0.2, 1);
+}
+.ksite .s-card:hover {
+  border-color: rgba(255, 75, 31, 0.45);
+  transform: translateY(-4px);
+}
+.ksite .s-card:hover::before {
+  transform: scaleY(1);
+}
+.ksite .s-card-idx {
+  font-size: 0.72rem;
+  letter-spacing: 0.24em;
+  color: var(--muted);
+}
+.ksite .s-card h3 {
+  margin-top: clamp(16px, 2vw, 26px);
+  font-family: var(--font-anton), sans-serif;
+  font-size: clamp(1.4rem, 2.6vw, 2.2rem);
+  text-transform: uppercase;
+  line-height: 1.02;
+  color: var(--ink);
+  transition: color 0.3s;
+}
+.ksite .s-card:hover h3 {
+  color: var(--accent);
+}
+.ksite .s-card p {
+  margin-top: 14px;
+  font-size: 0.95rem;
+  color: #565349;
+  max-width: 42ch;
+}
+/* pinned to the bottom so every card's action sits on the same line */
+.ksite .s-card .s-inq {
+  margin-top: auto;
+  align-self: flex-start;
+  padding-top: clamp(18px, 2vw, 26px);
+}
+@media (max-width: 900px) {
+  .ksite .s-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
-  .ksite .s-row p {
-    grid-column: 2;
-  }
-  .ksite .s-row .s-arm {
-    display: none;
+  .ksite .s-card {
+    min-height: 0;
   }
 }
 
+/* the inquiry pill, shared with /services */
+.ksite .s-inq {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  transition: gap 0.3s, color 0.3s;
+}
+.ksite .s-inq:hover {
+  gap: 16px;
+}
+.ksite .sv2-info .s-inq {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 100px;
+  padding: 13px 26px;
+  transition: background 0.3s, transform 0.3s;
+}
+.ksite .sv2-info .s-inq:hover {
+  background: #d93c12;
+  transform: translateY(-2px);
+}
 /* ============== numbers — pinned full-screen counter sequence ============= */
 .ksite #numbers {
   position: relative;
@@ -960,12 +992,12 @@ body:has(.ksite) {
   right: 0;
   bottom: 0;
   padding: 44px 16px 14px;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.88));
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.94));
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--ivory);
+  color: var(--ink);
 }
 .ksite .st-hint {
   padding: 18px clamp(18px, 3vw, 44px) 0;
@@ -1012,205 +1044,160 @@ body:has(.ksite) {
   margin: 30px auto 0;
 }
 
-/* ================================================ clients — editorial index */
+/* ============================================== clients — kinetic brand wall */
 .ksite #clients {
   position: relative;
-  padding: clamp(80px, 10vw, 140px) 0 clamp(70px, 8vw, 110px);
   border-top: 1px solid var(--line);
+  padding: clamp(70px, 9vw, 120px) 0 clamp(50px, 6vw, 80px);
   overflow: hidden;
 }
-.ksite #clients .cl-inner {
-  position: relative;
-  z-index: 2;
+.ksite .cw-inner {
   padding: 0 clamp(18px, 3vw, 44px);
   max-width: 1500px;
   margin: 0 auto;
 }
-/* ghost brand name behind */
-.ksite .cl-ghost {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-.ksite .cl-ghost span {
-  font-family: var(--font-anton), sans-serif;
-  text-transform: uppercase;
-  font-size: min(19vw, 24vh);
-  line-height: 1;
-  white-space: nowrap;
-  color: transparent;
-  -webkit-text-stroke: 1.4px rgba(236, 232, 225, 0.11);
-  opacity: 0;
-  transform: scale(0.93);
-  transition: opacity 0.5s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.ksite .cl-ghost span.on {
-  opacity: 1;
-  transform: scale(1);
-}
-/* header */
-.ksite .cl-top {
+.ksite .cw-top {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   gap: 24px;
   flex-wrap: wrap;
-  margin: 34px 0 44px;
+  margin: 30px 0 42px;
 }
-.ksite .cl-top h2 {
+.ksite .cw-h {
   font-family: var(--font-anton), sans-serif;
   text-transform: uppercase;
-  font-size: clamp(2.6rem, 7.4vw, 6.4rem);
-  line-height: 0.86;
+  font-size: clamp(1.8rem, 4.6vw, 3.8rem);
+  line-height: 0.9;
 }
-.ksite .cl-top h2 i {
+.ksite .cw-h i {
   font-style: normal;
   color: var(--accent);
 }
-.ksite .cl-tally {
-  text-align: right;
+.ksite .cw-tally {
   display: flex;
-  align-items: flex-end;
-  gap: clamp(18px, 3vw, 40px);
+  gap: clamp(20px, 3.4vw, 46px);
+  text-align: center;
 }
-.ksite .cl-tally div b {
+.ksite .cw-tally b {
   font-family: var(--font-anton), sans-serif;
-  font-size: clamp(2rem, 4.4vw, 3.6rem);
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
   line-height: 0.85;
+  color: var(--accent);
   display: block;
-  color: var(--text);
   font-weight: 400;
 }
-.ksite .cl-tally div small {
+.ksite .cw-tally small {
   display: block;
-  margin-top: 8px;
-  font-size: 0.66rem;
+  margin-top: 7px;
+  font-size: 0.62rem;
   letter-spacing: 0.26em;
   text-transform: uppercase;
   color: var(--muted);
 }
-/* index grid */
-.ksite .cl-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0 clamp(30px, 5vw, 80px);
-}
-.ksite .cl-row {
-  display: grid;
-  grid-template-columns: 42px 1fr auto;
-  gap: 14px;
-  align-items: baseline;
-  padding: clamp(11px, 1.5vh, 16px) 8px;
-  border-top: 1px solid var(--line);
-  position: relative;
-  overflow: hidden;
+/* the wall itself */
+.ksite .cw-wall {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.4vh, 16px);
   cursor: default;
 }
-.ksite .cl-col .cl-row:last-child {
-  border-bottom: 1px solid var(--line);
+.ksite .cw-row {
+  display: flex;
+  width: max-content;
+  will-change: transform;
 }
-.ksite .cl-row::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 75, 31, 0.16),
-    rgba(255, 75, 31, 0)
-  );
-  transition: width 0.55s cubic-bezier(0.6, 0.05, 0.2, 1);
-  pointer-events: none;
+.ksite .cw-row .seg {
+  display: flex;
+  align-items: center;
+  flex: none;
 }
-.ksite .cl-row:hover::before {
-  width: 100%;
-}
-.ksite .cl-row .idx {
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  color: var(--muted);
-  opacity: 0.6;
-  position: relative;
-  transition: color 0.35s, opacity 0.35s;
-}
-.ksite .cl-row .nm {
+.ksite .cw-name {
   font-family: var(--font-anton), sans-serif;
   text-transform: uppercase;
-  font-size: clamp(1.05rem, 2.1vw, 1.85rem);
-  letter-spacing: 0.02em;
-  color: rgba(236, 232, 225, 0.62);
-  position: relative;
-  transition: color 0.35s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.ksite .cl-row .sec {
-  font-size: 0.66rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--muted);
-  opacity: 0.45;
-  position: relative;
-  transition: opacity 0.35s, color 0.35s,
-    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
+  line-height: 1;
+  font-size: clamp(2.6rem, 6.4vw, 6rem);
+  color: transparent;
+  -webkit-text-stroke: 1.6px rgba(19, 17, 16, 0.34);
+  padding: 0 clamp(16px, 2vw, 30px);
+  transition: color 0.35s ease, -webkit-text-stroke-color 0.35s ease,
+    transform 0.35s ease;
+  cursor: pointer;
 }
-.ksite .cl-row:hover .nm {
-  color: var(--text);
-  transform: translateX(12px);
+.ksite .cw-name:hover {
+  color: var(--ink);
+  -webkit-text-stroke-color: var(--ink);
+  transform: scale(1.04);
 }
-.ksite .cl-row:hover .idx {
+.ksite .cw-name.lit {
   color: var(--accent);
-  opacity: 1;
+  -webkit-text-stroke-color: var(--accent);
+  text-shadow: 0 0 46px rgba(255, 75, 31, 0.35);
 }
-.ksite .cl-row:hover .sec {
-  opacity: 1;
+.ksite .cw-name.feat {
+  -webkit-text-stroke-color: rgba(255, 75, 31, 0.55);
+}
+.ksite .cw-name.feat:hover {
   color: var(--accent);
-  transform: translateX(-4px);
+  -webkit-text-stroke-color: var(--accent);
 }
-.ksite .cl-note {
-  margin-top: 44px;
+.ksite .cw-dot {
+  width: 9px;
+  height: 9px;
+  background: var(--accent);
+  flex: none;
+  border-radius: 1px;
+  transform: rotate(45deg);
+}
+.ksite .cw-footrow {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   gap: 20px;
-  flex-wrap: wrap;
+  margin-top: 44px;
   border-top: 1px solid var(--line);
-  padding-top: 22px;
+  padding-top: 20px;
+  font-size: 0.82rem;
   color: var(--muted);
-  font-size: 0.84rem;
+  font-style: italic;
 }
-.ksite .cl-note a {
-  color: var(--accent);
-  font-weight: 700;
-  letter-spacing: 0.16em;
+.ksite .cw-hint {
+  font-style: normal;
+  font-size: 0.68rem;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
-  font-size: 0.74rem;
+}
+/* sector chip that follows the cursor */
+.ksite .cw-chip {
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+  background: var(--ink);
+  color: var(--ivory);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: 100px;
+  opacity: 0;
+  transform: translate(-50%, -140%) scale(0.8);
+  transition: opacity 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+.ksite .cw-chip.on {
+  opacity: 1;
+  transform: translate(-50%, -140%) scale(1);
 }
 @media (max-width: 820px) {
-  .ksite .cl-grid {
-    grid-template-columns: 1fr;
+  .ksite .cw-name {
+    font-size: 11vw;
   }
-  .ksite .cl-col:last-child .cl-row:first-child {
-    border-top: none;
-  }
-  .ksite .cl-col:not(:last-child) .cl-row:last-child {
-    border-bottom: none;
-  }
-  .ksite .cl-ghost span {
-    font-size: 26vw;
-  }
-  .ksite .cl-row .sec {
-    display: none;
-  }
-  .ksite .cl-row {
-    grid-template-columns: 36px 1fr;
+  .ksite .cw-tally {
+    gap: 18px;
   }
 }
+
 
 /* -------------------------------------------------------------- contact -- */
 .ksite #contact {
@@ -1226,7 +1213,7 @@ body:has(.ksite) {
       transparent 60%
     ),
     radial-gradient(45% 40% at 8% 80%, rgba(255, 75, 31, 0.1), transparent 60%),
-    #050505;
+    #ffffff;
 }
 .ksite #contact .c-inner {
   padding: 120px clamp(18px, 3vw, 44px) 0;
@@ -1262,29 +1249,6 @@ body:has(.ksite) {
   max-width: 420px;
   font-size: 1rem;
 }
-.ksite .p-chips {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-.ksite .pchip {
-  padding: 11px 22px;
-  border-radius: 100px;
-  border: 1px solid rgba(236, 232, 225, 0.3);
-  color: rgba(236, 232, 225, 0.8);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  transition: all 0.3s;
-}
-.ksite .pchip.on,
-.ksite .pchip:hover {
-  border-color: var(--accent);
-  color: #fff;
-  background: rgba(255, 75, 31, 0.2);
-}
 .ksite .cta {
   background: var(--accent);
   color: #000;
@@ -1299,11 +1263,13 @@ body:has(.ksite) {
 }
 .ksite .cta:hover {
   transform: scale(1.05);
-  background: #fff;
+  /* Was white, which now disappears into the page — deepen the orange. */
+  background: #d93c12;
+  color: #fff;
 }
 .ksite .c-links {
   margin-top: 6vh;
-  border-top: 1px solid rgba(236, 232, 225, 0.18);
+  border-top: 1px solid rgba(17, 17, 16, 0.16);
   position: relative;
   z-index: 2;
 }
@@ -1313,7 +1279,7 @@ body:has(.ksite) {
   align-items: center;
   gap: 20px;
   padding: 20px clamp(18px, 3vw, 44px);
-  border-bottom: 1px solid rgba(236, 232, 225, 0.18);
+  border-bottom: 1px solid rgba(17, 17, 16, 0.16);
   transition: background 0.35s, padding 0.35s;
 }
 .ksite .c-link:hover {
@@ -1361,11 +1327,779 @@ body:has(.ksite) {
   text-transform: uppercase;
 }
 
+/* ------------------------------------------ sticky "start a project" CTA -- */
+.ksite .fab-wrap {
+  position: fixed;
+  right: clamp(16px, 2.6vw, 36px);
+  bottom: clamp(16px, 3vh, 30px);
+  z-index: 1300;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+  pointer-events: none;
+}
+.ksite .fab {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 100px;
+  padding: 16px 26px;
+  font-family: var(--font-grotesk), sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 18px 44px -12px rgba(255, 75, 31, 0.55),
+    0 4px 14px rgba(22, 18, 12, 0.12);
+  animation: k-fab-float 3.2s ease-in-out infinite;
+  transition: transform 0.3s, box-shadow 0.3s, opacity 0.5s;
+  opacity: 0;
+  transform: translateY(80px);
+}
+/* Hidden until revealed — keep it out of the pointer and a11y trees. */
+.ksite .fab:not(.in) {
+  pointer-events: none;
+  visibility: hidden;
+}
+.ksite .fab.in {
+  opacity: 1;
+  transform: none;
+}
+.ksite .fab:hover {
+  animation-play-state: paused;
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 26px 60px -14px rgba(255, 75, 31, 0.65),
+    0 6px 18px rgba(22, 18, 12, 0.14);
+}
+.ksite .fab-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #fff;
+  position: relative;
+  flex: none;
+}
+.ksite .fab-dot::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  animation: k-fab-ping 1.8s ease-out infinite;
+}
+@keyframes k-fab-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -7px;
+  }
+}
+@keyframes k-fab-ping {
+  0% {
+    transform: scale(0.4);
+    opacity: 1;
+  }
+  80%,
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+@media (max-width: 600px) {
+  .ksite .fab {
+    padding: 14px 20px;
+  }
+}
+
+/* ====================================== films page — scroll-driven viewer == */
+.ksite #filmstage {
+  position: relative;
+}
+/* Everything is absolutely placed so the frame can own the full height,
+   exactly as in the reference — nothing is stacked above or below it. */
+.ksite .fs-sticky {
+  height: 100svh;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg);
+
+  /* Declared here, not on .fs-viewport: .fs-head is a sibling of the viewport,
+     so anything scoped to the viewport is invisible to it and its calc()
+     silently collapses. Frame proportions are taken off the reference —
+     ~0.78 wide-to-tall, filling most of the viewport height. The vw term stops
+     it dominating a narrow window, where height alone would make it too wide. */
+  --fs-ratio: 0.78;
+  --fs-h: min(80svh, calc(44vw / 0.78));
+  --fs-w: calc(var(--fs-h) * var(--fs-ratio));
+  --fs-thumb-w: calc(var(--fs-w) * 0.3);
+  --fs-thumb-h: calc(var(--fs-thumb-w) / var(--fs-ratio));
+}
+.ksite .fs-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: min(360px, 42vw);
+  z-index: 4;
+}
+.ksite .fs-sticky .k-back {
+  padding-top: clamp(66px, 8.4vh, 86px);
+}
+.ksite .fs-sticky .sec-label {
+  padding-top: clamp(8px, 1.4vh, 16px);
+  margin-bottom: 0;
+}
+/* Parked just above the thumbnail band, never on top of it — text over these
+   images is unreadable, and the reference keeps the title clear of them too. */
+.ksite .fs-head {
+  position: absolute;
+  top: calc(50% - var(--fs-thumb-h) / 2 - 26px);
+  left: 0;
+  transform: translateY(-100%);
+  z-index: 4;
+  /* Exactly the room left of the frame, so the box itself can never reach it. */
+  width: min(460px, calc(50vw - var(--fs-w) / 2 - 20px));
+  padding: 0 clamp(18px, 3vw, 44px);
+}
+.ksite .fs-head .display {
+  font-size: clamp(1.5rem, 3vw, 2.6rem);
+  line-height: 0.92;
+}
+.ksite .fs-head p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+/* stage */
+.ksite .fs-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* thumbnails drifting behind */
+.ksite .fs-rail {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.4vw, 40px);
+  padding: 0 clamp(18px, 3vw, 44px);
+  width: max-content;
+  will-change: transform;
+  pointer-events: none;
+}
+.ksite .fs-thumb {
+  flex: none;
+  /* The reference runs its thumbnails at roughly a quarter of the frame. */
+  width: var(--fs-thumb-w);
+  display: block;
+}
+.ksite .fs-thumb img {
+  width: 100%;
+  aspect-ratio: var(--fs-ratio);
+  object-fit: cover;
+  /* Receded but still in colour, as in the reference recording. On white a
+     low opacity washes out, so lean on desaturation instead. */
+  filter: saturate(0.5) contrast(0.94);
+  opacity: 0.5;
+}
+
+/* the fixed frame the films pass through */
+.ksite .fs-frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--fs-w);
+  height: var(--fs-h);
+  z-index: 2;
+  background: var(--ink);
+  overflow: hidden;
+  /* the dashed marker sits outside the frame, so it is never clipped */
+  outline: 1px dashed var(--accent);
+  outline-offset: 14px;
+}
+.ksite .fs-reel {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+}
+.ksite .fs-shot {
+  flex: none;
+  width: 100%;
+  height: 100%;
+}
+.ksite .fs-shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* caption bar pinned inside the frame */
+.ksite .fs-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 9px 9px 14px;
+  background: var(--ink);
+  color: var(--ivory);
+}
+.ksite .fs-t {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+.ksite .fs-t i {
+  font-style: normal;
+  color: var(--accent);
+}
+.ksite .fs-go {
+  flex: none;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 100px;
+  padding: 8px 16px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: background 0.3s;
+}
+.ksite .fs-bar:hover .fs-go {
+  background: #d93c12;
+}
+
+/* footer row + progress */
+.ksite .fs-foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  /* Three tracks so the hint is centred on the page rather than parked in the
+     bottom-right corner, where the floating CTA would sit on top of it. */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: clamp(10px, 1.6vh, 18px) clamp(18px, 3vw, 44px)
+    clamp(16px, 2.4vh, 26px);
+  color: var(--muted);
+  font-size: 0.66rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+.ksite .fs-count {
+  font-family: var(--font-anton), sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+.ksite .fs-count i {
+  font-style: normal;
+  color: var(--muted);
+}
+.ksite .fs-hint {
+  grid-column: 2;
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.ksite .fs-chev {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px dashed var(--accent);
+  border-radius: 50%;
+  color: var(--accent);
+  font-size: 0.7rem;
+  letter-spacing: 0;
+  animation: k-fs-bob 1.8s ease-in-out infinite;
+}
+@keyframes k-fs-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+.ksite .fs-prog {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 0;
+  background: var(--accent);
+  z-index: 5;
+}
+
+@media (max-width: 760px) {
+  /* Back to normal flow: nothing is pinned, so nothing needs absolute placing. */
+  .ksite .fs-sticky {
+    height: auto;
+    padding-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  .ksite .fs-top,
+  .ksite .fs-head,
+  .ksite .fs-foot {
+    position: static;
+    transform: none;
+    width: auto;
+    background: none;
+  }
+  .ksite .fs-head {
+    padding: 14px clamp(18px, 3vw, 44px) 0;
+  }
+  .ksite .fs-viewport {
+    --fs-w: min(84vw, 380px);
+    --fs-h: calc(var(--fs-w) / 0.78);
+    position: static;
+    padding: 24px 0 8px;
+    overflow: visible;
+  }
+  .ksite .fs-rail {
+    display: none;
+  }
+  .ksite .fs-frame {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: var(--fs-w);
+    margin: 0 auto;
+    outline-offset: 8px;
+  }
+  /* swipe the reel itself instead of scrubbing it */
+  .ksite .fs-reel {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .ksite .fs-reel::-webkit-scrollbar {
+    display: none;
+  }
+  .ksite .fs-shot {
+    scroll-snap-align: center;
+  }
+  .ksite .fs-prog {
+    display: none;
+  }
+}
+
+/* back link shared by standalone pages */
+.ksite .k-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 96px clamp(18px, 3vw, 44px) 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+.ksite .k-back:hover {
+  color: var(--accent);
+}
+
+/* ============================== services page — full breakdown =========== */
+.ksite #svcstage {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: clamp(60px, 8vw, 110px);
+}
+/* giant drifting watermark behind everything */
+.ksite .sv-ghost {
+  position: absolute;
+  top: clamp(90px, 12vh, 150px);
+  left: 0;
+  width: max-content;
+  font-family: var(--font-anton), sans-serif;
+  text-transform: uppercase;
+  font-size: min(26vw, 300px);
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1.4px rgba(17, 17, 16, 0.07);
+  pointer-events: none;
+  z-index: 0;
+}
+.ksite .sv-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+.ksite #svcstage .k-back {
+  padding-top: clamp(78px, 10vh, 104px);
+}
+.ksite .sv-title {
+  padding: clamp(10px, 1.6vh, 20px) clamp(18px, 3vw, 44px) 0;
+  font-size: clamp(2.6rem, 8vw, 6.6rem);
+  /* .display sets 0.88, which crops Anton's caps once the reveal clips the
+     line box. Give the glyphs their own room instead. */
+  line-height: 1.16;
+  overflow: hidden;
+}
+.ksite .sv-title > span {
+  display: inline-block;
+}
+.ksite .sv-title i {
+  font-style: normal;
+  color: var(--accent);
+}
+.ksite .sv-sub {
+  padding: 16px clamp(18px, 3vw, 44px) 0;
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 1rem;
+}
+.ksite .sv2-list {
+  margin-top: clamp(34px, 5vw, 64px);
+  padding: 0 clamp(18px, 3vw, 44px);
+}
+
+/* one row per service */
+.ksite .sv2-item {
+  position: relative;
+  border-top: 1px solid var(--line);
+}
+.ksite .sv2-item:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.ksite .sv2-item::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -1px;
+  height: 2px;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.6, 0.05, 0.2, 1);
+}
+.ksite .sv2-item:hover::after,
+.ksite .sv2-item.open::after {
+  transform: scaleX(1);
+}
+.ksite .sv2-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2vw, 26px);
+  padding: clamp(20px, 2.4vw, 30px) 4px;
+  text-align: left;
+  color: var(--ink);
+}
+.ksite .sv2-head i {
+  flex: none;
+  width: 40px;
+  font-style: normal;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  transition: color 0.3s;
+}
+.ksite .sv2-head h2 {
+  flex: 1;
+  font-family: var(--font-anton), sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.4rem, 3.4vw, 2.6rem);
+  line-height: 1;
+  transition: color 0.3s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ksite .sv2-head:hover h2,
+.ksite .sv2-item.open .sv2-head h2 {
+  color: var(--accent);
+}
+.ksite .sv2-head:hover h2 {
+  transform: translateX(12px);
+}
+.ksite .sv2-head:hover i {
+  color: var(--accent);
+}
+.ksite .sv2-plus {
+  flex: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--accent);
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ksite .sv2-item.open .sv2-plus {
+  transform: rotate(135deg);
+}
+
+/* drawer */
+.ksite .sv2-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.55s cubic-bezier(0.6, 0.05, 0.2, 1);
+}
+.ksite .sv2-item.open .sv2-body {
+  grid-template-rows: 1fr;
+}
+.ksite .sv2-body-in {
+  overflow: hidden;
+}
+.ksite .sv2-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+  gap: clamp(22px, 4vw, 60px);
+  align-items: center;
+  padding: 4px 4px clamp(28px, 3.4vw, 44px) 54px;
+}
+/* the outlined figure sitting behind the copy */
+.ksite .sv2-gnum {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-anton), sans-serif;
+  font-size: clamp(5rem, 13vw, 11rem);
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 75, 31, 0.28);
+  pointer-events: none;
+  z-index: 0;
+}
+.ksite .sv2-ph {
+  overflow: hidden;
+  background: var(--ivory);
+}
+.ksite .sv2-ph img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+.ksite .sv2-info {
+  position: relative;
+  z-index: 1;
+  max-width: 46ch;
+}
+.ksite .sv2-info p {
+  font-size: clamp(0.98rem, 1.5vw, 1.15rem);
+  color: #4b483f;
+}
+.ksite .sv2-info .s-inq {
+  margin-top: 22px;
+}
+@media (max-width: 820px) {
+  .ksite .sv2-grid {
+    grid-template-columns: 1fr;
+    padding-left: 4px;
+    gap: 20px;
+  }
+  .ksite .sv2-gnum {
+    display: none;
+  }
+  .ksite .sv-ghost {
+    font-size: 34vw;
+  }
+}
+
+/* ============================================== inquiry dialog =========== */
+.ksite .iq-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 6000;
+  display: grid;
+  place-items: center;
+  padding: clamp(14px, 3vw, 40px);
+  background: rgba(17, 17, 16, 0.55);
+  backdrop-filter: blur(3px);
+  animation: k-iq-fade 0.25s ease both;
+}
+@keyframes k-iq-fade {
+  from {
+    opacity: 0;
+  }
+}
+.ksite .iq-panel {
+  position: relative;
+  width: min(620px, 100%);
+  max-height: 92svh;
+  overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: clamp(24px, 3.4vw, 44px);
+  animation: k-iq-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes k-iq-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+}
+.ksite .iq-x {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 1.9rem;
+  line-height: 1;
+  color: var(--muted);
+  transition: color 0.25s;
+}
+.ksite .iq-x:hover {
+  color: var(--accent);
+}
+.ksite .iq-head .display {
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+}
+.ksite .iq-head .display i {
+  font-style: normal;
+  color: var(--accent);
+}
+.ksite .iq-head p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.ksite .iq-label {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ksite .iq-scope {
+  margin-top: clamp(20px, 2.6vw, 30px);
+}
+.ksite .iq-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.ksite .iq-chip {
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  padding: 9px 16px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(17, 17, 16, 0.7);
+  transition: all 0.25s;
+}
+.ksite .iq-chip:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.ksite .iq-chip.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.ksite .iq-fields {
+  display: grid;
+  gap: clamp(14px, 2vw, 20px);
+  margin-top: clamp(20px, 2.6vw, 30px);
+}
+@media (min-width: 560px) {
+  .ksite .iq-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ksite .iq-field:first-child {
+    grid-column: 1 / -1;
+  }
+}
+.ksite .iq-field input {
+  width: 100%;
+  margin-top: 7px;
+  padding: 10px 2px;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: none;
+  border: none;
+  /* Underline fields keep the panel as quiet as the rest of the page. */
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  transition: border-color 0.25s;
+}
+.ksite .iq-field input::placeholder {
+  color: rgba(17, 17, 16, 0.32);
+}
+.ksite .iq-field input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+.ksite .iq-error {
+  margin-top: 16px;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.ksite .iq-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: clamp(22px, 3vw, 32px);
+}
+.ksite .iq-send {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 100px;
+  padding: 15px 30px;
+  font-weight: 700;
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: transform 0.25s, background 0.25s;
+}
+.ksite .iq-send:hover {
+  background: #d93c12;
+  transform: translateY(-2px);
+}
+.ksite .iq-mail {
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-decoration: underline;
+  transition: color 0.25s;
+}
+.ksite .iq-mail:hover {
+  color: var(--accent);
+}
+
 /* ------------------------------------------------------------ lightbox --- */
 .ksite .lb {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.94);
+  background: rgba(255, 255, 255, 0.96);
   z-index: 5000;
   display: grid;
   place-items: center;
@@ -1386,7 +2120,7 @@ body:has(.ksite) {
   top: 18px;
   right: 30px;
   font-size: 2.2rem;
-  color: #fff;
+  color: var(--ink);
   cursor: pointer;
   font-weight: 300;
 }

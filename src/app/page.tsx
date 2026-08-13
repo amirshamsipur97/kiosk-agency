@@ -2,11 +2,12 @@ import "./kiosk.css";
 import Chrome from "@/components/k/Chrome";
 import Hero from "@/components/k/Hero";
 import Manifesto from "@/components/k/Manifesto";
-import Films from "@/components/k/Films";
+import Feed from "@/components/k/Feed";
 import Ivory from "@/components/k/Ivory";
 import Ground from "@/components/k/Ground";
 import Clients from "@/components/k/Clients";
 import Contact from "@/components/k/Contact";
+import StickyCta from "@/components/k/StickyCta";
 import Motion from "@/components/k/Motion";
 
 export default function Home() {
@@ -15,11 +16,12 @@ export default function Home() {
       <Chrome />
       <Hero />
       <Manifesto />
-      <Films />
+      <Feed />
       <Ivory />
       <Ground />
       <Clients />
       <Contact />
+      <StickyCta />
       <Motion />
     </div>
   );

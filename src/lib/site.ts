@@ -65,11 +65,12 @@ export const site = {
   websiteUrl: "https://www.kioskoman.com",
   crNumber: "1480635",
   phones: [
+    "+968 909 909 23",
     "+968 9092 0764",
     "+968 7747 0912",
     "+968 9961 1029",
   ],
-  whatsapp: "+968 9092 0764",
+  whatsapp: "+968 909 909 23",
   address: {
     line1: "Unit 617, 6th floor, office 1991",
     line2: "Al Ghubrah St, Muscat, Sultanate of Oman",

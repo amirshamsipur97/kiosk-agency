@@ -1,17 +1,19 @@
 import { Fragment } from "react";
 import { TICKER } from "@/lib/kiosk";
+import Glow from "./Glow";
 
 /** Full-viewport hero + the marquee ticker that closes it. */
 export default function Hero() {
   return (
     <>
       <section id="hero">
+        <Glow intensity={0.3} />
         {/* Mouse-trail images are injected here by Motion. */}
         <div id="trail" aria-hidden />
 
         <div className="h-center">
           <div className="h-kicker" data-hf>
-            Creative media · Marketing · Events &amp; production — Muscat
+            Creative media · Marketing · Events &amp; production
           </div>
           <h1 className="display">
             <span className="hl">

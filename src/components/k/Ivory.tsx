@@ -1,15 +1,23 @@
-import type { CSSProperties } from "react";
+"use client";
+
+import { useState, type CSSProperties } from "react";
+import Link from "next/link";
 import { NUMBERS, SERVICES } from "@/lib/kiosk";
+import InquiryForm from "./InquiryForm";
 
 /**
- * The ivory block: the seven-service index, then the pinned full-screen
- * numbers sequence (numerals are photo-filled via background-clip:text).
+ * The ivory block: the services card grid, then the pinned full-screen numbers
+ * sequence (numerals are photo-filled via background-clip:text). The cards show
+ * everything up front — the accordion treatment lives on /services.
  */
 export default function Ivory() {
+  // Which service the inquiry dialog was opened from, so it can preselect it.
+  const [inquiry, setInquiry] = useState<string | null>(null);
+
   return (
     <div className="ivory">
       <section id="services">
-        <div className="sec-label">03 — Services</div>
+        <div className="sec-label">02 — Services</div>
         <div className="sv-head">
           <h2 className="display">
             <span className="split-l">
@@ -18,25 +26,38 @@ export default function Ivory() {
               </span>
             </span>
           </h2>
-          <p>
-            Two arms, one accountable team — digital campaigns and physical
-            builds under one roof.
-          </p>
+          <div className="sv-head-r">
+            <p>
+              Two arms, one accountable team — digital campaigns and physical
+              builds under one roof.
+            </p>
+            <Link className="sv-all" href="/services">
+              Full breakdown ↗
+            </Link>
+          </div>
         </div>
 
-        {SERVICES.map((s) => (
-          <div className="s-row" key={s.idx}>
-            <span className="s-idx">{s.idx}</span>
-            <h3>{s.title}</h3>
-            <p>{s.body}</p>
-            <span className="s-arm">{s.arm}</span>
-          </div>
-        ))}
+        <div className="s-grid">
+          {SERVICES.map((s) => (
+            <article className="s-card" key={s.idx}>
+              <span className="s-card-idx">{s.idx}</span>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
+              <button
+                type="button"
+                className="s-inq"
+                onClick={() => setInquiry(s.title)}
+              >
+                Inquiry <span aria-hidden>↗</span>
+              </button>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section id="numbers">
         <div className="n-sticky">
-          <div className="sec-label">04 — In numbers</div>
+          <div className="sec-label">03 — In numbers</div>
 
           <div className="n-stage">
             {NUMBERS.map((n, i) => (
@@ -72,6 +93,10 @@ export default function Ivory() {
           <div className="n-prog" id="nProg" />
         </div>
       </section>
+
+      {inquiry ? (
+        <InquiryForm preselect={inquiry} onClose={() => setInquiry(null)} />
+      ) : null}
     </div>
   );
 }

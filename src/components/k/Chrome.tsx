@@ -10,7 +10,6 @@ import { CONTACT, MENU } from "@/lib/kiosk";
  */
 export default function Chrome() {
   const [open, setOpen] = useState(false);
-  const [clock, setClock] = useState("Muscat — 00:00");
   const loaderRef = useRef<HTMLDivElement>(null);
   const pctRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -62,22 +61,6 @@ export default function Chrome() {
       count.kill();
       intro.kill();
     };
-  }, []);
-
-  /* ----------------------------------------------------------- clock --- */
-  useEffect(() => {
-    const tick = () =>
-      setClock(
-        "Muscat — " +
-          new Date().toLocaleTimeString("en-GB", {
-            timeZone: "Asia/Muscat",
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-      );
-    tick();
-    const id = setInterval(tick, 30000);
-    return () => clearInterval(id);
   }, []);
 
   /* ------------------------------------------------------------ menu --- */
@@ -182,9 +165,6 @@ export default function Chrome() {
           Kiosk<i>.</i>
         </a>
         <div className="n-right">
-          <span className="n-clock" suppressHydrationWarning>
-            {clock}
-          </span>
           <button
             className="menu-btn"
             aria-expanded={open}
@@ -212,7 +192,9 @@ export default function Chrome() {
         <div className="m-foot">
           <span>Muscat, Oman</span>
           <span>{CONTACT.email}</span>
-          <span>{CONTACT.phone}</span>
+          <span>
+            {CONTACT.phone} · {CONTACT.phone2}
+          </span>
         </div>
       </div>
     </>

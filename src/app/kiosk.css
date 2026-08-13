@@ -738,14 +738,15 @@ body:has(.ksite) {
 .ksite .s-inq:hover {
   gap: 16px;
 }
-.ksite .sv2-info .s-inq {
+/* on /services the pill is solid, since it is the section's only action */
+.ksite .sv3-copy .s-inq {
   background: var(--accent);
   color: #fff;
   border-radius: 100px;
   padding: 13px 26px;
-  transition: background 0.3s, transform 0.3s;
+  transition: background 0.3s, transform 0.3s, gap 0.3s;
 }
-.ksite .sv2-info .s-inq:hover {
+.ksite .sv3-copy .s-inq:hover {
   background: #d93c12;
   transform: translateY(-2px);
 }
@@ -1734,10 +1735,14 @@ body:has(.ksite) {
 /* ============================== services page — full breakdown =========== */
 .ksite #svcstage {
   position: relative;
-  overflow: hidden;
-  padding-bottom: clamp(60px, 8vw, 110px);
 }
-/* giant drifting watermark behind everything */
+/* the header band, the only place the watermark lives */
+.ksite .sv-hero {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: clamp(24px, 4vw, 48px);
+}
+/* giant drifting watermark behind the header */
 .ksite .sv-ghost {
   position: absolute;
   top: clamp(90px, 12vh, 150px);
@@ -1782,147 +1787,121 @@ body:has(.ksite) {
   color: var(--muted);
   font-size: 1rem;
 }
-.ksite .sv2-list {
-  margin-top: clamp(34px, 5vw, 64px);
-  padding: 0 clamp(18px, 3vw, 44px);
-}
-
-/* one row per service */
-.ksite .sv2-item {
-  position: relative;
-  border-top: 1px solid var(--line);
-}
-.ksite .sv2-item:last-child {
-  border-bottom: 1px solid var(--line);
-}
-.ksite .sv2-item::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: -1px;
-  height: 2px;
-  width: 100%;
-  background: var(--accent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.5s cubic-bezier(0.6, 0.05, 0.2, 1);
-}
-.ksite .sv2-item:hover::after,
-.ksite .sv2-item.open::after {
-  transform: scaleX(1);
-}
-.ksite .sv2-head {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: clamp(14px, 2vw, 26px);
-  padding: clamp(20px, 2.4vw, 30px) 4px;
-  text-align: left;
-  color: var(--ink);
-}
-.ksite .sv2-head i {
-  flex: none;
-  width: 40px;
-  font-style: normal;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  color: var(--muted);
-  transition: color 0.3s;
-}
-.ksite .sv2-head h2 {
-  flex: 1;
-  font-family: var(--font-anton), sans-serif;
-  text-transform: uppercase;
-  font-size: clamp(1.4rem, 3.4vw, 2.6rem);
-  line-height: 1;
-  transition: color 0.3s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.ksite .sv2-head:hover h2,
-.ksite .sv2-item.open .sv2-head h2 {
-  color: var(--accent);
-}
-.ksite .sv2-head:hover h2 {
-  transform: translateX(12px);
-}
-.ksite .sv2-head:hover i {
-  color: var(--accent);
-}
-.ksite .sv2-plus {
-  flex: none;
-  font-size: 1.6rem;
-  line-height: 1;
-  color: var(--accent);
-  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.ksite .sv2-item.open .sv2-plus {
-  transform: rotate(135deg);
-}
-
-/* drawer */
-.ksite .sv2-body {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.55s cubic-bezier(0.6, 0.05, 0.2, 1);
-}
-.ksite .sv2-item.open .sv2-body {
-  grid-template-rows: 1fr;
-}
-.ksite .sv2-body-in {
-  overflow: hidden;
-}
-.ksite .sv2-grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
-  gap: clamp(22px, 4vw, 60px);
-  align-items: center;
-  padding: 4px 4px clamp(28px, 3.4vw, 44px) 54px;
-}
-/* the outlined figure sitting behind the copy */
-.ksite .sv2-gnum {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  font-family: var(--font-anton), sans-serif;
-  font-size: clamp(5rem, 13vw, 11rem);
-  line-height: 0.8;
-  color: transparent;
-  -webkit-text-stroke: 1.5px rgba(255, 75, 31, 0.28);
-  pointer-events: none;
-  z-index: 0;
-}
-.ksite .sv2-ph {
-  overflow: hidden;
-  background: var(--ivory);
-}
-.ksite .sv2-ph img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  display: block;
-}
-.ksite .sv2-info {
+/* ---- one full section per service, alternating side and band ---- */
+.ksite .sv3 {
   position: relative;
   z-index: 1;
-  max-width: 46ch;
+  margin-top: clamp(30px, 4vw, 58px);
 }
-.ksite .sv2-info p {
-  font-size: clamp(0.98rem, 1.5vw, 1.15rem);
+.ksite .sv3-sec {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  padding: clamp(54px, 8vw, 118px) clamp(18px, 3vw, 44px);
+}
+.ksite .sv3-sec.alt {
+  background: var(--ivory);
+}
+/* the accent rule that draws across the top of each section */
+.ksite .sv3-rule {
+  position: absolute;
+  top: 0;
+  left: clamp(18px, 3vw, 44px);
+  right: clamp(18px, 3vw, 44px);
+  display: block;
+  height: 2px;
+  background: var(--accent);
+  transform-origin: left;
+  pointer-events: none;
+}
+.ksite .sv3-in {
+  position: relative;
+  z-index: 1;
+  max-width: 1500px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(26px, 5vw, 86px);
+  align-items: center;
+}
+/* every other section flips the photograph to the far side */
+.ksite .sv3-sec.rev .sv3-media {
+  order: 2;
+}
+.ksite .sv3-media {
+  position: relative;
+  overflow: hidden;
+  background: rgba(17, 17, 16, 0.06);
+}
+.ksite .sv3-media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ksite .sv3-media:hover img {
+  transform: scale(1.04);
+}
+.ksite .sv3-copy {
+  max-width: 52ch;
+}
+.ksite .sv3-idx {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.ksite .sv3-title {
+  margin-top: clamp(12px, 1.4vw, 18px);
+  font-family: var(--font-anton), sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.04;
+}
+.ksite .sv3-body {
+  margin-top: clamp(14px, 1.6vw, 20px);
+  max-width: 46ch;
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  line-height: 1.55;
   color: #4b483f;
 }
-.ksite .sv2-info .s-inq {
-  margin-top: 22px;
+.ksite .sv3-copy .s-inq {
+  margin-top: clamp(22px, 2.4vw, 30px);
 }
-@media (max-width: 820px) {
-  .ksite .sv2-grid {
-    grid-template-columns: 1fr;
-    padding-left: 4px;
-    gap: 20px;
+/* the outlined figure bleeding off the copy side */
+.ksite .sv3-num {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: 1.5vw;
+  font-family: var(--font-anton), sans-serif;
+  font-size: clamp(7rem, 19vw, 19rem);
+  line-height: 0.78;
+  color: transparent;
+  -webkit-text-stroke: 1.6px rgba(255, 75, 31, 0.16);
+  pointer-events: none;
+}
+.ksite .sv3-sec.rev .sv3-num {
+  right: auto;
+  left: 1.5vw;
+}
+@media (max-width: 900px) {
+  .ksite .sv3-in {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
   }
-  .ksite .sv2-gnum {
+  /* photograph always leads on a single column */
+  .ksite .sv3-sec.rev .sv3-media {
+    order: 0;
+  }
+  .ksite .sv3-num {
     display: none;
   }
+}
+@media (max-width: 820px) {
   .ksite .sv-ghost {
     font-size: 34vw;
   }

@@ -16,22 +16,16 @@ then extended over the following week with a films page, a services page, an inq
 
 | | |
 |---|---|
-| Live | **https://www.kioskoman.com** — last deploy `kiosk-agency-eklp123u1` (the WebGL glow) |
-| Git HEAD | `56d26e1` — in sync with `origin/main` |
-| Uncommitted | **40 files.** Everything after the glow deploy, plus several things already deployed |
+| Live | **https://www.kioskoman.com** — last deploy `kiosk-agency-anyxkztoe` (services rebuilt section by section) |
+| Git HEAD | `9bbfacd` — everything committed, tree clean |
 | Deploy | `vercel --prod --yes` from the repo root. Auto-aliases `www.kioskoman.com`. **`git push` does NOT deploy.** |
 | Local | `npm run dev` → the project's `.claude/launch.json` puts it on **:3010** |
 
-### What is LIVE but NOT committed
-Light theme · phone `+968 909 909 23` · 6-item menu with Blog · services accordion · brand wall ·
-real client imagery · `/films` page · inquiry dialog · second phone `+968 9092 0764` · WebGL glow.
-
-### What is LOCAL ONLY (built, verified, never deployed)
-- **`/services`** — the new full-breakdown page. *The live `/services` is still the old dark legacy page.*
-- **Homepage services as boxy cards** — live still shows the accordion rows.
-- The `Full breakdown ↗` link and the menu pointing `Services → /services`.
-
-> Deploying is one command. Committing is overdue — there is no rollback point for a week of work.
+### Caught up 2026-08-14
+The August backlog is committed (`3da3ebb`) and deployed. Verified against production HTML:
+the homepage services are the `.s-card` grid (0 old `.s-row`), and `/services` is 8 `.sv3-sec`
+sections (0 `.sv2-item`). `origin/main` is still behind — push when the Mapbox false positive
+is dealt with.
 
 ---
 
@@ -140,10 +134,11 @@ screenshots.
 
 ## 7. Open items
 
-1. **Commit and push.** A week of work has no restore point.
-2. **Deploy** `/services` + the homepage service cards.
-3. Homepage services became boxy cards; the user reported "no change" twice — they were looking at
-   `/services`. Confirm which surface they actually meant before changing more.
+1. **Push to GitHub.** Local is committed but `origin/main` is stale (see the Mapbox item below).
+2. `/services` is now a section per service (`.sv3-*`), no accordion anywhere. The services data
+   still has only `idx / title / body / img`, so each section is one paragraph. If the sections
+   should carry more depth, get real copy from the client rather than inventing capability lists.
+3. A sticky index rail down `/services` was offered and NOT built, to keep the change purely visual.
 4. `/insights` (linked from the menu as **Blog**) is still the old dark design.
 5. The inquiry form has **no backend** — it composes a WhatsApp message. Wire an endpoint if leads
    need storing.

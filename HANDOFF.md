@@ -88,6 +88,12 @@ because `.w > span` had `translateY(110%)` in CSS *and* a `dataset.split` guard 
 effect run skip setup after the first run's cleanup had killed the trigger. Words are now split in
 React, the CSS no longer hides them, and there is a `clearProps` + immediate-reveal fallback.
 
+**The clients honeycomb owns its own loop.** `Clients.tsx` is a client component with its own
+pointer handling and `requestAnimationFrame`; `Motion.tsx` has nothing to do with `#clients` any
+more. Two things there are deliberate and should not be "fixed": plain wheel does NOT zoom (it
+still scrolls the page, so the section never hijacks scrolling) and `.aw-stage` uses
+`touch-action: pan-y` so a finger can never get trapped on mobile.
+
 **Tailwind preflight leaks into `.ksite`.** Two fixes must stay: the 10px custom scrollbar is scoped
 to `body:has(.legacy-shell)` (it was stealing layout width) and `.ksite button { line-height: normal }`.
 

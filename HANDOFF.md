@@ -38,12 +38,13 @@ src/app/
   kiosk.css           ~2000 lines, EVERY rule scoped under .ksite
   films/page.tsx      /films
   services/page.tsx   /services
+  clients/page.tsx    /clients — the honeycomb
   (legacy)/           pre-2026 pages + their own layout holding the old chrome
                       (about, case-studies, contact, industries, insights, packages,
                        process, services/[slug])
 src/components/k/     the 2026 site. Chrome, Hero, Manifesto, Feed, Ivory, Ground,
                       Clients, Contact, StickyCta, Motion, Glow, InquiryForm,
-                      FilmStage, ServiceStage
+                      FilmStage, ServiceStage, ClientHive
 src/lib/kiosk.ts      SINGLE SOURCE OF TRUTH for copy, links, phone numbers, images
 public/k/             28 build/number photos + public/k/feed/ (32 branded client cards)
 ```
@@ -88,11 +89,13 @@ because `.w > span` had `translateY(110%)` in CSS *and* a `dataset.split` guard 
 effect run skip setup after the first run's cleanup had killed the trigger. Words are now split in
 React, the CSS no longer hides them, and there is a `clearProps` + immediate-reveal fallback.
 
-**The clients honeycomb owns its own loop.** `Clients.tsx` is a client component with its own
-pointer handling and `requestAnimationFrame`; `Motion.tsx` has nothing to do with `#clients` any
-more. Two things there are deliberate and should not be "fixed": plain wheel does NOT zoom (it
-still scrolls the page, so the section never hijacks scrolling) and `.aw-stage` uses
-`touch-action: pan-y` so a finger can never get trapped on mobile.
+**Two client surfaces, on purpose.** The homepage keeps the marquee wall (`Clients.tsx`, driven by
+`Motion.tsx`). The Apple Watch honeycomb is the separate `/clients` page (`ClientHive.tsx`), which
+owns its own pointer handling and `requestAnimationFrame` and is untouched by `Motion.tsx`. The
+honeycomb was briefly on the homepage and was moved out; do not merge them back without asking.
+Two things in it are deliberate and should not be "fixed": plain wheel does NOT zoom (it still
+scrolls the page, so the section never hijacks scrolling) and `.aw-stage` uses `touch-action:
+pan-y` so a finger can never get trapped on mobile.
 
 **Tailwind preflight leaks into `.ksite`.** Two fixes must stay: the 10px custom scrollbar is scoped
 to `body:has(.legacy-shell)` (it was stealing layout width) and `.ksite button { line-height: normal }`.

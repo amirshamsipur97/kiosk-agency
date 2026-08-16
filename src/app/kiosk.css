@@ -1096,60 +1096,139 @@ body:has(.ksite) {
   text-transform: uppercase;
   color: var(--muted);
 }
-/* the wall itself */
-.ksite .cw-wall {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(6px, 1.4vh, 16px);
-  cursor: default;
+/* ---- the honeycomb: a dragged, zoomable hex grid of brand cells ---- */
+.ksite .aw-stage {
+  position: relative;
+  height: clamp(430px, 70vh, 720px);
+  margin-top: clamp(18px, 3vw, 32px);
+  overflow: hidden;
+  cursor: grab;
+  /* vertical page scrolling always wins, so a finger can never get stuck */
+  touch-action: pan-y;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 75, 31, 0.07),
+    transparent 62%
+  );
 }
-.ksite .cw-row {
-  display: flex;
-  width: max-content;
+.ksite .aw-stage.grabbing {
+  cursor: grabbing;
+}
+/* the bezel vignette, so cells dissolve rather than clip at the edge */
+.ksite .aw-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, transparent 54%, var(--bg) 93%);
+}
+.ksite .aw-canvas {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
   will-change: transform;
 }
-.ksite .cw-row .seg {
-  display: flex;
-  align-items: center;
-  flex: none;
-}
-.ksite .cw-name {
-  font-family: var(--font-anton), sans-serif;
-  text-transform: uppercase;
-  white-space: nowrap;
-  line-height: 1;
-  font-size: clamp(2.6rem, 6.4vw, 6rem);
-  color: transparent;
-  -webkit-text-stroke: 1.6px rgba(19, 17, 16, 0.34);
-  padding: 0 clamp(16px, 2vw, 30px);
-  transition: color 0.35s ease, -webkit-text-stroke-color 0.35s ease,
-    transform 0.35s ease;
+.ksite .aw-cell {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
+  transition: border-color 0.3s, background 0.3s;
   cursor: pointer;
 }
-.ksite .cw-name:hover {
-  color: var(--ink);
-  -webkit-text-stroke-color: var(--ink);
-  transform: scale(1.04);
+.ksite .aw-cell.on {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.9);
 }
-.ksite .cw-name.lit {
-  color: var(--accent);
-  -webkit-text-stroke-color: var(--accent);
-  text-shadow: 0 0 46px rgba(255, 75, 31, 0.35);
+/* the brand typography, unchanged from the wall it replaces */
+.ksite .aw-name {
+  font-family: var(--font-anton), sans-serif;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.02;
+  padding: 0 12px;
+  font-size: var(--fs, 24px);
+  color: transparent;
+  -webkit-text-stroke: 1.2px rgba(19, 17, 16, 0.34);
+  transition: color 0.3s ease, -webkit-text-stroke-color 0.3s ease;
+  user-select: none;
 }
-.ksite .cw-name.feat {
+.ksite .aw-cell.feat .aw-name {
   -webkit-text-stroke-color: rgba(255, 75, 31, 0.55);
 }
-.ksite .cw-name.feat:hover {
+.ksite .aw-cell:hover .aw-name,
+.ksite .aw-cell.on .aw-name {
+  color: var(--ink);
+  -webkit-text-stroke-color: var(--ink);
+}
+.ksite .aw-cell.feat:hover .aw-name,
+.ksite .aw-cell.feat.on .aw-name {
   color: var(--accent);
   -webkit-text-stroke-color: var(--accent);
 }
-.ksite .cw-dot {
-  width: 9px;
-  height: 9px;
-  background: var(--accent);
-  flex: none;
-  border-radius: 1px;
-  transform: rotate(45deg);
+/* caption and zoom controls under the stage */
+.ksite .aw-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.ksite .aw-cap b {
+  display: block;
+  font-family: var(--font-anton), sans-serif;
+  text-transform: uppercase;
+  font-weight: 400;
+  font-size: clamp(1.1rem, 2.4vw, 1.7rem);
+  line-height: 1;
+}
+.ksite .aw-cap span {
+  display: block;
+  margin-top: 7px;
+  font-size: 0.62rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.ksite .aw-tools {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.ksite .aw-hint {
+  font-size: 0.64rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ksite .aw-zoom {
+  display: flex;
+  gap: 8px;
+}
+.ksite .aw-zoom button {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 1.05rem;
+  line-height: normal;
+  transition: border-color 0.3s, color 0.3s, background 0.3s;
+}
+.ksite .aw-zoom button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 .ksite .cw-footrow {
   display: flex;
@@ -1168,34 +1247,15 @@ body:has(.ksite) {
   letter-spacing: 0.26em;
   text-transform: uppercase;
 }
-/* sector chip that follows the cursor */
-.ksite .cw-chip {
-  position: fixed;
-  z-index: 60;
-  pointer-events: none;
-  background: var(--ink);
-  color: var(--ivory);
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  padding: 8px 16px;
-  border-radius: 100px;
-  opacity: 0;
-  transform: translate(-50%, -140%) scale(0.8);
-  transition: opacity 0.2s, transform 0.2s;
-  white-space: nowrap;
-}
-.ksite .cw-chip.on {
-  opacity: 1;
-  transform: translate(-50%, -140%) scale(1);
-}
 @media (max-width: 820px) {
-  .ksite .cw-name {
-    font-size: 11vw;
-  }
   .ksite .cw-tally {
     gap: 18px;
+  }
+  .ksite .aw-bar {
+    justify-content: flex-start;
+  }
+  .ksite .aw-hint {
+    display: none;
   }
 }
 

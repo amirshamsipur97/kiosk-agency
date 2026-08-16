@@ -278,9 +278,6 @@ export const CLIENTS: { name: string; sector: string; featured?: boolean }[] = [
   { name: "OQ", sector: "Energy", featured: true },
 ];
 
-/** Rows the brand wall splits into; names are dealt out round-robin. */
-export const WALL_ROWS = 4;
-
 /** Headline figure for the tally. The wall itself names a subset of these. */
 export const BRAND_COUNT = 40;
 

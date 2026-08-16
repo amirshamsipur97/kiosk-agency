@@ -21,6 +21,12 @@ then extended over the following week with a films page, a services page, an inq
 | Deploy | `vercel --prod --yes` from the repo root. Auto-aliases `www.kioskoman.com`. **`git push` does NOT deploy.** |
 | Local | `npm run dev` → the project's `.claude/launch.json` puts it on **:3010** |
 
+### Which surface is which
+- Homepage `#services` = **index rows** (`.s-row`, with the Online / Ground badge). The card grid
+  the August backlog introduced was shipped and then reverted on request. Do not reintroduce cards.
+- `/services` = the **full breakdown**, one `.sv3-sec` section per service.
+- Homepage `#clients` = the **marquee wall**. `/clients` = the **honeycomb**.
+
 ### Caught up 2026-08-14
 The August backlog is committed (`3da3ebb`) and deployed. Verified against production HTML:
 the homepage services are the `.s-card` grid (0 old `.s-row`), and `/services` is 8 `.sv3-sec`

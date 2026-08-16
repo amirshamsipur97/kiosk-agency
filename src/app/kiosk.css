@@ -624,9 +624,8 @@ body:has(.ksite) {
   font-size: 0.95rem;
   padding-bottom: 10px;
 }
-/* Services on the landing page are boxes, not rows: everything is on show, so
-   the section reads as a substantial block rather than a thin list. The
-   collapsible treatment lives on /services. */
+/* The landing page lists the services as index rows; the full breakdown, with
+   photographs and inquiry buttons, is the /services page. */
 .ksite .sv-head-r {
   display: flex;
   flex-direction: column;
@@ -647,79 +646,79 @@ body:has(.ksite) {
   border-bottom-color: var(--accent);
 }
 
-.ksite .s-grid {
+.ksite .s-row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(14px, 1.6vw, 22px);
-  padding: 0 clamp(18px, 3vw, 44px);
-}
-.ksite .s-card {
+  grid-template-columns: 60px 1fr 1.1fr auto;
+  gap: clamp(14px, 3vw, 40px);
+  align-items: center;
+  padding: clamp(20px, 2.6vw, 30px) clamp(18px, 3vw, 44px);
+  border-top: 1px solid var(--line-dark);
   position: relative;
-  display: flex;
-  flex-direction: column;
-  /* The tall min-height is the point — the section should feel like a block. */
-  min-height: clamp(240px, 24vw, 330px);
-  padding: clamp(24px, 2.4vw, 38px);
-  background: var(--bg);
-  border: 1px solid var(--line-dark);
   overflow: hidden;
-  transition: border-color 0.4s, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: color 0.35s;
 }
-/* accent bar that grows up the left edge on hover */
-.ksite .s-card::before {
+.ksite .s-row:last-of-type {
+  border-bottom: 1px solid var(--line-dark);
+}
+.ksite .s-row::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--accent);
+  inset: 0;
+  background: var(--ink);
   transform: scaleY(0);
   transform-origin: bottom;
   transition: transform 0.45s cubic-bezier(0.6, 0.05, 0.2, 1);
+  z-index: 0;
 }
-.ksite .s-card:hover {
-  border-color: rgba(255, 75, 31, 0.45);
-  transform: translateY(-4px);
-}
-.ksite .s-card:hover::before {
+.ksite .s-row:hover::before {
   transform: scaleY(1);
 }
-.ksite .s-card-idx {
-  font-size: 0.72rem;
-  letter-spacing: 0.24em;
-  color: var(--muted);
+.ksite .s-row > * {
+  position: relative;
+  z-index: 1;
 }
-.ksite .s-card h3 {
-  margin-top: clamp(16px, 2vw, 26px);
+.ksite .s-row:hover {
+  color: var(--ivory);
+}
+.ksite .s-row .s-idx {
+  font-size: 0.74rem;
+  letter-spacing: 0.2em;
+  color: inherit;
+  opacity: 0.5;
+}
+.ksite .s-row h3 {
   font-family: var(--font-anton), sans-serif;
-  font-size: clamp(1.4rem, 2.6vw, 2.2rem);
+  font-size: clamp(1.4rem, 3.2vw, 2.4rem);
   text-transform: uppercase;
-  line-height: 1.02;
-  color: var(--ink);
-  transition: color 0.3s;
+  line-height: 0.95;
 }
-.ksite .s-card:hover h3 {
+.ksite .s-row:hover h3 {
   color: var(--accent);
 }
-.ksite .s-card p {
-  margin-top: 14px;
-  font-size: 0.95rem;
-  color: #565349;
-  max-width: 42ch;
+.ksite .s-row p {
+  font-size: 0.9rem;
+  opacity: 0.72;
 }
-/* pinned to the bottom so every card's action sits on the same line */
-.ksite .s-card .s-inq {
-  margin-top: auto;
-  align-self: flex-start;
-  padding-top: clamp(18px, 2vw, 26px);
+.ksite .s-row .s-arm {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  border: 1.5px solid currentColor;
+  border-radius: 100px;
+  padding: 8px 16px;
+  white-space: nowrap;
 }
-@media (max-width: 900px) {
-  .ksite .s-grid {
-    grid-template-columns: minmax(0, 1fr);
+@media (max-width: 800px) {
+  .ksite .s-row {
+    grid-template-columns: 44px 1fr;
+    grid-template-rows: auto auto;
   }
-  .ksite .s-card {
-    min-height: 0;
+  .ksite .s-row p {
+    grid-column: 2;
+  }
+  .ksite .s-row .s-arm {
+    display: none;
   }
 }
 

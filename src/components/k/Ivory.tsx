@@ -1,19 +1,14 @@
-"use client";
-
-import { useState, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { NUMBERS, SERVICES } from "@/lib/kiosk";
-import InquiryForm from "./InquiryForm";
 
 /**
- * The ivory block: the services card grid, then the pinned full-screen numbers
- * sequence (numerals are photo-filled via background-clip:text). The cards show
- * everything up front — the accordion treatment lives on /services.
+ * The ivory block: the service index rows, then the pinned full-screen numbers
+ * sequence (numerals are photo-filled via background-clip:text). The rows are
+ * a scannable index; the full breakdown with photographs and inquiry buttons
+ * is the /services page.
  */
 export default function Ivory() {
-  // Which service the inquiry dialog was opened from, so it can preselect it.
-  const [inquiry, setInquiry] = useState<string | null>(null);
-
   return (
     <div className="ivory">
       <section id="services">
@@ -37,22 +32,14 @@ export default function Ivory() {
           </div>
         </div>
 
-        <div className="s-grid">
-          {SERVICES.map((s) => (
-            <article className="s-card" key={s.idx}>
-              <span className="s-card-idx">{s.idx}</span>
-              <h3>{s.title}</h3>
-              <p>{s.body}</p>
-              <button
-                type="button"
-                className="s-inq"
-                onClick={() => setInquiry(s.title)}
-              >
-                Inquiry <span aria-hidden>↗</span>
-              </button>
-            </article>
-          ))}
-        </div>
+        {SERVICES.map((s) => (
+          <div className="s-row" key={s.idx}>
+            <span className="s-idx">{s.idx}</span>
+            <h3>{s.title}</h3>
+            <p>{s.body}</p>
+            <span className="s-arm">{s.arm}</span>
+          </div>
+        ))}
       </section>
 
       <section id="numbers">
@@ -94,9 +81,6 @@ export default function Ivory() {
         </div>
       </section>
 
-      {inquiry ? (
-        <InquiryForm preselect={inquiry} onClose={() => setInquiry(null)} />
-      ) : null}
     </div>
   );
 }

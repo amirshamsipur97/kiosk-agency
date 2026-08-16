@@ -45,32 +45,34 @@ export default function Ivory() {
           const isOpen = open === i;
           return (
             <div className={`s-item${isOpen ? " open" : ""}`} key={s.idx}>
-              <button
-                className="s-row"
-                aria-expanded={isOpen}
-                aria-controls={`svc-${i}`}
-                onClick={() => setOpen(isOpen ? -1 : i)}
-              >
+              {/* The toggle is a layer behind the row, so the inquiry pill can
+                  sit inside the row without nesting one button in another. */}
+              <div className="s-row">
+                <button
+                  className="s-toggle"
+                  aria-expanded={isOpen}
+                  aria-controls={`svc-${i}`}
+                  aria-label={`${s.title} details`}
+                  onClick={() => setOpen(isOpen ? -1 : i)}
+                />
                 <span className="s-idx">{s.idx}</span>
                 <h3>{s.title}</h3>
-                <span className="s-arm">{s.arm}</span>
+                <button
+                  type="button"
+                  className="s-inq"
+                  onClick={() => setInquiry(s.title)}
+                >
+                  Inquiry <span aria-hidden>↗</span>
+                </button>
                 <span className="s-plus" aria-hidden>
                   +
                 </span>
-              </button>
+              </div>
 
               <div className="s-body" id={`svc-${i}`} role="region">
                 <div className="s-body-in">
                   <div className="s-drawer">
                     <p>{s.body}</p>
-                    <button
-                      type="button"
-                      className="s-inq"
-                      onClick={() => setInquiry(s.title)}
-                      tabIndex={isOpen ? 0 : -1}
-                    >
-                      Inquiry <span aria-hidden>↗</span>
-                    </button>
                   </div>
                 </div>
               </div>

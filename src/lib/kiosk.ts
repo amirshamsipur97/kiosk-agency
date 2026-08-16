@@ -140,61 +140,52 @@ export const FEED_B = [
   "/k/feed/irfan-investment.jpg",
 ];
 
-/** `arm` is the Online / Ground badge the landing page rows carry. */
 export const SERVICES = [
   {
     idx: "/01",
     title: "Creative strategy",
-    arm: "Online",
     body: "We turn business goals into clear creative direction, campaign concepts, and stronger brand communication.",
     img: "/k/feed/irfan-investment.jpg",
   },
   {
     idx: "/02",
     title: "Films & content",
-    arm: "Online",
     body: "We create films, photography, and digital content designed to capture attention and tell your brand story.",
     img: "/k/feed/juva-1.jpg",
   },
   {
     idx: "/03",
     title: "Performance ads",
-    arm: "Online",
     body: "We build performance-driven campaigns focused on brand awareness, qualified lead generation, and measurable growth.",
     img: "/k/feed/mk-properties-2.jpg",
   },
   {
     idx: "/04",
     title: "Stands & exhibitions",
-    arm: "Ground",
     body: "We design and build exhibition stands that bring your brand to life in physical spaces.",
     img: "/k/build-02-exhibition-arena.jpg",
   },
   {
     idx: "/05",
     title: "Activations & retail",
-    arm: "Ground",
     body: "We create brand activations and retail experiences that turn spaces into memorable customer interactions.",
     img: "/k/build-08-instore-retail.jpg",
   },
   {
     idx: "/06",
     title: "Signage & branding",
-    arm: "Ground",
     body: "We create visual identities and signage systems that make your brand consistent and recognizable across every touchpoint.",
     img: "/k/build-11-office-branding.jpg",
   },
   {
     idx: "/07",
     title: "Web & CRM",
-    arm: "Online",
     body: "Websites and CRM solutions designed to capture leads, organize customer data, and support business growth.",
     img: "/k/feed/mk-properties-4.jpg",
   },
   {
     idx: "/08",
     title: "Social media management",
-    arm: "Online",
     body: "We manage your social media from planning and publishing to audience engagement, keeping your brand active, consistent, and connected.",
     img: "/k/feed/movenpick-1.jpg",
   },

@@ -22,7 +22,7 @@ export const wa = (text?: string) =>
 
 export const MENU = [
   { label: "Services", href: "/services", n: "01" },
-  { label: "Clients", href: "#clients", n: "02" },
+  { label: "Clients", href: "/clients", n: "02" },
   { label: "Films", href: "/films", n: "03" },
   { label: "On the ground", href: "#ground", n: "04" },
   { label: "Contact", href: "#contact", n: "05" },
@@ -277,6 +277,9 @@ export const CLIENTS: { name: string; sector: string; featured?: boolean }[] = [
   { name: "Bank Dhofar", sector: "Banking", featured: true },
   { name: "OQ", sector: "Energy", featured: true },
 ];
+
+/** Rows the brand wall splits into; names are dealt out round-robin. */
+export const WALL_ROWS = 4;
 
 /** Headline figure for the tally. The wall itself names a subset of these. */
 export const BRAND_COUNT = 40;

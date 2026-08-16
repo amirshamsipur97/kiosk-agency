@@ -23,6 +23,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const top = [
     "",
     "/services",
+    "/clients",
+    "/films",
     "/industries",
     "/packages",
     "/process",

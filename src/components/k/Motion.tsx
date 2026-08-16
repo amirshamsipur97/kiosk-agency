@@ -327,9 +327,108 @@ export default function Motion() {
         });
       }
 
-      /* The clients honeycomb owns its own pointer and raf loop, in
-         Clients.tsx: it is driven by drag, not by scroll. */
+      /* -------------------------------------- clients kinetic wall ---- */
+      const wall = document.getElementById("cwWall");
+      const chip = document.getElementById("cwChip");
+      if (wall) {
+        const rowEls = [...wall.querySelectorAll<HTMLElement>(".cw-row")];
+        // Each row holds its segment three times, so a third of the width is
+        // exactly one loop.
+        const tweens = rowEls.map((row, r) => {
+          const forward = r % 2 === 1;
+          gsap.set(row, { xPercent: forward ? -33.334 : 0 });
+          return gsap.to(row, {
+            xPercent: forward ? 0 : -33.334,
+            duration: 34 + r * 7,
+            repeat: -1,
+            ease: "none",
+          });
+        });
 
+        /* scrolling fast sweeps the wall along with you */
+        let cool: ReturnType<typeof setTimeout> | undefined;
+        ScrollTrigger.create({
+          trigger: "#clients",
+          start: "top bottom",
+          end: "bottom top",
+          onUpdate: (self) => {
+            const boost = gsap.utils.clamp(
+              1,
+              4,
+              1 + Math.abs(self.getVelocity()) / 900,
+            );
+            tweens.forEach((t) =>
+              gsap.to(t, { timeScale: boost, duration: 0.2, overwrite: true }),
+            );
+            clearTimeout(cool);
+            cool = setTimeout(
+              () =>
+                tweens.forEach((t) =>
+                  gsap.to(t, {
+                    timeScale: 1,
+                    duration: 1.2,
+                    ease: "power2.out",
+                  }),
+                ),
+              140,
+            );
+          },
+        });
+        off.push(() => clearTimeout(cool));
+
+        /* a spotlight wanders the wall so it never sits still */
+        let lit: Element | null = null;
+        const spot = setInterval(() => {
+          const names = wall.querySelectorAll(".cw-name");
+          if (!names.length) return;
+          lit?.classList.remove("lit");
+          lit = names[Math.floor(Math.random() * names.length)];
+          lit.classList.add("lit");
+        }, 2000);
+        off.push(() => {
+          clearInterval(spot);
+          lit?.classList.remove("lit");
+        });
+
+        /* sector chip trails the cursor */
+        if (chip) {
+          const track = (e: PointerEvent) => {
+            const t = (e.target as HTMLElement)?.closest?.(".cw-name") as
+              | HTMLElement
+              | null;
+            if (t) {
+              chip.textContent = t.dataset.sec || "";
+              chip.style.left = e.clientX + "px";
+              chip.style.top = e.clientY + "px";
+              chip.classList.add("on");
+            } else {
+              chip.classList.remove("on");
+            }
+          };
+          const leave = () => chip.classList.remove("on");
+          wall.addEventListener("pointermove", track, { passive: true });
+          wall.addEventListener("pointerover", track, { passive: true });
+          wall.addEventListener("pointerleave", leave, { passive: true });
+          off.push(() => {
+            wall.removeEventListener("pointermove", track);
+            wall.removeEventListener("pointerover", track);
+            wall.removeEventListener("pointerleave", leave);
+            chip.classList.remove("on");
+          });
+        }
+
+        /* hovering a row nearly stops it so a name can be read */
+        rowEls.forEach((row, i) => {
+          const slow = () => gsap.to(tweens[i], { timeScale: 0.15, duration: 0.5 });
+          const resume = () => gsap.to(tweens[i], { timeScale: 1, duration: 0.8 });
+          row.addEventListener("pointerenter", slow);
+          row.addEventListener("pointerleave", resume);
+          off.push(() => {
+            row.removeEventListener("pointerenter", slow);
+            row.removeEventListener("pointerleave", resume);
+          });
+        });
+      }
       /* -------------------------------------------------- contact ----- */
       gsap.from("#contact .ln > span", {
         yPercent: 118,

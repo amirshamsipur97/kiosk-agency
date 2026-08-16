@@ -22,8 +22,10 @@ then extended over the following week with a films page, a services page, an inq
 | Local | `npm run dev` → the project's `.claude/launch.json` puts it on **:3010** |
 
 ### Which surface is which
-- Homepage `#services` = **index rows** (`.s-row`, with the Online / Ground badge). The card grid
-  the August backlog introduced was shipped and then reverted on request. Do not reintroduce cards.
+- Homepage `#services` = an **accordion of index rows**: `.s-item` = a `.s-row` header (index,
+  title, Online / Ground badge, rotating plus) over a `.s-body` drawer holding the description and
+  a solid Inquiry pill. One open at a time, the first open on load. It went cards → plain rows →
+  this in a single day, so do not "simplify" it back to either.
 - `/services` = the **full breakdown**, one `.sv3-sec` section per service.
 - Homepage `#clients` = the **marquee wall**. `/clients` = the **honeycomb**.
 

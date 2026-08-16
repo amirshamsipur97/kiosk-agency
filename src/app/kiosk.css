@@ -1222,7 +1222,7 @@ body:has(.ksite) {
 /* ---- the honeycomb: a dragged, zoomable hex grid of brand cells ---- */
 .ksite .aw-stage {
   position: relative;
-  height: clamp(430px, 70vh, 720px);
+  height: clamp(460px, 78vh, 880px);
   margin-top: clamp(18px, 3vw, 32px);
   overflow: hidden;
   cursor: grab;

@@ -9,8 +9,8 @@ const D = 150;
 const PITCH = D * 1.08;
 const ROW = PITCH * 0.866;
 
-const MIN_Z = 0.32;
-const MAX_Z = 2.1;
+const MIN_Z = 0.3;
+const MAX_Z = 2.8;
 /** How far the canvas may be dragged before it is pulled up short. */
 const PAN_LIMIT = 540;
 
@@ -108,8 +108,12 @@ export default function ClientHive() {
 
     let w = stage.clientWidth;
     let h = stage.clientHeight;
-    /** Zoom that brings the whole honeycomb inside the stage. */
-    const fit = () => clamp(Math.min(w / 1180, h / 940), MIN_Z, 1);
+    /**
+     * Opening zoom. Sized so the two inner rings sit comfortably in frame
+     * rather than so the whole grid fits: fitting everything made the cells
+     * far too small to read. The outer ring is a drag away.
+     */
+    const fit = () => clamp(Math.min(w / 1000, h / 712), 0.68, 1.5);
 
     let tx = 0;
     let ty = 0;

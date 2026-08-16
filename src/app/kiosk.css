@@ -646,19 +646,27 @@ body:has(.ksite) {
   border-bottom-color: var(--accent);
 }
 
+/* Each service is an index row that opens to its copy and an inquiry button.
+   The row itself keeps the ink wipe it always had. */
+.ksite .s-item {
+  position: relative;
+  border-top: 1px solid var(--line-dark);
+}
+.ksite .s-item:last-of-type {
+  border-bottom: 1px solid var(--line-dark);
+}
 .ksite .s-row {
+  width: 100%;
   display: grid;
-  grid-template-columns: 60px 1fr 1.1fr auto;
+  grid-template-columns: 60px 1fr auto 30px;
   gap: clamp(14px, 3vw, 40px);
   align-items: center;
+  text-align: left;
   padding: clamp(20px, 2.6vw, 30px) clamp(18px, 3vw, 44px);
-  border-top: 1px solid var(--line-dark);
   position: relative;
   overflow: hidden;
+  color: var(--ink);
   transition: color 0.35s;
-}
-.ksite .s-row:last-of-type {
-  border-bottom: 1px solid var(--line-dark);
 }
 .ksite .s-row::before {
   content: "";
@@ -691,13 +699,11 @@ body:has(.ksite) {
   font-size: clamp(1.4rem, 3.2vw, 2.4rem);
   text-transform: uppercase;
   line-height: 0.95;
+  transition: color 0.3s;
 }
-.ksite .s-row:hover h3 {
+.ksite .s-row:hover h3,
+.ksite .s-item.open .s-row h3 {
   color: var(--accent);
-}
-.ksite .s-row p {
-  font-size: 0.9rem;
-  opacity: 0.72;
 }
 .ksite .s-row .s-arm {
   font-size: 0.7rem;
@@ -709,16 +715,53 @@ body:has(.ksite) {
   padding: 8px 16px;
   white-space: nowrap;
 }
+.ksite .s-plus {
+  justify-self: end;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--accent);
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ksite .s-item.open .s-plus {
+  transform: rotate(135deg);
+}
+
+/* the drawer */
+.ksite .s-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.55s cubic-bezier(0.6, 0.05, 0.2, 1);
+}
+.ksite .s-item.open .s-body {
+  grid-template-rows: 1fr;
+}
+.ksite .s-body-in {
+  overflow: hidden;
+  /* the empty first track lines the copy up under the title */
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr);
+  gap: clamp(14px, 3vw, 40px);
+  padding: 0 clamp(18px, 3vw, 44px);
+}
+.ksite .s-drawer {
+  grid-column: 2;
+  padding-bottom: clamp(26px, 2.8vw, 36px);
+}
+.ksite .s-drawer p {
+  max-width: 62ch;
+  font-size: clamp(0.95rem, 1.3vw, 1.08rem);
+  line-height: 1.55;
+  color: #4b483f;
+}
 @media (max-width: 800px) {
   .ksite .s-row {
-    grid-template-columns: 44px 1fr;
-    grid-template-rows: auto auto;
-  }
-  .ksite .s-row p {
-    grid-column: 2;
+    grid-template-columns: 44px 1fr 30px;
   }
   .ksite .s-row .s-arm {
     display: none;
+  }
+  .ksite .s-body-in {
+    grid-template-columns: 44px minmax(0, 1fr);
   }
 }
 
@@ -737,7 +780,11 @@ body:has(.ksite) {
 .ksite .s-inq:hover {
   gap: 16px;
 }
-/* on /services the pill is solid, since it is the section's only action */
+/* solid wherever it is the block's only action */
+.ksite .s-drawer .s-inq {
+  margin-top: clamp(18px, 2vw, 24px);
+}
+.ksite .s-drawer .s-inq,
 .ksite .sv3-copy .s-inq {
   background: var(--accent);
   color: #fff;
@@ -745,6 +792,7 @@ body:has(.ksite) {
   padding: 13px 26px;
   transition: background 0.3s, transform 0.3s, gap 0.3s;
 }
+.ksite .s-drawer .s-inq:hover,
 .ksite .sv3-copy .s-inq:hover {
   background: #d93c12;
   transform: translateY(-2px);

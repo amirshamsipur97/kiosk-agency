@@ -1,14 +1,23 @@
-import type { CSSProperties } from "react";
+"use client";
+
+import { useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { NUMBERS, SERVICES } from "@/lib/kiosk";
+import InquiryForm from "./InquiryForm";
 
 /**
- * The ivory block: the service index rows, then the pinned full-screen numbers
- * sequence (numerals are photo-filled via background-clip:text). The rows are
- * a scannable index; the full breakdown with photographs and inquiry buttons
- * is the /services page.
+ * The ivory block: the services accordion, then the pinned full-screen numbers
+ * sequence (numerals are photo-filled via background-clip:text).
+ *
+ * Each service is an index row that opens to its description and an inquiry
+ * button. One is open at a time and the first starts open, so the section
+ * never reads as a list of closed doors.
  */
 export default function Ivory() {
+  const [open, setOpen] = useState(0);
+  // Which service the inquiry dialog was opened from, so it can preselect it.
+  const [inquiry, setInquiry] = useState<string | null>(null);
+
   return (
     <div className="ivory">
       <section id="services">
@@ -32,14 +41,42 @@ export default function Ivory() {
           </div>
         </div>
 
-        {SERVICES.map((s) => (
-          <div className="s-row" key={s.idx}>
-            <span className="s-idx">{s.idx}</span>
-            <h3>{s.title}</h3>
-            <p>{s.body}</p>
-            <span className="s-arm">{s.arm}</span>
-          </div>
-        ))}
+        {SERVICES.map((s, i) => {
+          const isOpen = open === i;
+          return (
+            <div className={`s-item${isOpen ? " open" : ""}`} key={s.idx}>
+              <button
+                className="s-row"
+                aria-expanded={isOpen}
+                aria-controls={`svc-${i}`}
+                onClick={() => setOpen(isOpen ? -1 : i)}
+              >
+                <span className="s-idx">{s.idx}</span>
+                <h3>{s.title}</h3>
+                <span className="s-arm">{s.arm}</span>
+                <span className="s-plus" aria-hidden>
+                  +
+                </span>
+              </button>
+
+              <div className="s-body" id={`svc-${i}`} role="region">
+                <div className="s-body-in">
+                  <div className="s-drawer">
+                    <p>{s.body}</p>
+                    <button
+                      type="button"
+                      className="s-inq"
+                      onClick={() => setInquiry(s.title)}
+                      tabIndex={isOpen ? 0 : -1}
+                    >
+                      Inquiry <span aria-hidden>↗</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </section>
 
       <section id="numbers">
@@ -81,6 +118,9 @@ export default function Ivory() {
         </div>
       </section>
 
+      {inquiry ? (
+        <InquiryForm preselect={inquiry} onClose={() => setInquiry(null)} />
+      ) : null}
     </div>
   );
 }

@@ -23,9 +23,11 @@ then extended over the following week with a films page, a services page, an inq
 
 ### Which surface is which
 - Homepage `#services` = an **accordion of index rows**: `.s-item` = a `.s-row` header (index,
-  title, Online / Ground badge, rotating plus) over a `.s-body` drawer holding the description and
-  a solid Inquiry pill. One open at a time, the first open on load. It went cards → plain rows →
-  this in a single day, so do not "simplify" it back to either.
+  title, Inquiry pill, rotating plus) over a `.s-body` drawer holding the description. One open at
+  a time, the first open on load. It went cards → plain rows → accordion → badges-out in a single
+  day, so do not "simplify" it back. The row header is deliberately not a `<button>`: `.s-toggle`
+  is a layer behind the contents, which pass clicks through to it, so the pill can live inside the
+  row without nesting buttons.
 - `/services` = the **full breakdown**, one `.sv3-sec` section per service.
 - Homepage `#clients` = the **marquee wall**. `/clients` = the **honeycomb**.
 

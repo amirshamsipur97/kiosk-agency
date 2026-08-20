@@ -38,6 +38,11 @@ then extended over the following week with a films page, a services page, an inq
   live link on its own. The covers are a first pass; swap the `img` line to change one.
 - The **KIOSK wordmark** in `Chrome.tsx` is a `Link` to `/` on every page. It used to be an anchor
   to `#hero`, which only exists on the homepage.
+- The **favicon** is the Figma mark (`6miTfu9ktj3SlAFCmSSER8`, node `1033:29420`): black rounded
+  square, orange `#E84504` square centred, radius `174/1240` of the canvas, square `540/1240`.
+  It is redrawn in code rather than exported, because the Figma export fills the rounded corners
+  with the frame's grey. Files: `src/app/favicon.ico` (16/32/48/64), `src/app/icon.png`,
+  `src/app/apple-icon.png` (opaque, iOS masks it itself), `public/icons/icon-{192,512}.png`.
 
 ### Caught up 2026-08-20
 Everything is committed, deployed and pushed. `origin/main == HEAD == 283eaec`, 16 commits

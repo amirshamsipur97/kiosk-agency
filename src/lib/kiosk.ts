@@ -26,7 +26,6 @@ export const MENU = [
   { label: "Films", href: "/films", n: "03" },
   { label: "On the ground", href: "/on-the-ground", n: "04" },
   { label: "Contact", href: "#contact", n: "05" },
-  // The only long-form content on the site today; still the pre-2026 design.
   { label: "Blog", href: "/insights", n: "06" },
 ];
 
@@ -188,6 +187,60 @@ export const SERVICES = [
     title: "Social media management",
     body: "We manage your social media from planning and publishing to audience engagement, keeping your brand active, consistent, and connected.",
     img: "/k/feed/movenpick-1.jpg",
+  },
+];
+
+/**
+ * What the blog covers. There are no articles written yet, so the page shows
+ * the subjects rather than pretending to a back catalogue. Add entries with a
+ * `href` and a `date` as pieces are published and the card becomes a link.
+ */
+export const JOURNAL: {
+  idx: string;
+  title: string;
+  body: string;
+  href?: string;
+  date?: string;
+}[] = [
+  {
+    idx: "/01",
+    title: "SEO insights",
+    body: "Tactics and frameworks for organic growth that keeps compounding after the campaign stops.",
+  },
+  {
+    idx: "/02",
+    title: "Marketing strategies",
+    body: "Performance playbooks aimed at qualified lead generation rather than impressions.",
+  },
+  {
+    idx: "/03",
+    title: "Automation guides",
+    body: "Removing manual work from a sales floor so a small team can carry a large pipeline.",
+  },
+  {
+    idx: "/04",
+    title: "Real estate marketing",
+    body: "Lead systems built for property businesses, from first click to a booked viewing.",
+  },
+  {
+    idx: "/05",
+    title: "Website optimisation",
+    body: "Turning the traffic you already pay for into measurable conversions.",
+  },
+  {
+    idx: "/06",
+    title: "Growth systems",
+    body: "Connecting every channel into one engine instead of a set of disconnected efforts.",
+  },
+  {
+    idx: "/07",
+    title: "Case study breakdowns",
+    body: "What worked on a real account, why it worked, and how to repeat it.",
+  },
+  {
+    idx: "/08",
+    title: "Industry trends",
+    body: "Where digital growth in the GCC is heading, and what it changes for a marketing budget.",
   },
 ];
 

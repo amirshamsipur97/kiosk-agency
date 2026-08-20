@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { GROUND } from "@/lib/kiosk";
 
 /** Draggable build gallery, then the campaign proof statement. */
@@ -14,10 +15,16 @@ export default function Ground() {
               </span>
             </span>
           </h2>
-          <p>
-            Exhibitions, activations and retail — 1000+ builds designed,
-            fabricated and installed by our own team.
-          </p>
+          <div className="g-head-r">
+            <p>
+              Retail stands, aisle takeovers, illuminated signage and exhibition
+              halls. Drawn, fabricated and installed by our own team, over 1000
+              builds so far.
+            </p>
+            <Link className="sv-all" href="/on-the-ground">
+              See the archive ↗
+            </Link>
+          </div>
         </div>
 
         <div className="strip duo" id="strip">

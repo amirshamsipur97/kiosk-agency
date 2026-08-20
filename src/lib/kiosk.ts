@@ -24,7 +24,7 @@ export const MENU = [
   { label: "Services", href: "/services", n: "01" },
   { label: "Clients", href: "/clients", n: "02" },
   { label: "Films", href: "/films", n: "03" },
-  { label: "On the ground", href: "#ground", n: "04" },
+  { label: "On the ground", href: "/on-the-ground", n: "04" },
   { label: "Contact", href: "#contact", n: "05" },
   // The only long-form content on the site today; still the pre-2026 design.
   { label: "Blog", href: "/insights", n: "06" },
@@ -222,22 +222,133 @@ export const NUMBERS = [
   },
 ];
 
+/**
+ * The landing page strip. Twelve builds picked to span every kind of work,
+ * landscape framing first because the strip crops to 16/11.
+ */
 export const GROUND = [
-  { img: "/k/num-02-builds.jpg", caption: "Expo booth — gaming" },
-  { img: "/k/build-02-exhibition-arena.jpg", caption: "Exhibition arena build" },
+  { img: "/k/ground/event-expo-hall.jpg", caption: "Expo hall, backlit stands" },
+  { img: "/k/ground/stand-aisle-long.jpg", caption: "Aisle takeover, hypermarket" },
   {
-    img: "/k/build-03-mall-display-automotive.jpg",
-    caption: "Mall display — automotive",
+    img: "/k/ground/signage-police-academy.jpg",
+    caption: "Academy signage, illuminated",
   },
-  { img: "/k/build-04-ticketing-units.jpg", caption: "Ticketing & event units" },
-  { img: "/k/num-01-years.jpg", caption: "Stage & conference set" },
-  { img: "/k/num-03-events.jpg", caption: "Outdoor festival build" },
-  { img: "/k/num-04-leads.jpg", caption: "Outdoor brand activation" },
-  { img: "/k/build-08-instore-retail.jpg", caption: "In-store retail activation" },
-  { img: "/k/build-09-posm-pallet.jpg", caption: "POSM — pallet display" },
-  { img: "/k/build-10-retail-pillars.jpg", caption: "Custom retail pillars" },
-  { img: "/k/build-11-office-branding.jpg", caption: "Office & venue branding" },
-  { img: "/k/build-12-giveaways.jpg", caption: "Promotional giveaways" },
+  {
+    img: "/k/ground/event-ballroom-ceiling.jpg",
+    caption: "Ballroom ceiling installation",
+  },
+  {
+    img: "/k/ground/production-awards-wall.jpg",
+    caption: "Awards backdrop and stage set",
+  },
+  { img: "/k/ground/school-display-wall.jpg", caption: "School display wall" },
+  {
+    img: "/k/ground/event-expo-stands.jpg",
+    caption: "Expo stands, built and installed",
+  },
+  {
+    img: "/k/ground/production-facade-emblem.jpg",
+    caption: "Facade emblem and lettering",
+  },
+  { img: "/k/ground/stand-aisle-snacks.jpg", caption: "Snack aisle branding" },
+  { img: "/k/ground/signage-barracks.jpg", caption: "Channel letters, lit" },
+  { img: "/k/ground/signage-the-corner.jpg", caption: "Storefront sign" },
+  {
+    img: "/k/ground/event-exhibition-floor.jpg",
+    caption: "Exhibition floor, multiple stands",
+  },
+];
+
+/**
+ * The /on-the-ground page, in the categories the archive is filed under.
+ * Captions describe what is in the frame; location labels are the client's own.
+ */
+export const GROUND_SETS = [
+  {
+    slug: "stands",
+    label: "Retail stands",
+    body: "Gondola ends, full aisle takeovers and illuminated display bays. Measured in store, built in our workshop and installed overnight so the doors open on time.",
+    shots: [
+      { img: "/k/ground/stand-aisle-long.jpg", caption: "Full aisle, overhead band" },
+      { img: "/k/ground/stand-aisle-snacks.jpg", caption: "Snack aisle, printed header" },
+      { img: "/k/ground/stand-aisle-floor.jpg", caption: "Floor graphic and shelf strips" },
+      { img: "/k/ground/stand-aisle-petcare.jpg", caption: "Pet care aisle takeover" },
+      { img: "/k/ground/stand-aisle-bakery.jpg", caption: "Bakery aisle, branded gondola" },
+      { img: "/k/ground/stand-union-barsha-3.jpg", caption: "Union Barsha, lit display bay" },
+      { img: "/k/ground/stand-union-barsha-2.jpg", caption: "Union Barsha, tea and beverages" },
+      { img: "/k/ground/stand-union-barsha-4.jpg", caption: "Union Barsha, end bay" },
+      { img: "/k/ground/stand-union-barsha-1.jpg", caption: "Union Barsha, aisle front" },
+      { img: "/k/ground/stand-union-hamriya-1.jpg", caption: "Union Hamriya, display bay" },
+      { img: "/k/ground/stand-union-hamriya-2.jpg", caption: "Union Hamriya, shelf units" },
+      { img: "/k/ground/stand-union-jumeirah-1.jpg", caption: "Union Jumeirah, display bay" },
+      { img: "/k/ground/stand-union-jumeirah-2.jpg", caption: "Union Jumeirah, aisle run" },
+      { img: "/k/ground/stand-sharjah-qurain-1.jpg", caption: "Sharjah Qurain, lit bay" },
+      { img: "/k/ground/stand-sharjah-qurain-2.jpg", caption: "Sharjah Qurain, beauty unit" },
+      { img: "/k/ground/stand-sharjah-halwan.jpg", caption: "Sharjah Halwan, lit bay" },
+      { img: "/k/ground/stand-lulu-khalidiya-3.jpg", caption: "Lulu Khalidiya, aisle takeover" },
+      { img: "/k/ground/stand-lulu-khalidiya-1.jpg", caption: "Lulu Khalidiya, floor graphic" },
+      { img: "/k/ground/stand-lulu-khalidiya-2.jpg", caption: "Lulu Khalidiya, aisle run" },
+      { img: "/k/ground/stand-lulu-qusais-1.jpg", caption: "Lulu Qusais, aisle takeover" },
+      { img: "/k/ground/stand-lulu-qusais-2.jpg", caption: "Lulu Qusais, floor graphic" },
+      { img: "/k/ground/stand-lulu-wahda-1.jpg", caption: "Lulu Wahda, aisle takeover" },
+    ],
+  },
+  {
+    slug: "events",
+    label: "Events & exhibitions",
+    body: "Expo halls, conventions and awards nights. Stand, stage, ceiling and floor delivered as one package, on a schedule that does not move.",
+    shots: [
+      { img: "/k/ground/event-expo-hall.jpg", caption: "Expo hall, backlit stands" },
+      { img: "/k/ground/event-exhibition-floor.jpg", caption: "Exhibition floor, multiple stands" },
+      { img: "/k/ground/event-expo-stands.jpg", caption: "Expo stands, built and installed" },
+      { img: "/k/ground/event-ballroom-ceiling.jpg", caption: "Ballroom ceiling installation" },
+      { img: "/k/ground/event-awards-plinths.jpg", caption: "Awards night, plinth layout" },
+      { img: "/k/ground/event-floral-letters.jpg", caption: "Convention letters, floral finish" },
+    ],
+  },
+  {
+    slug: "production",
+    label: "Production",
+    body: "Facade emblems, landmark letters and printed walls. Cut, welded, printed and finished in house, then installed by the same team that made them.",
+    shots: [
+      { img: "/k/ground/production-awards-wall.jpg", caption: "Awards backdrop, printed wall" },
+      { img: "/k/ground/production-facade-emblem.jpg", caption: "Facade emblem and lettering" },
+      { img: "/k/ground/production-landmark-letters.jpg", caption: "Landmark letters, waterfront" },
+      { img: "/k/ground/production-facade-cladding.jpg", caption: "Facade cladding and identification" },
+    ],
+  },
+  {
+    slug: "signage",
+    label: "Signage",
+    body: "Channel letters, backlit lettering and building identification. Designed to read as well at night as at noon.",
+    shots: [
+      { img: "/k/ground/signage-police-academy.jpg", caption: "Dubai Police Academy, illuminated" },
+      { img: "/k/ground/signage-barracks.jpg", caption: "Channel letters, Arabic and English" },
+      { img: "/k/ground/signage-the-corner.jpg", caption: "Storefront sign, The Corner" },
+    ],
+  },
+  {
+    slug: "schools",
+    label: "Schools & institutions",
+    body: "Corridor displays, honour walls and framed installations. Quiet work that has to survive a thousand pupils a day.",
+    shots: [
+      { img: "/k/ground/school-display-wall.jpg", caption: "Curved display wall, corridor" },
+      { img: "/k/ground/school-honour-wall.jpg", caption: "Honour wall, framed panels" },
+      { img: "/k/ground/school-stair-gallery.jpg", caption: "Stair gallery, framed prints" },
+    ],
+  },
+  {
+    slug: "3d",
+    label: "3D & visualisation",
+    body: "Every build starts as a drawing. We render the structure before anything is cut, so what is signed off is what gets installed.",
+    shots: [
+      { img: "/k/ground/render-canopy.jpg", caption: "Canopy structure, concept render" },
+      { img: "/k/ground/render-majlis.jpg", caption: "Majlis interior, concept render" },
+      { img: "/k/ground/render-admin-building.jpg", caption: "Admin building, concept render" },
+      { img: "/k/ground/render-villa.jpg", caption: "Villa facade, concept render" },
+      { img: "/k/ground/render-compound.jpg", caption: "Compound elevation, concept render" },
+    ],
+  },
 ];
 
 /**

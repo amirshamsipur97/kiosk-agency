@@ -122,6 +122,12 @@ Two things in it are deliberate and should not be "fixed": plain wheel does NOT 
 scrolls the page, so the section never hijacks scrolling) and `.aw-stage` uses `touch-action:
 pan-y` so a finger can never get trapped on mobile.
 
+**The film reel is magnetic, not linear.** `magnetise()` in `FilmStage.tsx` bends the scroll
+position so each film holds still in the frame for its `dwell` before travelling. `CHARACTER` also
+gives each film its own drift and swell. Keep the reel and the rail driven off the SAME magnetised
+`t`, or the magnifier illusion breaks. `.fs-shot` must keep `overflow: hidden`, otherwise the drift
+bleeds into the next film.
+
 **A per-item y stagger reads as a layout bug.** The blog cards animated in with
 `gsap.from(".jr-card", {y, stagger})`; caught mid-reveal every card sat at a different height and
 it looked like the grid was broken. Reveal a grid as one piece, or fade without translating, when
@@ -192,7 +198,10 @@ screenshots.
    need storing.
 6. `Start a project` CTAs still deep-link to WhatsApp; they could open `InquiryForm` instead.
 7. Images are the reference build's compressed copies (460×818). Ask the client for originals.
-8. Film→thumbnail mapping is a guess except `Zunairah`; swap in `src/lib/kiosk.ts`.
+8. Film covers are now picked off the feed library, but only `Zunairah` and `The Podcasts` are
+   confirmed against the actual film. `Discover Muscat`, `The Arc` and `Old → New Oman` are a
+   judgement call; swap the `img` line in `FILMS`. The page shows five covers because there are
+   five films: more covers needs more films, with their links.
 9. The brand tally claims **40** while the wall names **31** — get 9 more names or drop the number.
 10. Vercel's build machine failed once fetching Space Grotesk from Google (`module-not-found`). A
     retry fixed it; if it recurs, self-host the fonts.

@@ -30,6 +30,8 @@ then extended over the following week with a films page, a services page, an inq
   row without nesting buttons.
 - `/services` = the **full breakdown**, one `.sv3-sec` section per service.
 - Homepage `#clients` = the **marquee wall**. `/clients` = the **honeycomb**.
+- Homepage `#ground` = a **12 shot strip** (landscape crops only, the strip is 16/11).
+  `/on-the-ground` = the **full archive**, 43 shots in six categories from `GROUND_SETS`.
 
 ### Caught up 2026-08-14
 The August backlog is committed (`3da3ebb`) and deployed. Verified against production HTML:
@@ -148,6 +150,9 @@ screenshots.
 - `~/Movies/TapRecord/Video/REC-20260811035105.mp4` — the recording that defined the `/films`
   magnifier behaviour.
 - Originals for the client imagery: `~/Desktop/kiosk/pic/` (32 × 1080×1920 PNG).
+- Originals for the build archive: `~/Desktop/kiosk case/` (43 photographs, filed in the six
+  categories the `/on-the-ground` page uses). A larger unsorted library sits at
+  `~/Desktop/kiosk/hand/Pictures/` (389 files) if more shots are ever wanted.
 
 ---
 

@@ -33,8 +33,11 @@ then extended over the following week with a films page, a services page, an inq
 - Homepage `#ground` = a **12 shot strip** (landscape crops only, the strip is 16/11).
   `/on-the-ground` = the **full archive**, 43 shots in six categories from `GROUND_SETS`.
 - `/insights` = the **blog**, rebuilt in the 2026 design. The legacy page at that path is deleted.
-  No articles are published; the page indexes the eight subjects from `JOURNAL`. Give an entry an
-  `href` and a `date` and its card turns into a live link on its own.
+  No articles are published; the page indexes the eight subjects from `JOURNAL`, each with a cover
+  drawn from `public/k/ground/`. Give an entry an `href` and a `date` and its card turns into a
+  live link on its own. The covers are a first pass; swap the `img` line to change one.
+- The **KIOSK wordmark** in `Chrome.tsx` is a `Link` to `/` on every page. It used to be an anchor
+  to `#hero`, which only exists on the homepage.
 
 ### Caught up 2026-08-20
 Everything is committed, deployed and pushed. `origin/main == HEAD == 283eaec`, 16 commits
@@ -113,6 +116,11 @@ honeycomb was briefly on the homepage and was moved out; do not merge them back 
 Two things in it are deliberate and should not be "fixed": plain wheel does NOT zoom (it still
 scrolls the page, so the section never hijacks scrolling) and `.aw-stage` uses `touch-action:
 pan-y` so a finger can never get trapped on mobile.
+
+**A per-item y stagger reads as a layout bug.** The blog cards animated in with
+`gsap.from(".jr-card", {y, stagger})`; caught mid-reveal every card sat at a different height and
+it looked like the grid was broken. Reveal a grid as one piece, or fade without translating, when
+the items sit side by side.
 
 **Tailwind preflight leaks into `.ksite`.** Two fixes must stay: the 10px custom scrollbar is scoped
 to `body:has(.legacy-shell)` (it was stealing layout width) and `.ksite button { line-height: normal }`.

@@ -16,8 +16,8 @@ then extended over the following week with a films page, a services page, an inq
 
 | | |
 |---|---|
-| Live | **https://www.kioskoman.com** — last deploy `kiosk-agency-10wrj61t3` (the build archive) |
-| Git HEAD | `283eaec` — committed, tree clean, **pushed to `origin/main`** |
+| Live | **https://www.kioskoman.com** — last deploy `kiosk-agency-hcyoot4bl` (the blog) |
+| Git HEAD | committed, tree clean, **pushed to `origin/main`** |
 | Deploy | `vercel --prod --yes` from the repo root. Auto-aliases `www.kioskoman.com`. **`git push` does NOT deploy.** |
 | Local | `npm run dev` → the project's `.claude/launch.json` puts it on **:3010** |
 
@@ -32,6 +32,9 @@ then extended over the following week with a films page, a services page, an inq
 - Homepage `#clients` = the **marquee wall**. `/clients` = the **honeycomb**.
 - Homepage `#ground` = a **12 shot strip** (landscape crops only, the strip is 16/11).
   `/on-the-ground` = the **full archive**, 43 shots in six categories from `GROUND_SETS`.
+- `/insights` = the **blog**, rebuilt in the 2026 design. The legacy page at that path is deleted.
+  No articles are published; the page indexes the eight subjects from `JOURNAL`. Give an entry an
+  `href` and a `date` and its card turns into a live link on its own.
 
 ### Caught up 2026-08-20
 Everything is committed, deployed and pushed. `origin/main == HEAD == 283eaec`, 16 commits
@@ -168,7 +171,10 @@ screenshots.
    still has only `idx / title / body / img`, so each section is one paragraph. If the sections
    should carry more depth, get real copy from the client rather than inventing capability lists.
 3. A sticky index rail down `/services` was offered and NOT built, to keep the change purely visual.
-4. `/insights` (linked from the menu as **Blog**) is still the old dark design.
+4. The blog has **no articles**. `/insights` indexes the subjects and says so honestly. Writing the
+   first pieces is a content job, not a build one. Everything else still on the pre-2026 design:
+   `/about`, `/case-studies`, `/contact`, `/industries`, `/packages`, `/process`,
+   `/services/[slug]`, and **`not-found.tsx`** (the 404, which ships in every page's payload).
 5. The inquiry form has **no backend** — it composes a WhatsApp message. Wire an endpoint if leads
    need storing.
 6. `Start a project` CTAs still deep-link to WhatsApp; they could open `InquiryForm` instead.

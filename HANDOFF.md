@@ -16,8 +16,8 @@ then extended over the following week with a films page, a services page, an inq
 
 | | |
 |---|---|
-| Live | **https://www.kioskoman.com** — last deploy `kiosk-agency-anyxkztoe` (services rebuilt section by section) |
-| Git HEAD | `9bbfacd` — everything committed, tree clean |
+| Live | **https://www.kioskoman.com** — last deploy `kiosk-agency-10wrj61t3` (the build archive) |
+| Git HEAD | `283eaec` — committed, tree clean, **pushed to `origin/main`** |
 | Deploy | `vercel --prod --yes` from the repo root. Auto-aliases `www.kioskoman.com`. **`git push` does NOT deploy.** |
 | Local | `npm run dev` → the project's `.claude/launch.json` puts it on **:3010** |
 
@@ -33,11 +33,13 @@ then extended over the following week with a films page, a services page, an inq
 - Homepage `#ground` = a **12 shot strip** (landscape crops only, the strip is 16/11).
   `/on-the-ground` = the **full archive**, 43 shots in six categories from `GROUND_SETS`.
 
-### Caught up 2026-08-14
-The August backlog is committed (`3da3ebb`) and deployed. Verified against production HTML:
-the homepage services are the `.s-card` grid (0 old `.s-row`), and `/services` is 8 `.sv3-sec`
-sections (0 `.sv2-item`). `origin/main` is still behind — push when the Mapbox false positive
-is dealt with.
+### Caught up 2026-08-20
+Everything is committed, deployed and pushed. `origin/main == HEAD == 283eaec`, 16 commits
+landed in one push and GitHub's push protection did NOT fire: the Mapbox `pk.` blob it used to
+flag has been on the remote since `6eca335`, so no new secret is introduced. Verified against
+production HTML each time: homepage services are 8 `.s-item` accordions, `/services` is 8
+`.sv3-sec` sections, `/clients` is 31 `.aw-cell`, `/on-the-ground` is 43 `.gs-shot` in 6
+categories.
 
 ---
 
@@ -158,7 +160,10 @@ screenshots.
 
 ## 7. Open items
 
-1. **Push to GitHub.** Local is committed but `origin/main` is stale (see the Mapbox item below).
+1. Two captions on `/on-the-ground` need the client's word: the source folder `Stand/IBM` holds
+   supermarket aisles rather than anything to do with IBM, so those five are captioned generically,
+   and the folder `Dubai police` mixes the Academy sign with two unrelated ones, so the category is
+   presented as **Signage**.
 2. `/services` is now a section per service (`.sv3-*`), no accordion anywhere. The services data
    still has only `idx / title / body / img`, so each section is one paragraph. If the sections
    should carry more depth, get real copy from the client rather than inventing capability lists.
@@ -172,9 +177,11 @@ screenshots.
 9. The brand tally claims **40** while the wall names **31** — get 9 more names or drop the number.
 10. Vercel's build machine failed once fetching Space Grotesk from Google (`module-not-found`). A
     retry fixed it; if it recurs, self-host the fonts.
-11. GitHub push protection flags the Mapbox **`pk.`** token in `src/components/dock/MapModal.tsx:7`
-    (publishable, URL-restricted, false positive). Allow it again or move it to
-    `NEXT_PUBLIC_MAPBOX_TOKEN`.
+11. The Mapbox **`pk.`** token sits in `src/components/dock/MapModal.tsx:7` on a **public** repo.
+    It is publishable by design and URL-restricted to kioskoman.com, and it no longer blocks
+    pushes (the blob has been on the remote since `6eca335`). Moving it to
+    `NEXT_PUBLIC_MAPBOX_TOKEN` would be tidier but changes nothing about its exposure, since the
+    history already carries it.
 
 ---
 

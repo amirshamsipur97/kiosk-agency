@@ -80,7 +80,7 @@ export const FILMS = [
     meta: "Sustainability film",
     href: "https://youtu.be/mqQrEnULK14",
     cursor: "Watch",
-    img: "/k/feed/oxy-national-day.jpg",
+    img: "/k/feed/mk-properties-3.jpg",
   },
   {
     idx: "/04",
@@ -88,7 +88,7 @@ export const FILMS = [
     meta: "Brand storytelling",
     href: "https://youtu.be/bm-v8OEZeV4",
     cursor: "Watch",
-    img: "/k/feed/mall-of-oman.jpg",
+    img: "/k/feed/oxy-national-day.jpg",
   },
   {
     idx: "/05",

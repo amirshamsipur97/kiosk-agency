@@ -1780,12 +1780,15 @@ body:has(.ksite) {
   flex: none;
   width: 100%;
   height: 100%;
+  /* the image drifts inside its own cell, so it must be clipped to it */
+  overflow: hidden;
 }
 .ksite .fs-shot img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  will-change: transform;
 }
 /* caption bar pinned inside the frame */
 .ksite .fs-bar {

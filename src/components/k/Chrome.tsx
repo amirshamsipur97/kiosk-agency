@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import gsap from "gsap";
 import { CONTACT, MENU } from "@/lib/kiosk";
 
@@ -161,9 +162,10 @@ export default function Chrome() {
       </div>
 
       <nav>
-        <a className="logo" href="#hero">
+        {/* Home from every page, not an anchor that only exists on one */}
+        <Link className="logo" href="/" aria-label="KIOSK, back to home">
           Kiosk<i>.</i>
-        </a>
+        </Link>
         <div className="n-right">
           <button
             className="menu-btn"

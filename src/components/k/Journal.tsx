@@ -51,13 +51,13 @@ export default function Journal() {
         repeat: -1,
         ease: "sine.inOut",
       });
-      gsap.from(".jr-card", {
-        y: 30,
+      /* The grid fades as one piece. A per-card y stagger read as cards
+         sitting at different heights, so the cards themselves never move. */
+      gsap.from(".jr-grid", {
         opacity: 0,
-        duration: 0.7,
-        stagger: 0.05,
-        ease: "power3.out",
-        scrollTrigger: { trigger: ".jr-grid", start: "top 82%", once: true },
+        duration: 0.8,
+        ease: "power2.out",
+        scrollTrigger: { trigger: ".jr-grid", start: "top 86%", once: true },
       });
     }, root);
 
@@ -100,25 +100,41 @@ export default function Journal() {
 
       <div className="jr-inner">
         <div className="jr-grid">
-          {JOURNAL.map((j) =>
-            j.href ? (
+          {JOURNAL.map((j) => {
+            const inner = (
+              <>
+                <div className="jr-cover">
+                  {/* decorative: the heading beneath already names the subject */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={j.img} alt="" loading="lazy" />
+                  <i className="jr-idx">{j.idx}</i>
+                </div>
+                <div className="jr-body">
+                  <h2>{j.title}</h2>
+                  <p>{j.body}</p>
+                  <span className="jr-foot">
+                    {j.href ? (
+                      <>
+                        {j.date} <i aria-hidden>↗</i>
+                      </>
+                    ) : (
+                      "In progress"
+                    )}
+                  </span>
+                </div>
+              </>
+            );
+
+            return j.href ? (
               <Link className="jr-card is-live" href={j.href} key={j.idx}>
-                <span className="jr-idx">{j.idx}</span>
-                <h2>{j.title}</h2>
-                <p>{j.body}</p>
-                <span className="jr-foot">
-                  {j.date} <i aria-hidden>↗</i>
-                </span>
+                {inner}
               </Link>
             ) : (
               <article className="jr-card" key={j.idx}>
-                <span className="jr-idx">{j.idx}</span>
-                <h2>{j.title}</h2>
-                <p>{j.body}</p>
-                <span className="jr-foot">In progress</span>
+                {inner}
               </article>
-            ),
-          )}
+            );
+          })}
         </div>
 
         <div className="jr-cta">

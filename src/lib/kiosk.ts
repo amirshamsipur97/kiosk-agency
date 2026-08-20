@@ -199,47 +199,56 @@ export const JOURNAL: {
   idx: string;
   title: string;
   body: string;
+  img: string;
   href?: string;
   date?: string;
 }[] = [
   {
     idx: "/01",
     title: "SEO insights",
+    img: "/k/ground/stand-aisle-long.jpg",
     body: "Tactics and frameworks for organic growth that keeps compounding after the campaign stops.",
   },
   {
     idx: "/02",
     title: "Marketing strategies",
+    img: "/k/ground/event-expo-hall.jpg",
     body: "Performance playbooks aimed at qualified lead generation rather than impressions.",
   },
   {
     idx: "/03",
     title: "Automation guides",
+    img: "/k/ground/stand-aisle-snacks.jpg",
     body: "Removing manual work from a sales floor so a small team can carry a large pipeline.",
   },
   {
     idx: "/04",
     title: "Real estate marketing",
+    img: "/k/ground/render-compound.jpg",
     body: "Lead systems built for property businesses, from first click to a booked viewing.",
   },
   {
     idx: "/05",
     title: "Website optimisation",
+    img: "/k/ground/render-admin-building.jpg",
     body: "Turning the traffic you already pay for into measurable conversions.",
   },
   {
     idx: "/06",
     title: "Growth systems",
+    img: "/k/ground/event-exhibition-floor.jpg",
     body: "Connecting every channel into one engine instead of a set of disconnected efforts.",
   },
   {
     idx: "/07",
     title: "Case study breakdowns",
+    img: "/k/ground/production-awards-wall.jpg",
     body: "What worked on a real account, why it worked, and how to repeat it.",
   },
   {
     idx: "/08",
     title: "Industry trends",
+    img: "/k/ground/event-ballroom-ceiling.jpg",
     body: "Where digital growth in the GCC is heading, and what it changes for a marketing budget.",
   },
 ];

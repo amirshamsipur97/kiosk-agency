@@ -2401,6 +2401,8 @@ body:has(.ksite) {
 .ksite .jr-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* every row the same height, so no card is taller than its neighbour */
+  grid-auto-rows: 1fr;
   gap: clamp(12px, 1.4vw, 20px);
   border-top: 1px solid var(--line);
   padding-top: clamp(26px, 3vw, 42px);
@@ -2409,57 +2411,71 @@ body:has(.ksite) {
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: clamp(210px, 20vw, 280px);
-  padding: clamp(20px, 2vw, 30px);
+  /* stretch to the row, so all four line up top and bottom */
+  height: 100%;
   background: var(--ivory);
   overflow: hidden;
   transition: background 0.4s, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
-/* accent bar climbing the left edge, the same gesture the service cards used */
-.ksite .jr-card::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--accent);
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform 0.45s cubic-bezier(0.6, 0.05, 0.2, 1);
-}
-.ksite .jr-card:hover::before {
-  transform: scaleY(1);
-}
 .ksite .jr-card:hover {
   transform: translateY(-3px);
 }
+/* the cover, a fixed ratio so every card starts at the same height */
+.ksite .jr-cover {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: rgba(17, 17, 16, 0.06);
+}
+.ksite .jr-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ksite .jr-card:hover .jr-cover img {
+  transform: scale(1.05);
+}
 .ksite .jr-idx {
-  font-size: 0.7rem;
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-style: normal;
+  font-size: 0.64rem;
+  font-weight: 700;
   letter-spacing: 0.2em;
-  color: var(--muted);
+  color: #fff;
+  background: var(--accent);
+  padding: 7px 12px;
+}
+.ksite .jr-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: clamp(18px, 1.8vw, 26px);
 }
 .ksite .jr-card h2 {
-  margin-top: 14px;
   font-family: var(--font-anton), sans-serif;
   text-transform: uppercase;
-  font-size: clamp(1.05rem, 1.6vw, 1.45rem);
-  line-height: 1.06;
+  font-size: clamp(1.05rem, 1.6vw, 1.4rem);
+  line-height: 1.08;
   transition: color 0.3s;
 }
 .ksite .jr-card:hover h2 {
   color: var(--accent);
 }
 .ksite .jr-card p {
-  margin-top: 12px;
-  font-size: 0.9rem;
+  margin-top: 10px;
+  font-size: 0.88rem;
   line-height: 1.5;
   color: #565349;
 }
 .ksite .jr-foot {
   margin-top: auto;
-  padding-top: clamp(16px, 2vw, 24px);
-  font-size: 0.64rem;
+  padding-top: clamp(14px, 1.6vw, 20px);
+  font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;

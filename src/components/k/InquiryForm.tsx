@@ -2,6 +2,11 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { CONTACT, SERVICES } from "@/lib/kiosk";
+import {
+  leadCaptureReady,
+  submitLead,
+  submitLeadInBackground,
+} from "@/lib/leads";
 
 type Props = {
   /** Title of the service the visitor opened the form from, if any. */
@@ -10,9 +15,12 @@ type Props = {
 };
 
 /**
- * Inquiry dialog. There is no backend on this site, so a completed form is
- * composed into a message and handed to WhatsApp — or to email as a fallback.
- * Nothing is stored or sent anywhere else.
+ * Inquiry dialog. A completed form is recorded in the lead sheet, and the
+ * visitor can hand the same details to WhatsApp or to email as well.
+ *
+ * Every path is survivable: if the sheet is not configured, or the request
+ * fails, WhatsApp and email still work and the visitor is told plainly, so an
+ * inquiry is never quietly lost.
  */
 export default function InquiryForm({ preselect, onClose }: Props) {
   const [name, setName] = useState("");
@@ -20,6 +28,10 @@ export default function InquiryForm({ preselect, onClose }: Props) {
   const [email, setEmail] = useState("");
   const [scope, setScope] = useState<string[]>(preselect ? [preselect] : []);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
+  /* A field no human ever sees. Anything in it came from a bot. */
+  const [trap, setTrap] = useState("");
   const panelRef = useRef<HTMLDivElement>(null);
   const firstRef = useRef<HTMLInputElement>(null);
   const uid = useId();
@@ -67,8 +79,38 @@ export default function InquiryForm({ preselect, onClose }: Props) {
     return true;
   };
 
+  const lead = () => ({
+    name: name.trim(),
+    phone: phone.trim(),
+    email: email.trim(),
+    scope,
+    form: "inquiry",
+    company_website: trap,
+  });
+
+  /** Record the inquiry and stay in the dialog to confirm it. */
+  const submit = async () => {
+    if (!validate() || busy) return;
+    setBusy(true);
+    const ok = await submitLead(lead());
+    setBusy(false);
+    if (ok) {
+      setSent(true);
+      return;
+    }
+    setError(
+      "That did not go through. Please send it on WhatsApp or by email instead.",
+    );
+  };
+
+  /**
+   * Record it and hand the visitor to WhatsApp. The send is deliberately not
+   * awaited: window.open has to stay inside the click or the popup blocker
+   * eats it, and keepalive lets the request finish on its own.
+   */
   const send = () => {
     if (!validate()) return;
+    submitLeadInBackground(lead());
     open(
       `https://api.whatsapp.com/send?phone=${CONTACT.phoneIntl}&text=${encodeURIComponent(message())}`,
       "_blank",
@@ -78,6 +120,7 @@ export default function InquiryForm({ preselect, onClose }: Props) {
 
   const mail = () => {
     if (!validate()) return;
+    submitLeadInBackground(lead());
     location.href =
       `mailto:${CONTACT.email}?subject=` +
       encodeURIComponent("Inquiry — Kiosk Agency") +
@@ -100,6 +143,31 @@ export default function InquiryForm({ preselect, onClose }: Props) {
           ×
         </button>
 
+        {sent ? (
+          <div className="iq-done" role="status">
+            <h3 className="display">
+              Thank you, <i>{name.trim().split(" ")[0]}</i>
+            </h3>
+            <p>
+              Your inquiry is with us. We reply within a day, usually sooner.
+              If it is urgent, WhatsApp is the fastest way to reach the studio.
+            </p>
+            <div className="iq-actions">
+              <a
+                className="iq-send"
+                href={`https://api.whatsapp.com/send?phone=${CONTACT.phoneIntl}&text=${encodeURIComponent(message())}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Message us on WhatsApp
+              </a>
+              <button type="button" className="iq-mail" onClick={onClose}>
+                close
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
         <div className="iq-head">
           <h3 className="display" id={`${uid}-t`}>
             Start an <i>inquiry</i>
@@ -157,6 +225,20 @@ export default function InquiryForm({ preselect, onClose }: Props) {
           </label>
         </div>
 
+        {/* Not display:none — some bots skip hidden fields but not
+            off-screen ones. Hidden from people and from screen readers. */}
+        <div className="iq-trap" aria-hidden>
+          <label>
+            Company website
+            <input
+              tabIndex={-1}
+              autoComplete="off"
+              value={trap}
+              onChange={(e) => setTrap(e.target.value)}
+            />
+          </label>
+        </div>
+
         {error ? (
           <p className="iq-error" role="alert">
             {error}
@@ -164,13 +246,29 @@ export default function InquiryForm({ preselect, onClose }: Props) {
         ) : null}
 
         <div className="iq-actions">
-          <button type="button" className="iq-send" onClick={send}>
-            Send via WhatsApp
+          {leadCaptureReady ? (
+            <button
+              type="button"
+              className="iq-send"
+              onClick={submit}
+              disabled={busy}
+            >
+              {busy ? "Sending…" : "Send inquiry"}
+            </button>
+          ) : null}
+          <button
+            type="button"
+            className={leadCaptureReady ? "iq-alt" : "iq-send"}
+            onClick={send}
+          >
+            {leadCaptureReady ? "or send on WhatsApp" : "Send via WhatsApp"}
           </button>
           <button type="button" className="iq-mail" onClick={mail}>
             or email us
           </button>
         </div>
+          </>
+        )}
       </div>
     </div>
   );

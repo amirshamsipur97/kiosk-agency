@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { CONTACT, SERVICES } from "@/lib/kiosk";
+import { waFor } from "@/lib/cms";
+import { useContent } from "./Content";
 import {
   leadCaptureReady,
   submitLead,
@@ -23,6 +24,7 @@ type Props = {
  * inquiry is never quietly lost.
  */
 export default function InquiryForm({ preselect, onClose }: Props) {
+  const { services, settings } = useContent();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -111,18 +113,14 @@ export default function InquiryForm({ preselect, onClose }: Props) {
   const send = () => {
     if (!validate()) return;
     submitLeadInBackground(lead());
-    open(
-      `https://api.whatsapp.com/send?phone=${CONTACT.phoneIntl}&text=${encodeURIComponent(message())}`,
-      "_blank",
-      "noopener",
-    );
+    open(waFor(settings, message()), "_blank", "noopener");
   };
 
   const mail = () => {
     if (!validate()) return;
     submitLeadInBackground(lead());
     location.href =
-      `mailto:${CONTACT.email}?subject=` +
+      `mailto:${settings.email}?subject=` +
       encodeURIComponent("Inquiry — Kiosk Agency") +
       "&body=" +
       encodeURIComponent(message());
@@ -149,13 +147,13 @@ export default function InquiryForm({ preselect, onClose }: Props) {
               Thank you, <i>{name.trim().split(" ")[0]}</i>
             </h3>
             <p>
-              Your inquiry is with us. We reply within a day, usually sooner.
-              If it is urgent, WhatsApp is the fastest way to reach the studio.
+              Your inquiry is with us. We reply within a day, usually sooner. If
+              it is urgent, WhatsApp is the fastest way to reach the studio.
             </p>
             <div className="iq-actions">
               <a
                 className="iq-send"
-                href={`https://api.whatsapp.com/send?phone=${CONTACT.phoneIntl}&text=${encodeURIComponent(message())}`}
+                href={waFor(settings, message())}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -168,105 +166,107 @@ export default function InquiryForm({ preselect, onClose }: Props) {
           </div>
         ) : (
           <>
-        <div className="iq-head">
-          <h3 className="display" id={`${uid}-t`}>
-            Start an <i>inquiry</i>
-          </h3>
-          <p>Tell us who you are and what you need. We reply within a day.</p>
-        </div>
+            <div className="iq-head">
+              <h3 className="display" id={`${uid}-t`}>
+                Start an <i>inquiry</i>
+              </h3>
+              <p>
+                Tell us who you are and what you need. We reply within a day.
+              </p>
+            </div>
 
-        <div className="iq-scope">
-          <span className="iq-label">Scope of work</span>
-          <div className="iq-chips">
-            {SERVICES.map((s) => (
+            <div className="iq-scope">
+              <span className="iq-label">Scope of work</span>
+              <div className="iq-chips">
+                {services.map((s) => (
+                  <button
+                    type="button"
+                    key={s.title}
+                    className={`iq-chip${scope.includes(s.title) ? " on" : ""}`}
+                    aria-pressed={scope.includes(s.title)}
+                    onClick={() => toggle(s.title)}
+                  >
+                    {s.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="iq-fields">
+              <label className="iq-field">
+                <span className="iq-label">Name</span>
+                <input
+                  ref={firstRef}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your name"
+                  autoComplete="name"
+                />
+              </label>
+              <label className="iq-field">
+                <span className="iq-label">Phone</span>
+                <input
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+968 ····"
+                  inputMode="tel"
+                  autoComplete="tel"
+                />
+              </label>
+              <label className="iq-field">
+                <span className="iq-label">Email</span>
+                <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  inputMode="email"
+                  autoComplete="email"
+                />
+              </label>
+            </div>
+
+            {/* Not display:none — some bots skip hidden fields but not
+            off-screen ones. Hidden from people and from screen readers. */}
+            <div className="iq-trap" aria-hidden>
+              <label>
+                Company website
+                <input
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={trap}
+                  onChange={(e) => setTrap(e.target.value)}
+                />
+              </label>
+            </div>
+
+            {error ? (
+              <p className="iq-error" role="alert">
+                {error}
+              </p>
+            ) : null}
+
+            <div className="iq-actions">
+              {leadCaptureReady ? (
+                <button
+                  type="button"
+                  className="iq-send"
+                  onClick={submit}
+                  disabled={busy}
+                >
+                  {busy ? "Sending…" : "Send inquiry"}
+                </button>
+              ) : null}
               <button
                 type="button"
-                key={s.idx}
-                className={`iq-chip${scope.includes(s.title) ? " on" : ""}`}
-                aria-pressed={scope.includes(s.title)}
-                onClick={() => toggle(s.title)}
+                className={leadCaptureReady ? "iq-alt" : "iq-send"}
+                onClick={send}
               >
-                {s.title}
+                {leadCaptureReady ? "or send on WhatsApp" : "Send via WhatsApp"}
               </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="iq-fields">
-          <label className="iq-field">
-            <span className="iq-label">Name</span>
-            <input
-              ref={firstRef}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              autoComplete="name"
-            />
-          </label>
-          <label className="iq-field">
-            <span className="iq-label">Phone</span>
-            <input
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+968 ····"
-              inputMode="tel"
-              autoComplete="tel"
-            />
-          </label>
-          <label className="iq-field">
-            <span className="iq-label">Email</span>
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@company.com"
-              inputMode="email"
-              autoComplete="email"
-            />
-          </label>
-        </div>
-
-        {/* Not display:none — some bots skip hidden fields but not
-            off-screen ones. Hidden from people and from screen readers. */}
-        <div className="iq-trap" aria-hidden>
-          <label>
-            Company website
-            <input
-              tabIndex={-1}
-              autoComplete="off"
-              value={trap}
-              onChange={(e) => setTrap(e.target.value)}
-            />
-          </label>
-        </div>
-
-        {error ? (
-          <p className="iq-error" role="alert">
-            {error}
-          </p>
-        ) : null}
-
-        <div className="iq-actions">
-          {leadCaptureReady ? (
-            <button
-              type="button"
-              className="iq-send"
-              onClick={submit}
-              disabled={busy}
-            >
-              {busy ? "Sending…" : "Send inquiry"}
-            </button>
-          ) : null}
-          <button
-            type="button"
-            className={leadCaptureReady ? "iq-alt" : "iq-send"}
-            onClick={send}
-          >
-            {leadCaptureReady ? "or send on WhatsApp" : "Send via WhatsApp"}
-          </button>
-          <button type="button" className="iq-mail" onClick={mail}>
-            or email us
-          </button>
-        </div>
+              <button type="button" className="iq-mail" onClick={mail}>
+                or email us
+              </button>
+            </div>
           </>
         )}
       </div>

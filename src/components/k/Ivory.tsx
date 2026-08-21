@@ -2,7 +2,9 @@
 
 import { useState, type CSSProperties } from "react";
 import Link from "next/link";
-import { NUMBERS, SERVICES } from "@/lib/kiosk";
+import { NUMBERS } from "@/lib/kiosk";
+import { idxOf } from "@/lib/cms";
+import { useContent } from "./Content";
 import InquiryForm from "./InquiryForm";
 
 /**
@@ -14,6 +16,7 @@ import InquiryForm from "./InquiryForm";
  * never reads as a list of closed doors.
  */
 export default function Ivory() {
+  const { services } = useContent();
   const [open, setOpen] = useState(0);
   // Which service the inquiry dialog was opened from, so it can preselect it.
   const [inquiry, setInquiry] = useState<string | null>(null);
@@ -41,10 +44,10 @@ export default function Ivory() {
           </div>
         </div>
 
-        {SERVICES.map((s, i) => {
+        {services.map((s, i) => {
           const isOpen = open === i;
           return (
-            <div className={`s-item${isOpen ? " open" : ""}`} key={s.idx}>
+            <div className={`s-item${isOpen ? " open" : ""}`} key={s.title}>
               {/* The toggle is a layer behind the row, so the inquiry pill can
                   sit inside the row without nesting one button in another. */}
               <div className="s-row">
@@ -55,7 +58,7 @@ export default function Ivory() {
                   aria-label={`${s.title} details`}
                   onClick={() => setOpen(isOpen ? -1 : i)}
                 />
-                <span className="s-idx">{s.idx}</span>
+                <span className="s-idx">{idxOf(i)}</span>
                 <h3>{s.title}</h3>
                 <button
                   type="button"

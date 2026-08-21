@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { wa } from "@/lib/kiosk";
+import { waFor } from "@/lib/cms";
+import { useContent } from "./Content";
 
 /**
  * Floating "Start a project" pill. It stays pinned to the bottom-right for the
@@ -9,6 +10,7 @@ import { wa } from "@/lib/kiosk";
  * more than one tap away.
  */
 export default function StickyCta() {
+  const { settings } = useContent();
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export default function StickyCta() {
     <div className="fab-wrap">
       <a
         className={`fab${shown ? " in" : ""}`}
-        href={wa("Hi Kiosk — I'd like to start a project.")}
+        href={waFor(settings, "Hi Kiosk — I'd like to start a project.")}
         target="_blank"
         rel="noopener"
         tabIndex={shown ? 0 : -1}

@@ -1,15 +1,27 @@
-import { CONTACT, wa } from "@/lib/kiosk";
+"use client";
 
-const LINKS = [
-  { small: "WhatsApp", big: CONTACT.phone, href: wa() },
-  { small: "Phone", big: CONTACT.phone2, href: `tel:+${CONTACT.phone2Intl}` },
-  { small: "Email", big: CONTACT.email, href: `mailto:${CONTACT.email}` },
-  { small: "Instagram", big: CONTACT.instagramHandle, href: CONTACT.instagram },
-  { small: "Studio", big: CONTACT.studio, href: CONTACT.maps },
-];
+import { waFor } from "@/lib/cms";
+import { useContent } from "./Content";
 
-/** Closing CTA. */
+/** Closing CTA. Every number, address and handle comes from the panel. */
 export default function Contact() {
+  const { settings } = useContent();
+  const links = [
+    { small: "WhatsApp", big: settings.phone, href: waFor(settings) },
+    {
+      small: "Phone",
+      big: settings.phone2,
+      href: `tel:+${settings.phone2_intl}`,
+    },
+    { small: "Email", big: settings.email, href: `mailto:${settings.email}` },
+    {
+      small: "Instagram",
+      big: settings.instagram_handle,
+      href: settings.instagram,
+    },
+    { small: "Studio", big: settings.studio, href: settings.maps },
+  ].filter((l) => l.big);
+
   return (
     <section id="contact">
       <div className="c-inner">
@@ -32,7 +44,7 @@ export default function Contact() {
           <a
             className="cta magnetic"
             id="waCta"
-            href={wa("Hi Kiosk — I'd like to start a project.")}
+            href={waFor(settings, "Hi Kiosk — I'd like to start a project.")}
             target="_blank"
             rel="noopener"
           >
@@ -42,7 +54,7 @@ export default function Contact() {
       </div>
 
       <div className="c-links">
-        {LINKS.map((l) => (
+        {links.map((l) => (
           <a
             className="c-link"
             key={l.small}

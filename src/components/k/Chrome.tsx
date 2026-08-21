@@ -3,13 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
-import { CONTACT, MENU } from "@/lib/kiosk";
+import { MENU } from "@/lib/kiosk";
+import { useContent } from "./Content";
 
 /**
  * Site furniture: film grain, custom cursor, intro loader, fixed nav with the
  * live Muscat clock, and the full-screen overlay menu.
  */
 export default function Chrome() {
+  const { settings } = useContent();
   const [open, setOpen] = useState(false);
   const loaderRef = useRef<HTMLDivElement>(null);
   const pctRef = useRef<HTMLDivElement>(null);
@@ -110,9 +112,9 @@ export default function Chrome() {
 
     // Delegated so rows rendered later still light the cursor up.
     const over = (e: PointerEvent) => {
-      const el = (e.target as HTMLElement)?.closest?.("a,button") as
-        | HTMLElement
-        | null;
+      const el = (e.target as HTMLElement)?.closest?.(
+        "a,button",
+      ) as HTMLElement | null;
       if (!el) return;
       const text = el.dataset.cursor;
       if (text) {
@@ -193,9 +195,9 @@ export default function Chrome() {
         ))}
         <div className="m-foot">
           <span>Muscat, Oman</span>
-          <span>{CONTACT.email}</span>
+          <span>{settings.email}</span>
           <span>
-            {CONTACT.phone} · {CONTACT.phone2}
+            {settings.phone} · {settings.phone2}
           </span>
         </div>
       </div>

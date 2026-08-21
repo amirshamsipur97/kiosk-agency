@@ -4,12 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { JOURNAL, wa } from "@/lib/kiosk";
+import { idxOf, waFor } from "@/lib/cms";
+import { useContent } from "./Content";
 import InquiryForm from "./InquiryForm";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const LIVE = JOURNAL.filter((j) => j.href).length;
 
 /**
  * The blog. Nothing is published yet, so the page is honest about it: it shows
@@ -20,6 +19,8 @@ const LIVE = JOURNAL.filter((j) => j.href).length;
  * Motion is additive only, so the index renders complete without the script.
  */
 export default function Journal() {
+  const { posts, settings } = useContent();
+  const live = posts.filter((j) => j.href).length;
   const [inquiry, setInquiry] = useState(false);
   const rootRef = useRef<HTMLElement>(null);
 
@@ -90,8 +91,8 @@ export default function Journal() {
               accounts we run, not from theory.
             </p>
             <p className="jr-state">
-              {LIVE
-                ? `${LIVE} pieces published`
+              {live
+                ? `${live} pieces published`
                 : "The first pieces are being written. Ask for one and we will send it when it lands."}
             </p>
           </div>
@@ -100,14 +101,14 @@ export default function Journal() {
 
       <div className="jr-inner">
         <div className="jr-grid">
-          {JOURNAL.map((j) => {
+          {posts.map((j, i) => {
             const inner = (
               <>
                 <div className="jr-cover">
                   {/* decorative: the heading beneath already names the subject */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={j.img} alt="" loading="lazy" />
-                  <i className="jr-idx">{j.idx}</i>
+                  <i className="jr-idx">{idxOf(i)}</i>
                 </div>
                 <div className="jr-body">
                   <h2>{j.title}</h2>
@@ -126,11 +127,11 @@ export default function Journal() {
             );
 
             return j.href ? (
-              <Link className="jr-card is-live" href={j.href} key={j.idx}>
+              <Link className="jr-card is-live" href={j.href} key={j.title}>
                 {inner}
               </Link>
             ) : (
-              <article className="jr-card" key={j.idx}>
+              <article className="jr-card" key={j.title}>
                 {inner}
               </article>
             );
@@ -142,8 +143,8 @@ export default function Journal() {
             Want one of these <i>applied</i> to your business?
           </h2>
           <p>
-            You do not have to wait for the article. Tell us what you are
-            trying to grow and we will walk you through it.
+            You do not have to wait for the article. Tell us what you are trying
+            to grow and we will walk you through it.
           </p>
           <div className="jr-actions">
             <button
@@ -155,7 +156,10 @@ export default function Journal() {
             </button>
             <a
               className="jr-alt"
-              href={wa("Hello KIOSK, I have a question about growth systems.")}
+              href={waFor(
+                settings,
+                "Hello KIOSK, I have a question about growth systems.",
+              )}
               target="_blank"
               rel="noreferrer"
             >

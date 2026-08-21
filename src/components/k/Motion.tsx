@@ -50,7 +50,12 @@ export default function Motion() {
           });
           gsap
             .timeline({ onComplete: () => img.remove() })
-            .to(img, { scale: 1, opacity: 1, duration: 0.35, ease: "power3.out" })
+            .to(img, {
+              scale: 1,
+              opacity: 1,
+              duration: 0.35,
+              ease: "power3.out",
+            })
             .to(
               img,
               {
@@ -115,14 +120,19 @@ export default function Motion() {
           scrollTrigger: { trigger: el, start: "top 90%" },
         });
       });
-      document.querySelectorAll<HTMLElement>(".split-l > span").forEach((el) => {
-        gsap.from(el, {
-          yPercent: 112,
-          duration: 1.1,
-          ease: "power4.out",
-          scrollTrigger: { trigger: el.closest("h2") || el, start: "top 85%" },
+      document
+        .querySelectorAll<HTMLElement>(".split-l > span")
+        .forEach((el) => {
+          gsap.from(el, {
+            yPercent: 112,
+            duration: 1.1,
+            ease: "power4.out",
+            scrollTrigger: {
+              trigger: el.closest("h2") || el,
+              start: "top 85%",
+            },
+          });
         });
-      });
       gsap.utils.toArray<HTMLElement>(".s-card").forEach((el) => {
         gsap.from(el, {
           opacity: 0,
@@ -156,8 +166,7 @@ export default function Motion() {
         // loading and the row is still growing.
         const loopWidth = () => {
           const mid = el.children[el.children.length / 2] as
-            | HTMLElement
-            | undefined;
+            HTMLElement | undefined;
           return mid ? mid.offsetLeft : el.scrollWidth / 2;
         };
         const render = () => {
@@ -265,7 +274,10 @@ export default function Motion() {
               if (!sec) return;
               const total = sec.offsetHeight - innerHeight;
               const frac = (Number(b.dataset.i) + 0.5) / slides.length;
-              scrollTo({ top: sec.offsetTop + total * frac, behavior: "smooth" });
+              scrollTo({
+                top: sec.offsetTop + total * frac,
+                behavior: "smooth",
+              });
             };
             b.addEventListener("click", click);
             off.push(() => b.removeEventListener("click", click));
@@ -393,9 +405,9 @@ export default function Motion() {
         /* sector chip trails the cursor */
         if (chip) {
           const track = (e: PointerEvent) => {
-            const t = (e.target as HTMLElement)?.closest?.(".cw-name") as
-              | HTMLElement
-              | null;
+            const t = (e.target as HTMLElement)?.closest?.(
+              ".cw-name",
+            ) as HTMLElement | null;
             if (t) {
               chip.textContent = t.dataset.sec || "";
               chip.style.left = e.clientX + "px";
@@ -419,8 +431,10 @@ export default function Motion() {
 
         /* hovering a row nearly stops it so a name can be read */
         rowEls.forEach((row, i) => {
-          const slow = () => gsap.to(tweens[i], { timeScale: 0.15, duration: 0.5 });
-          const resume = () => gsap.to(tweens[i], { timeScale: 1, duration: 0.8 });
+          const slow = () =>
+            gsap.to(tweens[i], { timeScale: 0.15, duration: 0.5 });
+          const resume = () =>
+            gsap.to(tweens[i], { timeScale: 1, duration: 0.8 });
           row.addEventListener("pointerenter", slow);
           row.addEventListener("pointerleave", resume);
           off.push(() => {
@@ -460,7 +474,12 @@ export default function Motion() {
               });
             };
             const leave = () =>
-              gsap.to(m, { x: 0, y: 0, duration: 0.6, ease: "elastic.out(1,.4)" });
+              gsap.to(m, {
+                x: 0,
+                y: 0,
+                duration: 0.6,
+                ease: "elastic.out(1,.4)",
+              });
             m.addEventListener("mousemove", move);
             m.addEventListener("mouseleave", leave);
             off.push(() => {

@@ -31,7 +31,12 @@ export default function Ground() {
           {GROUND.map((g) => (
             <figure className="st-item" key={g.caption}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={g.img} alt={g.caption} loading="lazy" draggable={false} />
+              <img
+                src={g.img}
+                alt={g.caption}
+                loading="lazy"
+                draggable={false}
+              />
               <figcaption>{g.caption}</figcaption>
             </figure>
           ))}

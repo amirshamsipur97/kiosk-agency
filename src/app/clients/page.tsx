@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "../kiosk.css";
 import Chrome from "@/components/k/Chrome";
+import { ContentProvider } from "@/components/k/Content";
 import ClientHive from "@/components/k/ClientHive";
 import Contact from "@/components/k/Contact";
 import StickyCta from "@/components/k/StickyCta";
@@ -28,15 +29,17 @@ const JSON_LD = {
 export default function ClientsPage() {
   return (
     <div className="ksite">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
-      />
-      <Chrome />
-      <ClientHive />
-      <Contact />
-      <StickyCta />
-      <Motion />
+      <ContentProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+        />
+        <Chrome />
+        <ClientHive />
+        <Contact />
+        <StickyCta />
+        <Motion />
+      </ContentProvider>
     </div>
   );
 }

@@ -4,12 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { FILMS } from "@/lib/kiosk";
+import { idxOf, type Film } from "@/lib/cms";
+import { useContent } from "./Content";
 
 gsap.registerPlugin(ScrollTrigger);
-
-/** The side rail repeats the films so the edges of the screen are never bare. */
-const RAIL = [...FILMS, ...FILMS, ...FILMS];
 
 /**
  * Each film gets its own feel as it passes through the frame, so the reel
@@ -24,11 +22,13 @@ const RAIL = [...FILMS, ...FILMS, ...FILMS];
  * Derived from the index rather than random, so the behaviour is the same on
  * every visit and identical between server and client.
  */
-const CHARACTER = FILMS.map((_, i) => ({
-  dwell: 0.13 + 0.03 * (i % 3),
-  drift: 0.05 + 0.035 * ((i + 1) % 3),
-  pop: 0.03 + 0.025 * (i % 2),
-}));
+function characterOf(i: number) {
+  return {
+    dwell: 0.13 + 0.03 * (i % 3),
+    drift: 0.05 + 0.035 * ((i + 1) % 3),
+    pop: 0.03 + 0.025 * (i % 2),
+  };
+}
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
@@ -40,8 +40,8 @@ function magnetise(t: number, last: number) {
   if (last <= 0) return 0;
   const seg = Math.min(last - 1e-6, Math.max(0, t));
   const i = Math.floor(seg);
+  const { dwell } = characterOf(i);
   const f = seg - i;
-  const { dwell } = CHARACTER[i] ?? CHARACTER[0];
   const u = clamp01((f - dwell) / (1 - 2 * dwell));
   // smoothstep, so it leaves and arrives without a hard edge
   return i + u * u * (3 - 2 * u);
@@ -57,6 +57,7 @@ function magnetise(t: number, last: number) {
  * becomes a native scroll-snap reel, which is what a thumb expects.
  */
 export default function FilmStage() {
+  const { films } = useContent();
   const [active, setActive] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const reelRef = useRef<HTMLDivElement>(null);
@@ -70,7 +71,7 @@ export default function FilmStage() {
     const viewport = rail?.parentElement;
     if (!section || !reel || !rail || !viewport) return;
 
-    const last = FILMS.length - 1;
+    const last = films.length - 1;
 
     if (
       matchMedia("(max-width: 760px)").matches ||
@@ -92,7 +93,7 @@ export default function FilmStage() {
       const st = ScrollTrigger.create({
         trigger: section,
         start: "top top",
-        end: "+=" + FILMS.length * 70 + "%",
+        end: "+=" + films.length * 70 + "%",
         pin: ".fs-sticky",
         scrub: 0.5,
         onUpdate: (self) => {
@@ -113,7 +114,7 @@ export default function FilmStage() {
           for (let n = 0; n < shots.length; n++) {
             const d = t - n; // 0 when this film is dead centre
             const near = Math.max(0, 1 - Math.abs(d));
-            const c = CHARACTER[n];
+            const c = characterOf(n);
             gsap.set(shots[n], {
               x: d * step * c.drift,
               scale: 1 + c.pop * near,
@@ -131,10 +132,11 @@ export default function FilmStage() {
             // whole pixels and the error compounds over every film. Rects are
             // sub-pixel and both are translated equally, so the delta is exact.
             const a = first.getBoundingClientRect();
-            const pitch = (kids[1] as HTMLElement).getBoundingClientRect().left - a.left;
+            const pitch =
+              (kids[1] as HTMLElement).getBoundingClientRect().left - a.left;
             // Centre on the middle copy so neither edge ever runs out of film.
             const centreLeft =
-              first.offsetLeft + (FILMS.length + t) * pitch + a.width / 2;
+              first.offsetLeft + (films.length + t) * pitch + a.width / 2;
             gsap.set(rail, { x: viewport.clientWidth / 2 - centreLeft });
           }
 
@@ -150,9 +152,13 @@ export default function FilmStage() {
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [films]);
 
-  const film = FILMS[active];
+  const film: Film | undefined = films[Math.min(active, films.length - 1)];
+  if (!film) return null;
+
+  /* Three copies so the rail never runs dry at either edge. */
+  const rail = [...films, ...films, ...films];
 
   return (
     <section id="filmstage" ref={sectionRef}>
@@ -176,8 +182,8 @@ export default function FilmStage() {
         <div className="fs-viewport">
           {/* thumbnails drifting behind the frame */}
           <div className="fs-rail" ref={railRef} aria-hidden>
-            {RAIL.map((f, i) => (
-              <span className="fs-thumb" key={`${f.idx}-${i}`}>
+            {rail.map((f, i) => (
+              <span className="fs-thumb" key={`${f.title}-${i}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={f.img} alt="" loading="lazy" />
               </span>
@@ -187,8 +193,8 @@ export default function FilmStage() {
           {/* the fixed frame the films pass through */}
           <div className="fs-frame">
             <div className="fs-reel" ref={reelRef}>
-              {FILMS.map((f) => (
-                <div className="fs-shot" key={f.idx}>
+              {films.map((f) => (
+                <div className="fs-shot" key={f.title}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={f.img} alt={f.title} />
                 </div>
@@ -203,7 +209,7 @@ export default function FilmStage() {
               data-cursor={film.cursor}
             >
               <span className="fs-t">
-                <i>{film.idx}</i> {film.title}
+                <i>{idxOf(films.indexOf(film))}</i> {film.title}
               </span>
               <span className="fs-go">{film.cursor}</span>
             </a>
@@ -213,7 +219,7 @@ export default function FilmStage() {
         <div className="fs-foot">
           <span className="fs-count">
             {String(active + 1).padStart(2, "0")}
-            <i>/{String(FILMS.length).padStart(2, "0")}</i>
+            <i>/{String(films.length).padStart(2, "0")}</i>
           </span>
           <span className="fs-hint">
             <span className="fs-chev" aria-hidden>

@@ -166,7 +166,8 @@ export default function ClientHive() {
       p.y = e.clientY;
 
       if (pts.size >= 2) {
-        if (pinchStart) tz = clamp(pinchZ * (spread() / pinchStart), MIN_Z, MAX_Z);
+        if (pinchStart)
+          tz = clamp(pinchZ * (spread() / pinchStart), MIN_Z, MAX_Z);
         clampPan();
         return;
       }
@@ -205,7 +206,8 @@ export default function ClientHive() {
     };
 
     const zoom = (e: Event) => {
-      const dir = (e.currentTarget as HTMLElement).dataset.zoom === "in" ? 1 : -1;
+      const dir =
+        (e.currentTarget as HTMLElement).dataset.zoom === "in" ? 1 : -1;
       tz = clamp(tz * (dir > 0 ? 1.32 : 1 / 1.32), MIN_Z, MAX_Z);
       clampPan();
     };

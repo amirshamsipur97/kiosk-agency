@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SERVICES } from "@/lib/kiosk";
+import { idxOf } from "@/lib/cms";
+import { useContent } from "./Content";
 import InquiryForm from "./InquiryForm";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -19,6 +20,7 @@ gsap.registerPlugin(ScrollTrigger);
  * never runs every section still renders complete.
  */
 export default function ServiceStage() {
+  const { services } = useContent();
   const [inquiry, setInquiry] = useState<string | null>(null);
   const rootRef = useRef<HTMLElement>(null);
 
@@ -147,15 +149,15 @@ export default function ServiceStage() {
       </header>
 
       <div className="sv3">
-        {SERVICES.map((s, i) => (
+        {services.map((s, i) => (
           <section
             className={`sv3-sec${i % 2 ? " rev alt" : ""}`}
             data-i={i}
-            key={s.idx}
+            key={s.title}
           >
             <span className="sv3-rule" aria-hidden />
             <span className="sv3-num" aria-hidden>
-              {s.idx.replace("/", "")}
+              {String(i + 1).padStart(2, "0")}
             </span>
 
             <div className="sv3-in">
@@ -165,7 +167,7 @@ export default function ServiceStage() {
               </figure>
 
               <div className="sv3-copy">
-                <span className="sv3-idx">{s.idx}</span>
+                <span className="sv3-idx">{idxOf(i)}</span>
                 <h2 className="sv3-title">{s.title}</h2>
                 <p className="sv3-body">{s.body}</p>
                 <button

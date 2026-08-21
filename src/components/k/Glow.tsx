@@ -160,7 +160,11 @@ export default function Glow({ intensity = 0.17 }: Props) {
         -((e.clientY - r.top) / r.height - 0.5),
       );
       if (uniforms.uPointer.value < 1)
-        gsap.to(uniforms.uPointer, { value: 1, duration: 1.2, overwrite: true });
+        gsap.to(uniforms.uPointer, {
+          value: 1,
+          duration: 1.2,
+          overwrite: true,
+        });
     };
     const onLeave = () =>
       gsap.to(uniforms.uPointer, { value: 0, duration: 1.4, overwrite: true });

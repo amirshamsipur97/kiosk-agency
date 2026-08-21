@@ -132,6 +132,17 @@ const SECTIONS: Section[] = [
   },
 ];
 
+/**
+ * Strip the invisible marks a paste can carry.
+ *
+ * Copying an address out of a chat window, a PDF or a right-to-left document
+ * often brings zero-width and bidi control characters with it. They are never
+ * part of an address or a password, they cannot be seen, and the browser then
+ * refuses the field with a message that does not mention them.
+ */
+const clean = (v: string) =>
+  v.replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, "");
+
 /* ------------------------------------------------------------------- shell */
 
 export default function Studio() {
@@ -163,8 +174,8 @@ export default function Studio() {
     if (!supabase) return;
     setAuthError(null);
     const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+      email: clean(email).trim(),
+      password: clean(password),
     });
     if (error) setAuthError(error.message);
   };
@@ -196,7 +207,7 @@ export default function Studio() {
               type="email"
               value={email}
               autoComplete="username"
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setEmail(clean(e.target.value).trim())}
               required
             />
           </label>
@@ -206,7 +217,7 @@ export default function Studio() {
               type="password"
               value={password}
               autoComplete="current-password"
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setPassword(clean(e.target.value))}
               required
             />
           </label>

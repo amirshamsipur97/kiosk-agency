@@ -20,6 +20,17 @@
   RewriteCond %{HTTP_HOST} ^kioskoman\.com$ [NC]
   RewriteRule ^ https://www.kioskoman.com%{REQUEST_URI} [L,R=301]
 
+  # The pre-2026 pages are gone. Anything Google still holds a link to is sent
+  # to its nearest replacement rather than to a 404, so the ranking carries
+  # over instead of being thrown away.
+  RedirectMatch 301 ^/services/[^/]+/?$        /services
+  RedirectMatch 301 ^/industries(/.*)?$        /
+  RedirectMatch 301 ^/case-studies/?$          /on-the-ground
+  RedirectMatch 301 ^/packages/?$              /services
+  RedirectMatch 301 ^/process/?$               /services
+  RedirectMatch 301 ^/about/?$                 /
+  RedirectMatch 301 ^/contact/?$               /#contact
+
   # /services is a file called services.html. Resolve it without showing the
   # extension, and without touching anything that really exists.
   RewriteCond %{REQUEST_FILENAME} !-d

@@ -1,26 +1,39 @@
-import Button from "@/components/ui/Button";
+import Link from "next/link";
+import "./kiosk.css";
 
+/**
+ * The 404. Worth building properly rather than leaving to the framework:
+ * this component is serialised into every page's payload, so whatever it
+ * imports is carried by the whole site.
+ */
 export default function NotFound() {
   return (
-    <section className="flex min-h-[70vh] items-center justify-center px-6 py-32 text-center">
-      <div>
-        <p className="font-display text-7xl font-semibold text-accent md:text-8xl">
+    <div className="ksite">
+      <section id="nf">
+        <div className="nf-ghost" aria-hidden>
           404
-        </p>
-        <h1 className="mt-4 font-display text-2xl font-semibold md:text-3xl">
-          This page doesn&apos;t exist
-        </h1>
-        <p className="mx-auto mt-3 max-w-md text-mist">
-          The page you&apos;re looking for may have moved. Let&apos;s get you
-          back to building.
-        </p>
-        <div className="mt-8 flex justify-center gap-3">
-          <Button href="/">Back Home</Button>
-          <Button href="/contact" variant="ghost">
-            Contact Us
-          </Button>
         </div>
-      </div>
-    </section>
+        <div className="nf-in">
+          <div className="sec-label">404 — Not here</div>
+          <h1 className="display nf-title">
+            This page has <i>moved on</i>
+          </h1>
+          <p>
+            The address does not exist, or it did and no longer does. The work
+            is all still here, one link away.
+          </p>
+          <div className="nf-links">
+            <Link className="nf-cta" href="/">
+              Back to home
+            </Link>
+            <Link href="/services">Services</Link>
+            <Link href="/clients">Clients</Link>
+            <Link href="/films">Films</Link>
+            <Link href="/on-the-ground">On the ground</Link>
+            <Link href="/insights">Blog</Link>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

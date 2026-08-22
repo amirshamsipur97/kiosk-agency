@@ -12,65 +12,26 @@ const ROW = PITCH * 0.866;
 const MAX_Z = 2.8;
 
 /**
- * How many times the client list is laid out around the centre. The brands
- * repeat, so dragging never reaches an empty edge and the grid is not limited
- * to the length of the list. Nine copies is roughly ten rings of hexagons,
- * far more than fits on any screen at any zoom this page allows.
+ * How far out, in fade radii, a cell is written once and then skipped. Well
+ * past anything the eye can pick out, so nothing pops as it comes back.
  */
-const REPEATS = 9;
-
-/**
- * How far out, in fade radii, a cell is written once and then skipped. Just
- * past the point where its opacity has reached zero.
- */
-const FAR = 1.45;
+const FAR = 2.1;
 
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 
-/** Axial neighbour directions, in ring-walk order. */
-const AX: [number, number][] = [
-  [1, 0],
-  [1, -1],
-  [0, -1],
-  [-1, 0],
-  [-1, 1],
-  [0, 1],
-];
-
-function ringCells(ring: number) {
-  const out: { q: number; r: number }[] = [];
-  let q = AX[4][0] * ring;
-  let r = AX[4][1] * ring;
-  for (let i = 0; i < 6; i++) {
-    for (let j = 0; j < ring; j++) {
-      out.push({ q, r });
-      q += AX[i][0];
-      r += AX[i][1];
-    }
-  }
-  return out;
-}
-
 /**
- * Hex rings out from the centre. A ring that cannot be filled completely is
- * spread evenly around itself rather than left with one bald side.
+ * The grid is one tile repeated forever.
+ *
+ * Rows are offset by half a pitch, which is what makes it read as a honeycomb,
+ * and an even number of rows means the tile joins itself top to bottom as
+ * exactly as it does left to right. Every cell is drawn once and each frame is
+ * placed at whichever copy of itself is nearest the camera, so dragging never
+ * reaches an edge and no second copy is ever needed on screen at once.
  */
-function hexLayout(n: number) {
-  const out = [{ q: 0, r: 0 }];
-  for (let ring = 1; out.length < n; ring++) {
-    const cells = ringCells(ring);
-    const need = n - out.length;
-    if (need >= cells.length) {
-      out.push(...cells);
-    } else {
-      const step = cells.length / need;
-      for (let k = 0; k < need; k++) {
-        out.push(cells[Math.round(k * step) % cells.length]);
-      }
-    }
-  }
-  return out;
-}
+const COLS = 20;
+const ROWS = 14; // even, or the offset rows would not meet
+const TILE_W = COLS * PITCH;
+const TILE_H = ROWS * ROW;
 
 /**
  * The client honeycomb: the Apple Watch home screen, in the site's own
@@ -89,33 +50,43 @@ export default function ClientHive() {
   const capRef = useRef<HTMLDivElement>(null);
 
   const cells = useMemo(() => {
-    // Featured brands first, so the spiral drops them in the middle.
+    // Every slot in the tile, centred on the origin.
+    const slots: { x: number; y: number }[] = [];
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLS; col++) {
+        slots.push({
+          x: (col - (COLS - 1) / 2) * PITCH + (row % 2) * (PITCH / 2),
+          y: (row - (ROWS - 1) / 2) * ROW,
+        });
+      }
+    }
+
+    // Featured brands first, dealt to the slots nearest the middle, so the
+    // page still opens on them. The list then cycles through the rest.
     const ordered = [...CLIENTS].sort(
       (a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0),
     );
-    const total = ordered.length * REPEATS;
-    const coords = hexLayout(total);
-    // The list cycles, so a brand recurs a whole list later: never beside
-    // itself, and the centre still opens on the featured ones.
-    return Array.from({ length: total }, (_, i) => {
-      const c = ordered[i % ordered.length];
-      const { q, r } = coords[i];
+    const byDistance = slots
+      .map((s, i) => ({ i, d: Math.hypot(s.x, s.y) }))
+      .sort((a, b) => a.d - b.d);
+
+    const out = new Array(slots.length);
+    byDistance.forEach(({ i }, rank) => {
+      const c = ordered[rank % ordered.length];
       const longest = Math.max(...c.name.split(" ").map((w) => w.length));
-      return {
+      out[i] = {
         ...c,
-        x: PITCH * (q + r / 2),
-        y: ROW * r,
+        ...slots[i],
         // Anton is condensed, so roughly 236px of room per character line.
         fs: clamp(236 / longest, 12, 34),
       };
     });
+    return out as ((typeof CLIENTS)[number] & {
+      x: number;
+      y: number;
+      fs: number;
+    })[];
   }, []);
-
-  /** Far enough to reach the outermost ring, whatever the list length. */
-  const panLimit = useMemo(
-    () => Math.max(...cells.map((c) => Math.max(Math.abs(c.x), Math.abs(c.y)))),
-    [cells],
-  );
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -130,12 +101,11 @@ export default function ClientHive() {
     let w = stage.clientWidth;
     let h = stage.clientHeight;
     /**
-     * The furthest you may zoom out. Any further and the outermost ring would
-     * come inside the frame and the grid would stop looking endless, so the
-     * floor is whatever keeps it filling the stage on this screen.
+     * The furthest you may zoom out. One tile has to stay at least as big as
+     * the stage: any further out and a cell would have to appear twice on
+     * screen at once, which one element cannot do.
      */
-    const floorZ = () =>
-      Math.max(0.3, (w / 2) / panLimit, (h / 2) / panLimit);
+    const floorZ = () => Math.max(w / TILE_W, h / TILE_H, 0.34);
 
     /**
      * Opening zoom. Sized so the two inner rings sit comfortably in frame
@@ -158,12 +128,6 @@ export default function ClientHive() {
     const parked = new Array(cellEls.length).fill(false);
 
     const smooth = !matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    const clampPan = () => {
-      const m = panLimit * tz + 40;
-      tx = clamp(tx, -m, m);
-      ty = clamp(ty, -m, m);
-    };
 
     /* ---------------------------------------------------- pointer ---- */
     const pts = new Map<number, { x: number; y: number }>();
@@ -200,7 +164,6 @@ export default function ClientHive() {
       if (pts.size >= 2) {
         if (pinchStart)
           tz = clamp(pinchZ * (spread() / pinchStart), floorZ(), MAX_Z);
-        clampPan();
         return;
       }
       travel += Math.abs(dx) + Math.abs(dy);
@@ -208,7 +171,6 @@ export default function ClientHive() {
       ty += dy;
       vx = dx;
       vy = dy;
-      clampPan();
     };
 
     const up = (e: PointerEvent) => {
@@ -224,9 +186,15 @@ export default function ClientHive() {
       if (!cell) return;
       const i = Number((cell as HTMLElement).dataset.i);
       tz = clamp(Math.max(tz, 1.15), floorZ(), MAX_Z);
-      tx = -cells[i].x * tz;
-      ty = -cells[i].y * tz;
-      clampPan();
+      // Steer to the copy of this cell that is actually on screen, not to
+      // the one at its base position, which may be tiles away.
+      const c = cells[i];
+      const camX = -tx / tz;
+      const camY = -ty / tz;
+      const wx = TILE_W * Math.round((camX - c.x) / TILE_W);
+      const wy = TILE_H * Math.round((camY - c.y) / TILE_H);
+      tx = -(c.x + wx) * tz;
+      ty = -(c.y + wy) * tz;
     };
 
     /* Plain wheel still scrolls the page. Only a pinch gesture zooms. */
@@ -234,14 +202,12 @@ export default function ClientHive() {
       if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
       tz = clamp(tz * (1 - e.deltaY * 0.0022), floorZ(), MAX_Z);
-      clampPan();
     };
 
     const zoom = (e: Event) => {
       const dir =
         (e.currentTarget as HTMLElement).dataset.zoom === "in" ? 1 : -1;
       tz = clamp(tz * (dir > 0 ? 1.32 : 1 / 1.32), floorZ(), MAX_Z);
-      clampPan();
     };
 
     stage.addEventListener("pointerdown", down);
@@ -257,7 +223,6 @@ export default function ClientHive() {
       w = stage.clientWidth;
       h = stage.clientHeight;
       if (wasFit) tz = fit();
-      clampPan();
     });
     ro.observe(stage);
 
@@ -277,7 +242,6 @@ export default function ClientHive() {
         vy *= 0.92;
         if (Math.abs(vx) < 0.06) vx = 0;
         if (Math.abs(vy) < 0.06) vy = 0;
-        clampPan();
       }
 
       canvas.style.transform = `translate3d(${cx}px, ${cy}px, 0) scale(${cz})`;
@@ -286,9 +250,18 @@ export default function ClientHive() {
       const R = Math.min(w, h) * 0.52 || 1;
       let near = -1;
       let nearD = Infinity;
+      // Where the camera is, in the grid's own units.
+      const camX = -cx / cz;
+      const camY = -cy / cz;
+
       for (let i = 0; i < cellEls.length; i++) {
-        const sx = cells[i].x * cz + cx;
-        const sy = cells[i].y * cz + cy;
+        // Place this cell at whichever copy of itself is nearest the camera.
+        // That is the whole trick: the grid has no edge because every cell
+        // follows you.
+        const wx = TILE_W * Math.round((camX - cells[i].x) / TILE_W);
+        const wy = TILE_H * Math.round((camY - cells[i].y) / TILE_H);
+        const sx = (cells[i].x + wx) * cz + cx;
+        const sy = (cells[i].y + wy) * cz + cy;
         const d = Math.hypot(sx, sy) / R;
 
         // Beyond the fade there is nothing left to see. Write those cells
@@ -297,7 +270,6 @@ export default function ClientHive() {
         // is worth a style write every frame.
         if (d > FAR) {
           if (!parked[i]) {
-            cellEls[i].style.transform = "translate(-50%, -50%) scale(.54)";
             cellEls[i].style.opacity = "0";
             parked[i] = true;
           }
@@ -305,10 +277,14 @@ export default function ClientHive() {
         }
         parked[i] = false;
 
-        const t = Math.min(d, 1.3);
-        const s = 1 - 0.46 * (t / 1.3);
-        const o = clamp(1 - 1.05 * Math.max(0, t - 0.5), 0.07, 1);
-        cellEls[i].style.transform = `translate(-50%, -50%) scale(${s})`;
+        const t = Math.min(d, 1.4);
+        const s = 1 - 0.34 * (t / 1.4);
+        // Gentler than it was: the point of an endless grid is that you can
+        // read what you are dragging towards, not just what is dead centre.
+        const o = clamp(1 - 0.72 * Math.max(0, t - 0.66), 0.28, 1);
+        // The wrap rides in the transform, so it costs no layout.
+        cellEls[i].style.transform =
+          `translate(-50%, -50%) translate(${wx}px, ${wy}px) scale(${s})`;
         cellEls[i].style.opacity = String(o);
         if (d < nearD) {
           nearD = d;
@@ -344,7 +320,7 @@ export default function ClientHive() {
       stage.removeEventListener("wheel", wheel);
       zoomBtns.forEach((b) => b.removeEventListener("click", zoom));
     };
-  }, [cells, panLimit]);
+  }, [cells]);
 
   return (
     <section id="clienthive">

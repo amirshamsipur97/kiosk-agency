@@ -1322,8 +1322,8 @@ body:has(.ksite) {
   pointer-events: none;
   background: radial-gradient(
     circle at 50% 50%,
-    transparent 76%,
-    var(--bg) 104%
+    transparent 88%,
+    var(--bg) 112%
   );
 }
 .ksite .aw-canvas {

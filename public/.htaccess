@@ -1,0 +1,74 @@
+# kioskoman.com on Hostinger.
+#
+# The site is a static export, so Apache serves it directly. This file does
+# four jobs: clean URLs, one canonical host, a real 404, and caching that
+# actually lets the CDN do its work.
+#
+# It sits in public/ so the build copies it into out/ automatically. Upload
+# the whole of out/ into public_html and this comes with it.
+
+# ---------------------------------------------------------------- rewriting
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Always https. Hostinger issues the certificate; this makes it stick.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # One host, so the same page is never indexed twice.
+  RewriteCond %{HTTP_HOST} ^kioskoman\.com$ [NC]
+  RewriteRule ^ https://www.kioskoman.com%{REQUEST_URI} [L,R=301]
+
+  # /services is a file called services.html. Resolve it without showing the
+  # extension, and without touching anything that really exists.
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME}\.html -f
+  RewriteRule ^(.*)$ $1.html [L]
+
+  # Someone who types /services.html should land on /services, not on a
+  # duplicate of it.
+  RewriteCond %{THE_REQUEST} \s/+(.+)\.html[\s?] [NC]
+  RewriteRule ^ /%1 [L,R=301]
+</IfModule>
+
+ErrorDocument 404 /404.html
+
+# ------------------------------------------------------------------ caching
+<IfModule mod_headers.c>
+  # Everything under /_next/static carries a content hash in its name, so it
+  # can be cached forever. This is where most of the weight is.
+  <FilesMatch "\.(js|css|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Images are not hashed, so cache them for a week and revalidate.
+  <FilesMatch "\.(jpg|jpeg|png|webp|avif|svg|ico)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+
+  # HTML must never be cached hard, or an edit in /studio would appear to do
+  # nothing for whoever already has the page.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+
+  # The panel is a back office. Keep it out of indexes even if a link leaks.
+  <FilesMatch "^studio\.html$">
+    Header set X-Robots-Tag "noindex, nofollow"
+  </FilesMatch>
+
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# --------------------------------------------------------------- compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# ------------------------------------------------------------------ tidiness
+Options -Indexes

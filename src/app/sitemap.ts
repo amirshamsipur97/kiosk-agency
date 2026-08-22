@@ -56,3 +56,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [...top, ...svc, ...ind];
 }
+
+/* Generated at build time, not per request: the site is exported as files. */
+export const dynamic = "force-static";

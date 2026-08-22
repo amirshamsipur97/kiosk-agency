@@ -13,3 +13,6 @@ export default function robots(): MetadataRoute.Robots {
     host: BASE,
   };
 }
+
+/* Generated at build time, not per request: the site is exported as files. */
+export const dynamic = "force-static";

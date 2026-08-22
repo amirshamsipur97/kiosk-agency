@@ -23,3 +23,6 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
   };
 }
+
+/* Generated at build time, not per request: the site is exported as files. */
+export const dynamic = "force-static";

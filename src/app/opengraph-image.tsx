@@ -82,3 +82,6 @@ export default function OgImage() {
     { ...size }
   );
 }
+
+/* Generated at build time, not per request: the site is exported as files. */
+export const dynamic = "force-static";

@@ -9,10 +9,21 @@ const D = 150;
 const PITCH = D * 1.08;
 const ROW = PITCH * 0.866;
 
-const MIN_Z = 0.3;
 const MAX_Z = 2.8;
-/** How far the canvas may be dragged before it is pulled up short. */
-const PAN_LIMIT = 540;
+
+/**
+ * How many times the client list is laid out around the centre. The brands
+ * repeat, so dragging never reaches an empty edge and the grid is not limited
+ * to the length of the list. Nine copies is roughly ten rings of hexagons,
+ * far more than fits on any screen at any zoom this page allows.
+ */
+const REPEATS = 9;
+
+/**
+ * How far out, in fade radii, a cell is written once and then skipped. Just
+ * past the point where its opacity has reached zero.
+ */
+const FAR = 1.45;
 
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 
@@ -82,8 +93,12 @@ export default function ClientHive() {
     const ordered = [...CLIENTS].sort(
       (a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0),
     );
-    const coords = hexLayout(ordered.length);
-    return ordered.map((c, i) => {
+    const total = ordered.length * REPEATS;
+    const coords = hexLayout(total);
+    // The list cycles, so a brand recurs a whole list later: never beside
+    // itself, and the centre still opens on the featured ones.
+    return Array.from({ length: total }, (_, i) => {
+      const c = ordered[i % ordered.length];
       const { q, r } = coords[i];
       const longest = Math.max(...c.name.split(" ").map((w) => w.length));
       return {
@@ -95,6 +110,12 @@ export default function ClientHive() {
       };
     });
   }, []);
+
+  /** Far enough to reach the outermost ring, whatever the list length. */
+  const panLimit = useMemo(
+    () => Math.max(...cells.map((c) => Math.max(Math.abs(c.x), Math.abs(c.y)))),
+    [cells],
+  );
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -109,11 +130,20 @@ export default function ClientHive() {
     let w = stage.clientWidth;
     let h = stage.clientHeight;
     /**
+     * The furthest you may zoom out. Any further and the outermost ring would
+     * come inside the frame and the grid would stop looking endless, so the
+     * floor is whatever keeps it filling the stage on this screen.
+     */
+    const floorZ = () =>
+      Math.max(0.3, (w / 2) / panLimit, (h / 2) / panLimit);
+
+    /**
      * Opening zoom. Sized so the two inner rings sit comfortably in frame
      * rather than so the whole grid fits: fitting everything made the cells
-     * far too small to read. The outer ring is a drag away.
+     * far too small to read.
      */
-    const fit = () => clamp(Math.min(w / 1000, h / 712), 0.68, 1.5);
+    const fit = () =>
+      clamp(Math.min(w / 1000, h / 712), Math.max(0.68, floorZ()), 1.5);
 
     let tx = 0;
     let ty = 0;
@@ -124,11 +154,13 @@ export default function ClientHive() {
     let vx = 0;
     let vy = 0;
     let active = -1;
+    /** Which cells are already sitting at rest off the edge of the fade. */
+    const parked = new Array(cellEls.length).fill(false);
 
     const smooth = !matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const clampPan = () => {
-      const m = PAN_LIMIT * tz + 40;
+      const m = panLimit * tz + 40;
       tx = clamp(tx, -m, m);
       ty = clamp(ty, -m, m);
     };
@@ -167,7 +199,7 @@ export default function ClientHive() {
 
       if (pts.size >= 2) {
         if (pinchStart)
-          tz = clamp(pinchZ * (spread() / pinchStart), MIN_Z, MAX_Z);
+          tz = clamp(pinchZ * (spread() / pinchStart), floorZ(), MAX_Z);
         clampPan();
         return;
       }
@@ -191,7 +223,7 @@ export default function ClientHive() {
       const cell = (e.target as HTMLElement).closest?.(".aw-cell");
       if (!cell) return;
       const i = Number((cell as HTMLElement).dataset.i);
-      tz = clamp(Math.max(tz, 1.15), MIN_Z, MAX_Z);
+      tz = clamp(Math.max(tz, 1.15), floorZ(), MAX_Z);
       tx = -cells[i].x * tz;
       ty = -cells[i].y * tz;
       clampPan();
@@ -201,14 +233,14 @@ export default function ClientHive() {
     const wheel = (e: WheelEvent) => {
       if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
-      tz = clamp(tz * (1 - e.deltaY * 0.0022), MIN_Z, MAX_Z);
+      tz = clamp(tz * (1 - e.deltaY * 0.0022), floorZ(), MAX_Z);
       clampPan();
     };
 
     const zoom = (e: Event) => {
       const dir =
         (e.currentTarget as HTMLElement).dataset.zoom === "in" ? 1 : -1;
-      tz = clamp(tz * (dir > 0 ? 1.32 : 1 / 1.32), MIN_Z, MAX_Z);
+      tz = clamp(tz * (dir > 0 ? 1.32 : 1 / 1.32), floorZ(), MAX_Z);
       clampPan();
     };
 
@@ -258,6 +290,21 @@ export default function ClientHive() {
         const sx = cells[i].x * cz + cx;
         const sy = cells[i].y * cz + cy;
         const d = Math.hypot(sx, sy) / R;
+
+        // Beyond the fade there is nothing left to see. Write those cells
+        // once, then leave them alone: with the list repeated there are
+        // several hundred of them and only the neighbourhood of the centre
+        // is worth a style write every frame.
+        if (d > FAR) {
+          if (!parked[i]) {
+            cellEls[i].style.transform = "translate(-50%, -50%) scale(.54)";
+            cellEls[i].style.opacity = "0";
+            parked[i] = true;
+          }
+          continue;
+        }
+        parked[i] = false;
+
         const t = Math.min(d, 1.3);
         const s = 1 - 0.46 * (t / 1.3);
         const o = clamp(1 - 1.05 * Math.max(0, t - 0.5), 0.07, 1);
@@ -297,7 +344,7 @@ export default function ClientHive() {
       stage.removeEventListener("wheel", wheel);
       zoomBtns.forEach((b) => b.removeEventListener("click", zoom));
     };
-  }, [cells]);
+  }, [cells, panLimit]);
 
   return (
     <section id="clienthive">
@@ -333,7 +380,7 @@ export default function ClientHive() {
             {cells.map((c, i) => (
               <div
                 className={`aw-cell${c.featured ? " feat" : ""}`}
-                key={c.name}
+                key={i}
                 data-i={i}
                 style={{
                   left: `${c.x}px`,
